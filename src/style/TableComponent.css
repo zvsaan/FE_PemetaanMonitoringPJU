@@ -1,0 +1,20 @@
+/* TableComponent.css */
+.ant-table {
+  font-size: 16px;
+}
+
+.ant-table-thead > tr > th {
+  background-color: #009879;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+}
+
+.ant-table-tbody > tr > td {
+  text-align: center;
+}
+
+.ant-tag {
+  font-size: 14px;
+  padding: 4px 8px;
+}

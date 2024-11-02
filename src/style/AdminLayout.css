@@ -1,0 +1,99 @@
+/* Admin Navbar */
+.admin-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    padding: 10px;
+    color: white;
+    position: fixed;
+    width: calc(100% - 250px); /* Lebar navbar akan disesuaikan agar tidak menumpuk sidebar */
+    top: 0;
+    left: 250px; /* Navbar berada di samping sidebar */
+    z-index: 1000; /* Pastikan navbar tetap di atas konten */
+  }
+  
+  .navbar-brand {
+    font-size: 1.5rem;
+  }
+  
+  .navbar-toggle {
+    display: none;
+    cursor: pointer;
+  }
+  
+  .navbar-toggle-icon {
+    font-size: 2rem;
+  }
+  
+  /* Admin Sidebar */
+  .admin-sidebar {
+    width: 250px;
+    height: 100vh;
+    background-color: #444;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-top: 60px; /* To avoid overlap with navbar */
+    transition: transform 0.3s ease;
+    z-index: 999; /* Sidebar tetap di bawah navbar */
+  }
+  
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .admin-sidebar ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .admin-sidebar ul li {
+    padding: 15px;
+  }
+  
+  .admin-sidebar ul li a {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .admin-sidebar ul li a:hover {
+    background-color: #555;
+  }
+  
+  /* Admin Content */
+  .admin-content {
+    margin-left: 250px; /* Sesuaikan dengan lebar sidebar */
+    padding: 20px;
+    margin-top: 60px; /* To avoid overlap with navbar */
+    min-height: 100vh;
+    background-color: #f4f4f4;
+    transition: margin-left 0.3s ease;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .admin-sidebar {
+      transform: translateX(-100%);
+    }
+  
+    .admin-sidebar.open {
+      transform: translateX(0);
+    }
+  
+    .navbar-toggle {
+      display: block;
+    }
+  
+    .admin-navbar {
+      width: 100%; /* Navbar full-width pada layar kecil */
+      left: 0;
+    }
+  
+    .admin-content {
+      margin-left: 0;
+      margin-top: 60px;
+    }
+  }
+  
