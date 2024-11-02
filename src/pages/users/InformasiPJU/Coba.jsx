@@ -13,7 +13,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-const MapComponent = () => {
+const Coba = () => {
   const [locations, setLocations] = useState([]);
 
   useEffect(() => {
@@ -61,4 +61,4 @@ const MapComponent = () => {
   );
 };
 
-export default MapComponent;
+export default Coba;

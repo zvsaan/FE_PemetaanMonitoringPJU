@@ -10,7 +10,7 @@ import Contact from "../pages/users/Contact/Contact";
 import About from "../pages/users/About/About";
 import NotFoundLayout from "../screens/NotFoundLayout";
 
-import TiangTable from "../pages/users/InformasiPJU/TiangTable";
+import Coba from "../pages/users/InformasiPJU/Coba";
 
 export default function UserRoutes() {
   return (
@@ -23,7 +23,7 @@ export default function UserRoutes() {
       <Route path="/hubungikami" element={<Contact />} />
       <Route path="/tentangkami" element={<About />} />
 
-      <Route path="/coba" element={<TiangTable />} />
+      <Route path="/coba" element={<Coba />} />
       
       <Route path="*" element={<NotFoundLayout />} />
     </Routes>
