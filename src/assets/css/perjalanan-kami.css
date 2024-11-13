@@ -1,0 +1,37 @@
+/* tambahkan di file CSS Anda */
+@keyframes slideDown {
+    0% {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes arrowScroll {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+}
+
+.arrow-line {
+    position: absolute;
+    left: 20%; /* Atur sesuai kebutuhan */
+    top: 0; /* Mulai dari atas */
+    width: 3px;
+    height: 100%;
+    background-color: #FF0000;
+    z-index: -1;
+    animation: arrowScroll 2s linear infinite;
+}
+
+.arrow-line {
+    border: 1px solid red;
+}
