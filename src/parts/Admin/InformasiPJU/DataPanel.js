@@ -45,7 +45,7 @@ const DataPanel = () => {
 
   const updatePanel = async (id, formData) => {
     try {
-      await axios.put(`http://localhost:8000/api/panels/${id}`, formData, {
+      await axios.post(`http://localhost:8000/api/panels/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${authToken}`,
           'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ const DataPanel = () => {
           <thead>
             <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
               <th className="py-3 px-6 text-left">No</th>
-              {/* <th className="py-3 px-6 text-left">Lapisan</th> */}
+              <th className="py-3 px-6 text-left">Lapisan</th>
               <th className="py-3 px-6 text-left">No APP</th>
               <th className="py-3 px-6 text-left">Longitude</th>
               <th className="py-3 px-6 text-left">Latitude</th>
@@ -186,7 +186,7 @@ const DataPanel = () => {
             {currentData.map((item, index) => (
               <tr key={item.id_panel} className="border-b border-gray-200 hover:bg-gray-100">
                 <td className="py-3 px-6 text-left">{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                {/* <td className="py-3 px-6 text-left">{item.lapisan || '-'}</td> */}
+                <td className="py-3 px-6 text-left">{item.lapisan || '-'}</td>
                 <td className="py-3 px-6 text-left">{item.no_app || '-'}</td>
                 <td className="py-3 px-6 text-left">{item.longitude || '-'}</td>
                 <td className="py-3 px-6 text-left">{item.latitude || '-'}</td>

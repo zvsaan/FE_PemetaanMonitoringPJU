@@ -10,6 +10,7 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
     status: data?.status || 'draft',
   });
   const [image, setImage] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,22 +18,51 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
   };
 
   const handleImageChange = (e) => {
-    setImage(e.target.files[0]); // Simpan file gambar yang dipilih
+    setImage(e.target.files[0]);
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.title || formData.title.length > 255) {
+      newErrors.title = 'Judul harus diisi dan tidak lebih dari 255 karakter.';
+    }
+    if (!formData.content) {
+      newErrors.content = 'Konten harus diisi.';
+    }
+    if (formData.author && formData.author.length > 255) {
+      newErrors.author = 'Penulis tidak boleh lebih dari 255 karakter.';
+    }
+    if (!formData.published_date) {
+      newErrors.published_date = 'Tanggal terbit harus diisi.';
+    }
+    if (!['draft', 'published', 'archived'].includes(formData.status)) {
+      newErrors.status = 'Status harus dipilih dengan benar.';
+    }
+    if (image && !['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/svg+xml'].includes(image.type)) {
+      newErrors.image_url = 'Gambar harus berupa file dengan format jpeg, png, jpg, gif, atau svg.';
+    }
+    if (image && image.size > 2048 * 1024) {
+      newErrors.image_url = 'Ukuran gambar tidak boleh lebih dari 2 MB.';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
 
-    // Buat FormData untuk mengirim data dengan file
     const formDataToSubmit = new FormData();
     for (const key in formData) {
       formDataToSubmit.append(key, formData[key]);
     }
     if (image) {
-      formDataToSubmit.append('image_url', image); // Tambahkan gambar ke FormData
+      formDataToSubmit.append('image_url', image);
     }
 
-    onSubmit(formDataToSubmit); // Kirim FormData ke fungsi handleModalSubmit di parent
+    onSubmit(formDataToSubmit);
   };
 
   return (
@@ -63,6 +93,7 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
               />
+              {errors.title && <p className="text-red-500 text-xs">{errors.title}</p>}
             </div>
             <div className="mb-4">
               <label className="block text-gray-700">Konten</label>
@@ -72,9 +103,10 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
               />
+              {errors.content && <p className="text-red-500 text-xs">{errors.content}</p>}
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700">Author</label>
+              <label className="block text-gray-700">Penulis</label>
               <input
                 type="text"
                 name="author"
@@ -82,6 +114,7 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
               />
+              {errors.author && <p className="text-red-500 text-xs">{errors.author}</p>}
             </div>
             <div className="mb-4">
               <label className="block text-gray-700">Tanggal</label>
@@ -92,6 +125,7 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
               />
+              {errors.published_date && <p className="text-red-500 text-xs">{errors.published_date}</p>}
             </div>
             <div className="mb-4">
               <label className="block text-gray-700">Status</label>
@@ -105,6 +139,7 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
                 <option value="published">Published</option>
                 <option value="archived">Archived</option>
               </select>
+              {errors.status && <p className="text-red-500 text-xs">{errors.status}</p>}
             </div>
             <div className="mb-4">
               <label className="block text-gray-700">Gambar</label>
@@ -114,6 +149,7 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
                 onChange={handleImageChange}
                 className="w-full p-2 border rounded"
               />
+              {errors.image_url && <p className="text-red-500 text-xs">{errors.image_url}</p>}
             </div>
             <div className="flex justify-end space-x-4">
               <button onClick={onClose} type="button" className="p-2 bg-gray-300 rounded">Batal</button>

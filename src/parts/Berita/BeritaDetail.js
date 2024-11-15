@@ -1,18 +1,49 @@
-/* eslint-disable linebreak-style */
-/* eslint-disable import/extensions */
-/* eslint-disable max-len */
-/* eslint-disable react/jsx-filename-extension */
-/* eslint-disable react/prop-types */
 /* eslint-disable */
-import React from 'react';
-
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import Fade from 'react-awesome-reveal';
-
 import NotFound from 'assets/images/NotFound.png';
-
 import Button from 'elements/Button';
+import RekomendasiBerita from './RekomendasiBerita';
 
-export default function BeritaDetail({ data }) {
+export default function BeritaDetail() {
+  const [data, setData] = useState(null);
+  const { id } = useParams();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/api/userberita/${id}`);
+        const result = await response.json();
+
+        if (result && result.status === 'published') {
+          setData({
+            ...result,
+            imageUrl: `http://localhost:8000${result.image_url}`,
+          });
+        } else {
+          setData(null);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setData(null);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  // Fungsi untuk format tanggal
+  const formatTanggal = (tanggal) => {
+    const date = new Date(tanggal);
+    return new Intl.DateTimeFormat('id-ID', { 
+      weekday: 'long', 
+      day: 'numeric', 
+      month: 'long', 
+      year: 'numeric' 
+    }).format(date);
+  };
+
   if (data === null) {
     return (
       <section className="container mx-auto">
@@ -46,37 +77,37 @@ export default function BeritaDetail({ data }) {
         </Button>
       </Fade>
 
-      {
-        data.map((item) => (
-          <div className="flex flex-col mt-8 justify-center">
-            <Fade bottom triggerOnce>
-              <h1 className="text-5xl text-theme-blue text-center font-bold">{item.title}</h1>
+      <div className="flex flex-col mt-8 justify-center">
+        <Fade bottom triggerOnce>
+          <h1 className="text-5xl text-theme-blue text-center font-bold">{data.title}</h1>
 
-              <p className="font-light text-xl text-gray-400 text-center mb-10">
-                {item.type}
-              </p>
-            </Fade>
+          <p className="font-light text-xl text-gray-400 text-center mb-10">
+            {formatTanggal(data.published_date)}
+          </p>
+        </Fade>
 
-            <Fade bottom delay={300 * 1} triggerOnce>
-              <div className="flex justify-center xl:mb-6">
-                <img src={item.imageUrl} alt="Project" className="flex w-4/5 sm:w-4/6" />
-              </div>
-            </Fade>
-
-            <Fade bottom delay={300 * 1} triggerOnce>
-              <div className="flex flex-col mt-16 mb-12 mx-8 sm:mx-16 xl:mx-28">
-                <h1 className="text-3xl text-theme-blue font-bold mb-3">
-                  Project Detail
-                </h1>
-
-                <p className="font-light text-lg text-gray-400 text-justify">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                </p>
-              </div>
-            </Fade>
+        <Fade bottom delay={300} triggerOnce>
+          <div className="flex justify-center xl:mb-6">
+            <img src={data.imageUrl} alt={data.title} className="flex w-4/5 sm:w-4/6" />
           </div>
-        ))
-      }
+        </Fade>
+
+        <Fade bottom delay={600} triggerOnce>
+          <div className="flex flex-col mt-16 mb-12 mx-8 sm:mx-16 xl:mx-28">
+            <h1 className="text-3xl text-theme-blue font-bold mb-3">
+              Project Detail
+            </h1>
+
+            <p 
+              className="font-light text-lg text-gray-400 text-justify"
+              dangerouslySetInnerHTML={{ __html: data.content.replace(/\n/g, '<br />') }}>
+            </p>
+          </div>
+        </Fade>
+      </div>
+
+      {/* Tambahkan rekomendasi berita di sini */}
+      <RekomendasiBerita />
     </section>
   );
 }

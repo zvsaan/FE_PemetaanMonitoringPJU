@@ -82,8 +82,8 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
                 <option value="">Pilih Panel ID</option>
                 {panels.map((panel) => (
                   <option key={panel.id_panel} value={panel.id_panel}>
-                    {`Panel ${panel.id_panel}`} {/* Customize as needed */}
-                  </option>
+                    {`Panel ke-${panel.id_panel} - No APP: ${panel.no_app}`}
+                  </option>                
                 ))}
               </select>
             </div>

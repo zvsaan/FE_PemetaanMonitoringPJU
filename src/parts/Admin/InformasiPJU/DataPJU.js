@@ -45,7 +45,7 @@ const DataPju = () => {
 
   const updatePju = async (id, formData) => {
     try {
-      await axios.put(`http://localhost:8000/api/pjus/${id}`, formData, {
+      await axios.post(`http://localhost:8000/api/pjus/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${authToken}`,
           'Content-Type': 'application/json',

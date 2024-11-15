@@ -38,10 +38,10 @@ export default function AboutUs() {
       <div className="container relative mx-auto px-4 lg:px-20 text-center lg:text-left lg:flex lg:justify-start">
         <div className="lg:w-2/3">
           <Fade direction="up" triggerOnce>
-            <h1 className="text-5xl lg:text-6xl font-bold mb-4">Tentang Kami</h1>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">Tentang Kami</h1>
           </Fade>
           <Fade direction="up" delay={300} triggerOnce>
-            <p className="text-lg lg:text-xl mb-8 max-w-2xl">
+            <p className="text-base md:text-lg lg:text-xl mb-8 max-w-2xl">
               PT Tri Tunggal Madiun Terang berkomitmen untuk menerangi jalan-jalan di wilayah 
               Kabupaten Madiun dengan sistem penerangan yang handal dan efisien, 
               memberikan rasa aman dan nyaman untuk semua pengguna jalan.
@@ -58,27 +58,33 @@ export default function AboutUs() {
             </button>
           </Fade>
 
-          {/* Video Section (Directly under button and aligned to the left) */}
-          <Fade direction="up" delay={900} triggerOnce>
-            <div
-              className="mt-4 cursor-pointer max-w-xs lg:max-w-md lg:pl-0"
-              onClick={handleOpenModal}
-            >
-              <div className="relative">
-                <img
-                  src={TentangKamiFoto}
-                  alt="Video Preview"
-                  className="rounded-lg w-full"
-                />
-                {/* Play Button Icon */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <svg className="w-12 h-12 text-white bg-black bg-opacity-50 p-2 rounded-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </Fade>
+          {/* Video Section (Resized and Improved Responsiveness) */}
+{/* Video Section (Left-Aligned on Large Screens, Centered on Small Screens) */}
+<Fade direction="up" delay={900} triggerOnce>
+  <div
+    className="mt-4 cursor-pointer max-w-[220px] md:max-w-[280px] lg:max-w-[320px] lg:pl-0 mx-auto lg:mx-0"
+    onClick={handleOpenModal}
+  >
+    <div className="relative">
+      <img
+        src={TentangKamiFoto}
+        alt="Video Preview"
+        className="rounded-lg w-full"
+      />
+      {/* Play Button Icon */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <svg
+          className="w-10 h-10 text-white bg-black bg-opacity-50 p-2 rounded-full"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path d="M8 5v14l11-7z" />
+        </svg>
+      </div>
+    </div>
+  </div>
+</Fade>
         </div>
       </div>
 

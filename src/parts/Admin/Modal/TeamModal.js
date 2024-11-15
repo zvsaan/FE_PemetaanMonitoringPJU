@@ -8,6 +8,7 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
     description: data?.description || '',
   });
   const [photo, setPhoto] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,8 +19,29 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
     setPhoto(e.target.files[0]); // Simpan file foto yang dipilih
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name || formData.name.length > 255) {
+      newErrors.name = 'Nama harus diisi dan tidak boleh lebih dari 255 karakter.';
+    }
+    if (!formData.position || formData.position.length > 255) {
+      newErrors.position = 'Posisi harus diisi dan tidak boleh lebih dari 255 karakter.';
+    }
+    if (photo && !['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/svg+xml'].includes(photo.type)) {
+      newErrors.photo_url = 'Foto harus berupa file dengan format jpeg, png, jpg, gif, atau svg.';
+    }
+    if (photo && photo.size > 2048 * 1024) {
+      newErrors.photo_url = 'Ukuran foto tidak boleh lebih dari 2 MB.';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
 
     // Buat FormData untuk mengirim data dengan file
     const formDataToSubmit = new FormData();
@@ -60,8 +82,8 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
                 value={formData.name}
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
-                required
               />
+              {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
             </div>
             <div className="mb-4">
               <label className="block text-gray-700">Posisi</label>
@@ -71,8 +93,8 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
                 value={formData.position}
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
-                required
               />
+              {errors.position && <p className="text-red-500 text-xs">{errors.position}</p>}
             </div>
             <div className="mb-4">
               <label className="block text-gray-700">Deskripsi</label>
@@ -91,6 +113,7 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
                 onChange={handlePhotoChange}
                 className="w-full p-2 border rounded"
               />
+              {errors.photo_url && <p className="text-red-500 text-xs">{errors.photo_url}</p>}
             </div>
             <div className="flex justify-end space-x-4">
               <button onClick={onClose} type="button" className="p-2 bg-gray-300 rounded">Batal</button>
