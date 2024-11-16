@@ -6,20 +6,20 @@ const InactivityTimer = () => {
   const navigate = useNavigate();
   const [inactive, setInactive] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const INACTIVITY_LIMIT = 10 * 60 * 1000;
+  const INACTIVITY_LIMIT = 1 * 60 * 60 * 1000;
 
   // Cek apakah user sudah login
   const isAuthenticated = localStorage.getItem('authToken');
 
   const updateExpiry = () => {
-    if (isAuthenticated) {  // hanya set expiry jika user terautentikasi
+    if (isAuthenticated) {
       const expiryTime = new Date().getTime() + INACTIVITY_LIMIT;
       localStorage.setItem('tokenExpiry', expiryTime);
     }
   };
 
   const checkExpiry = () => {
-    if (!isAuthenticated) return;  // hentikan pengecekan jika tidak ada token
+    if (!isAuthenticated) return;
 
     const expiryTime = localStorage.getItem('tokenExpiry');
     const currentTime = new Date().getTime();
@@ -34,7 +34,7 @@ const InactivityTimer = () => {
   };
 
   useEffect(() => {
-    if (!isAuthenticated) return;  // hanya lanjutkan jika user terautentikasi
+    if (!isAuthenticated) return;
 
     updateExpiry();
 
@@ -51,16 +51,16 @@ const InactivityTimer = () => {
   }, [isAuthenticated]);
 
   const handleLogout = () => {
-    setIsLoggingOut(true); // Set isLoggingOut ke true untuk mencegah popup ganda
-    setInactive(false); // Reset inactive state sebelum logout
+    setIsLoggingOut(true);
+    setInactive(false);
     localStorage.removeItem('authToken');
     localStorage.removeItem('tokenExpiry');
-    navigate('/login', { replace: true }); // Replace state to avoid going back
+    navigate('/login', { replace: true });
   };
 
   useEffect(() => {
     if (inactive && !isLoggingOut) {
-      document.body.classList.add("overflow-hidden"); // Prevent background scrolling when modal is open
+      document.body.classList.add("overflow-hidden");
     } else {
       document.body.classList.remove("overflow-hidden");
     }
@@ -68,8 +68,8 @@ const InactivityTimer = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      setInactive(false); // Reset inactive state jika tidak ada autentikasi
-      setIsLoggingOut(false); // Reset isLoggingOut ketika user logout
+      setInactive(false);
+      setIsLoggingOut(false);
     }
   }, [isAuthenticated]);
 

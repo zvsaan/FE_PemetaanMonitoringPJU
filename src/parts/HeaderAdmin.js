@@ -5,7 +5,7 @@ import { faBell, faBars, faSearch, faUserCircle } from '@fortawesome/free-solid-
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const HeaderAdmin = ({ toggleSidebar }) => {
+const HeaderAdmin = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const navigate = useNavigate();
 
@@ -37,10 +37,6 @@ const HeaderAdmin = ({ toggleSidebar }) => {
 
   return (
     <header className="flex items-center justify-between bg-white px-4 py-5">
-      {/* Menu Icon for Mobile */}
-      <button onClick={toggleSidebar} className="text-2xl md:hidden focus:outline-none">
-        <FontAwesomeIcon icon={faBars} />
-      </button>
 
       {/* Search Bar */}
       <div className="flex items-center w-full max-w-md bg-gray-100 rounded-lg px-4 py-2 ml-2 md:ml-0">

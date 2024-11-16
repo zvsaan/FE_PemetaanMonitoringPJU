@@ -1,77 +1,39 @@
 /* eslint-disable */
-import React, { useEffect, useState } from 'react';
-import { FaEdit, FaTrashAlt } from 'react-icons/fa';
-import Modal from '../Modal/BeritaModal';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import {
+  Table,
+  Input,
+  Button,
+  Modal,
+  Pagination,
+  Upload,
+  Form,
+  Select,
+  DatePicker,
+  notification,
+} from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
+import axios from "axios";
+import moment from "moment";
 
 const DataBerita = () => {
   const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState(data);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState('');
+  const [modalType, setModalType] = useState("");
   const [selectedData, setSelectedData] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null); // State untuk preview gambar
+  const [form] = Form.useForm();
 
-  const authToken = localStorage.getItem('authToken');
-
-  // Fungsi individual untuk masing-masing operasi CRUD
-  const getBerita = async () => {
-    try {
-      const response = await axios.get('http://localhost:8000/api/berita', {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-      setData(response.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
-
-  const createBerita = async (formData) => {
-    try {
-      await axios.post('http://localhost:8000/api/berita', formData, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      getBerita();
-    } catch (error) {
-      console.error('Error creating data:', error);
-    }
-  };
-
-  const updateBerita = async (id, formData) => {
-    try {
-        // formData.append('_method', 'PUT');
-
-        await axios.post(`http://localhost:8000/api/berita/${id}`, formData, {
-            headers: {
-                Authorization: `Bearer ${authToken}`,
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-        getBerita();
-        } catch (error) {
-            console.error('Error updating data:', error);
-        }
-    };
-
-  const deleteBerita = async (id) => {
-    try {
-      await axios.delete(`http://localhost:8000/api/berita/${id}`, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-      getBerita();
-    } catch (error) {
-      console.error('Error deleting data:', error);
-    }
-  };
+  const authToken = localStorage.getItem("authToken");
 
   useEffect(() => {
     getBerita();
@@ -81,175 +43,289 @@ const DataBerita = () => {
     setFilteredData(data);
   }, [data]);
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1);
-    const searchValue = e.target.value.toLowerCase();
-    setFilteredData(data.filter(item =>
-      Object.values(item).some(val =>
+  const getBerita = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/api/berita", {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      setData(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      notification.error({ message: "Gagal memuat data berita" });
+    }
+  };
+
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+    const searchValue = value.toLowerCase();
+    const filtered = data.filter((item) =>
+      Object.values(item).some((val) =>
         String(val).toLowerCase().includes(searchValue)
       )
-    ));
+    );
+    setFilteredData(filtered);
+    setCurrentPage(1);
   };
 
   const handleCreate = () => {
-    setModalType('create');
+    setModalType("create");
     setSelectedData(null);
+    form.resetFields();
+    setPreviewImage(null); // Reset preview image saat tambah data
     setShowModal(true);
   };
 
   const handleEdit = (item) => {
-    setModalType('edit');
+    setModalType("edit");
     setSelectedData(item);
+
+    // Set nilai awal form
+    form.setFieldsValue({
+      ...item,
+      published_date: moment(item.published_date),
+    });
+
+    // Set preview image dari data yang dipilih
+    setPreviewImage(item.image_url ? `http://localhost:8000${item.image_url}` : null);
+
+    // Tampilkan modal
     setShowModal(true);
   };
 
   const handleDelete = (item) => {
-    setModalType('delete');
-    setSelectedData(item);
-    setShowModal(true);
+    Modal.confirm({
+      title: "Hapus Data",
+      content: `Apakah Anda yakin ingin menghapus data dengan judul "${item.title}"?`,
+      okText: "Ya",
+      cancelText: "Batal",
+      onOk: async () => {
+        try {
+          await axios.delete(
+            `http://localhost:8000/api/berita/${item.id_berita}`,
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+          getBerita();
+          notification.success({ message: "Berita berhasil dihapus" });
+        } catch (error) {
+          console.error("Error deleting data:", error);
+          notification.error({ message: "Gagal menghapus berita" });
+        }
+      },
+    });
   };
 
-  const handleModalClose = () => {
-    setShowModal(false);
-    setSelectedData(null);
-  };
+  const handleSubmit = async (values) => {
+      const formData = new FormData();
 
-  const handleModalSubmit = async (formData) => {
-    try {
-      if (modalType === 'create') {
-        await createBerita(formData);
-      } else if (modalType === 'edit') {
-        await updateBerita(selectedData.id_berita, formData);
-      } else if (modalType === 'delete') {
-        await deleteBerita(selectedData.id_berita);
+      for (const key in values) {
+          if (key === "published_date") {
+              formData.append(key, values[key].format("YYYY-MM-DD"));
+          } else if (key === "image_url" && values.image_url?.file) {
+              // Hanya tambahkan `image_url` jika ada file baru
+              formData.append(key, values.image_url.file);
+          } else if (key !== "image_url") {
+              formData.append(key, values[key]);
+          }
       }
-      handleModalClose();
-    } catch (error) {
-      console.error('Error submitting form:', error);
-    }
+
+      try {
+          if (modalType === "create") {
+              await axios.post("http://localhost:8000/api/berita", formData, {
+                  headers: {
+                      Authorization: `Bearer ${authToken}`,
+                      "Content-Type": "multipart/form-data",
+                  },
+              });
+              notification.success({ message: "Berita berhasil ditambahkan" });
+          } else if (modalType === "edit") {
+              await axios.post(
+                  `http://localhost:8000/api/berita/${selectedData.id_berita}`,
+                  formData,
+                  {
+                      headers: {
+                          Authorization: `Bearer ${authToken}`,
+                          "Content-Type": "multipart/form-data",
+                      },
+                  }
+              );
+              notification.success({ message: "Berita berhasil diperbarui" });
+          }
+          getBerita();
+          setShowModal(false);
+      } catch (error) {
+          console.error("Error submitting data:", error);
+          notification.error({ message: "Gagal menyimpan data berita" });
+      }
   };
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const currentData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const columns = [
+    {
+      title: "No",
+      dataIndex: "no",
+      key: "no",
+      render: (_, __, index) => index + 1,
+    },
+    { title: "Judul", dataIndex: "title", key: "title" },
+    { title: "Konten", dataIndex: "content", key: "content" },
+    { title: "Penulis", dataIndex: "author", key: "author" },
+    { title: "Tanggal", dataIndex: "published_date", key: "published_date" },
+    {
+      title: "Gambar",
+      dataIndex: "image_url",
+      key: "image_url",
+      render: (url) =>
+        url ? (
+          <img
+            src={`http://localhost:8000${url}`}
+            alt="berita"
+            style={{ width: 50 }}
+          />
+        ) : (
+          "Tidak Ada"
+        ),
+    },
+    { title: "Status", dataIndex: "status", key: "status" },
+    {
+      title: "Aksi",
+      key: "aksi",
+      render: (_, record) => (
+        <div>
+          <Button
+            icon={<EditOutlined />}
+            type="link"
+            onClick={() => handleEdit(record)}
+          />
+          <Button
+            icon={<DeleteOutlined />}
+            type="link"
+            danger
+            onClick={() => handleDelete(record)}
+          />
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="container mx-auto">
-      {/* Search and Create */}
-      <div className="flex justify-between items-center mb-4">
-        <input
-          type="text"
+    <div className="container">
+      <div className="flex justify-between mb-4">
+        <Input.Search
           placeholder="Cari di semua kolom"
           value={searchTerm}
-          onChange={handleSearch}
-          className="p-2 border rounded"
+          onChange={(e) => handleSearch(e.target.value)}
+          allowClear
+          style={{ width: 300 }}
         />
-        <button onClick={handleCreate} className="p-2 bg-blue-500 text-white rounded">Tambah Data</button>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleCreate}
+        >
+          Tambah Data
+        </Button>
       </div>
-
-      {/* Table */}
-      <div className="overflow-x-scroll w-full">
-        <table className="min-w-full w-full bg-white border border-gray-200">
-          <thead>
-            <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">No</th>
-              <th className="py-3 px-6 text-left">Judul</th>
-              <th className="py-3 px-6 text-left">Konten</th>
-              <th className="py-3 px-6 text-left">Author</th>
-              <th className="py-3 px-6 text-left">Tanggal</th>
-              <th className="py-3 px-6 text-left">Images</th>
-              <th className="py-3 px-6 text-left">Status</th>
-              <th className="py-3 px-6 text-left">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-600 text-sm font-light">
-            {currentData.map((item, index) => (
-                <tr key={item.id_berita} className="border-b border-gray-200 hover:bg-gray-100">
-                <td className="py-3 px-6 text-left h-16">{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td className="py-3 px-6 text-left h-16 max-w-xs overflow-hidden whitespace-nowrap text-ellipsis">
-                    {item.title}
-                </td>
-                <td className="py-3 px-6 text-left h-16 max-w-xs overflow-hidden whitespace-nowrap text-ellipsis">
-                    {item.content}
-                </td>
-                <td className="py-3 px-6 text-left h-16 max-w-xs overflow-hidden whitespace-nowrap text-ellipsis">
-                    {item.author}
-                </td>
-                <td className="py-3 px-6 text-left h-16 max-w-xs overflow-hidden whitespace-nowrap text-ellipsis">
-                    {item.published_date}
-                </td>
-                <td className="py-3 px-6 text-left h-16">
-                    {item.image_url && (
-                    <img 
-                        src={`http://localhost:8000${item.image_url}`} 
-                        alt="Berita" 
-                        className="w-16 h-16 object-cover rounded" 
-                    />
-                    )}
-                </td>
-                <td className="py-3 px-6 text-left h-16 max-w-xs overflow-hidden whitespace-nowrap text-ellipsis">
-                    {item.status}
-                </td>
-                <td className="py-3 px-6 text-center">
-                    <div className="flex items-center space-x-4">
-                    <button onClick={() => handleEdit(item)} className="text-blue-500 hover:text-blue-700">
-                        <FaEdit />
-                    </button>
-                    <button onClick={() => handleDelete(item)} className="text-red-500 hover:text-red-700">
-                        <FaTrashAlt />
-                    </button>
-                    </div>
-                </td>
-                </tr>
-            ))}
-            </tbody>
-        </table>
-      </div>
-
-      {/* Pagination and Items Per Page */}
-      <div className="flex justify-between items-center mt-4">
-        <div className="flex items-center">
-          <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-4 py-2 mx-1 bg-gray-200 rounded disabled:opacity-50"
+      <Table
+        dataSource={filteredData.map((item, index) => ({ ...item, key: index }))}
+        columns={columns}
+        pagination={{
+          current: currentPage,
+          pageSize: itemsPerPage,
+          total: filteredData.length,
+          showSizeChanger: true,
+          onChange: (page, pageSize) => {
+            setCurrentPage(page);
+            setItemsPerPage(pageSize);
+          },
+        }}
+      />
+      <Modal
+        title={modalType === "create" ? "Tambah Data" : "Edit Data"}
+        visible={showModal}
+        onCancel={() => {
+          setShowModal(false);
+          setPreviewImage(null); // Reset preview image
+        }}
+        onOk={() => form.submit()}
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          initialValues={selectedData || {}} // Set nilai awal untuk form
+        >
+          <Form.Item
+            name="title"
+            label="Judul"
+            rules={[{ required: true, message: "Judul harus diisi" }]}
           >
-            Previous
-          </button>
-          <span className="mx-2">Page {currentPage} of {totalPages}</span>
-          <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 mx-1 bg-gray-200 rounded disabled:opacity-50"
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="content"
+            label="Konten"
+            rules={[{ required: true, message: "Konten harus diisi" }]}
           >
-            Next
-          </button>
-        </div>
-
-        <div className="flex items-center">
-          <span className="mr-2">View:</span>
-          <select
-            value={itemsPerPage}
-            onChange={(e) => setItemsPerPage(Number(e.target.value))}
-            className="p-2 border rounded"
+            <Input.TextArea />
+          </Form.Item>
+          <Form.Item name="author" label="Penulis">
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="published_date"
+            label="Tanggal"
+            rules={[{ required: true, message: "Tanggal harus diisi" }]}
           >
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>30</option>
-            <option value={100}>50</option>
-          </select>
-        </div>
-      </div>
+            <DatePicker format="YYYY-MM-DD" />
+          </Form.Item>
+          <Form.Item
+            name="status"
+            label="Status"
+            rules={[{ required: true, message: "Status harus dipilih" }]}
+          >
+            <Select>
+              <Select.Option value="draft">Draft</Select.Option>
+              <Select.Option value="published">Published</Select.Option>
+              <Select.Option value="archived">Archived</Select.Option>
+            </Select>
+          </Form.Item>
 
-      {/* Modal Overlay */}
-      {showModal && (
-        <Modal
-          type={modalType}
-          data={selectedData}
-          onClose={handleModalClose}
-          onSubmit={handleModalSubmit}
-        />
-      )}
+          {/* Preview Gambar */}
+          {previewImage && (
+            <div style={{ marginBottom: 16 }}>
+              <p>Preview Gambar:</p>
+              <img
+                src={previewImage}
+                alt="Preview"
+                style={{ width: "100%", maxWidth: 200, height: "auto" }}
+              />
+            </div>
+          )}
+
+          <Form.Item
+            name="image_url"
+            label="Gambar"
+            rules={[
+              {
+                required: modalType === "edit", // Wajib diisi hanya saat edit
+                message: "Gambar harus diupload",
+              },
+            ]}
+          >
+            <Upload
+              maxCount={1}
+              beforeUpload={(file) => {
+                setPreviewImage(URL.createObjectURL(file)); // Update preview image
+                return false; // Mencegah upload langsung
+              }}
+              accept="image/*"
+            >
+              <Button icon={<UploadOutlined />}>Upload Gambar</Button>
+            </Upload>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

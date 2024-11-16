@@ -19,16 +19,40 @@ const ProblemPercentageCard = () => {
         data: [problematicPJU, totalPJU - problematicPJU],
         backgroundColor: ['#ff6384', '#36a2eb'],
         hoverBackgroundColor: ['#ff6384', '#36a2eb'],
+        borderWidth: 2, // Atur tebal border
       },
     ],
+  };
+
+  // Opsi untuk Doughnut chart
+  const chartOptions = {
+    cutout: '70%', // Sesuaikan ukuran lingkaran dalam (0%-99%)
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true, // Tampilkan legend
+        position: 'bottom', // Posisi legend
+        labels: {
+          color: '#4B5563', // Warna teks legend
+        },
+      },
+      tooltip: {
+        enabled: true, // Aktifkan tooltip
+        callbacks: {
+          label: function (context) {
+            return `${context.label}: ${context.raw} (${((context.raw / totalPJU) * 100).toFixed(2)}%)`;
+          },
+        },
+      },
+    },
   };
 
   return (
     <div className="bg-white p-4 md:p-6 rounded-lg shadow-lg w-full flex flex-col items-center">
       <h3 className="text-md md:text-lg font-semibold mb-2 text-gray-700">PJU Bermasalah Bulan Ini</h3>
       <p className="text-sm text-gray-500 mb-4">Dari total {totalPJU} PJU, {problematicPJU} bermasalah.</p>
-      <div className="w-32 h-32">
-        <Doughnut data={chartData} />
+      <div className="h-60 w-60"> {/* Pastikan ukurannya sesuai */}
+        <Doughnut data={chartData} options={chartOptions} />
       </div>
       <p className="text-center text-xl font-bold text-red-500 mt-4">
         {problemPercentage.toFixed(2)}%

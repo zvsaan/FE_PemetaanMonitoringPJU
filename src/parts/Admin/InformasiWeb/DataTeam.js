@@ -1,46 +1,55 @@
 /* eslint-disable */
-import React, { useEffect, useState } from 'react';
-import { FaEdit, FaTrashAlt } from 'react-icons/fa';
-import ModalTeam from '../Modal/TeamModal';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { Table, Button, Modal, Form, Input, Upload, notification, Pagination } from "antd";
+import { UploadOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import axios from "axios";
 
 const DataTeam = () => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState(data);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState('');
+  const [modalType, setModalType] = useState("");
   const [selectedData, setSelectedData] = useState(null);
+  const [form] = Form.useForm();
+  const [photo, setPhoto] = useState(null);
 
-  const authToken = localStorage.getItem('authToken');
+  const authToken = localStorage.getItem("authToken");
 
-  // Fungsi untuk masing-masing operasi CRUD
+  const notify = (type, message) => {
+    notification[type]({
+      message: message,
+    });
+  };
+
   const getTeam = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/teams', {
+      const response = await axios.get("http://localhost:8000/api/teams", {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
       setData(response.data);
+      setFilteredData(response.data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
 
   const createTeam = async (formData) => {
     try {
-      await axios.post('http://localhost:8000/api/teams', formData, {
+      await axios.post("http://localhost:8000/api/teams", formData, {
         headers: {
           Authorization: `Bearer ${authToken}`,
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
       getTeam();
+      notify("success", "Berhasil menambahkan data!");
     } catch (error) {
-      console.error('Error creating data:', error);
+      console.error("Error creating data:", error);
     }
   };
 
@@ -49,12 +58,13 @@ const DataTeam = () => {
       await axios.post(`http://localhost:8000/api/teams/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${authToken}`,
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
       getTeam();
+      notify("success", "Berhasil mengupdate data!");
     } catch (error) {
-      console.error('Error updating data:', error);
+      console.error("Error updating data:", error);
     }
   };
 
@@ -66,8 +76,9 @@ const DataTeam = () => {
         },
       });
       getTeam();
+      notify("success", "Berhasil menghapus data!");
     } catch (error) {
-      console.error('Error deleting data:', error);
+      console.error("Error deleting data:", error);
     }
   };
 
@@ -75,172 +86,128 @@ const DataTeam = () => {
     getTeam();
   }, []);
 
-  useEffect(() => {
-    setFilteredData(data);
-  }, [data]);
-
   const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
+    const value = e.target.value.toLowerCase();
+    setSearchTerm(value);
+    const filtered = data.filter((item) =>
+      Object.values(item).some((val) => String(val).toLowerCase().includes(value))
+    );
+    setFilteredData(filtered);
     setCurrentPage(1);
-    const searchValue = e.target.value.toLowerCase();
-    setFilteredData(data.filter(item =>
-      Object.values(item).some(val =>
-        String(val).toLowerCase().includes(searchValue)
-      )
-    ));
   };
 
-  const handleCreate = () => {
-    setModalType('create');
-    setSelectedData(null);
-    setShowModal(true);
-  };
-
-  const handleEdit = (item) => {
-    setModalType('edit');
-    setSelectedData(item);
-    setShowModal(true);
-  };
-
-  const handleDelete = (item) => {
-    setModalType('delete');
-    setSelectedData(item);
-    setShowModal(true);
-  };
-
-  const handleModalClose = () => {
-    setShowModal(false);
-    setSelectedData(null);
-  };
-
-  const handleModalSubmit = async (formData) => {
+  const handleModalSubmit = async () => {
     try {
-      if (modalType === 'create') {
-        await createTeam(formData);
-      } else if (modalType === 'edit') {
-        await updateTeam(selectedData.id_team, formData);
-      } else if (modalType === 'delete') {
-        await deleteTeam(selectedData.id_team);
+      const values = await form.validateFields();
+      const formData = new FormData();
+      for (const key in values) {
+        formData.append(key, values[key]);
       }
-      handleModalClose();
+      if (photo) {
+        formData.append("photo_url", photo);
+      }
+      if (modalType === "create") {
+        await createTeam(formData);
+      } else if (modalType === "edit") {
+        await updateTeam(selectedData.id_team, formData);
+      }
+      setShowModal(false);
+      form.resetFields();
+      setPhoto(null);
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error("Validation Failed:", error);
     }
   };
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const currentData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const columns = [
+    { title: "No", dataIndex: "id_team", render: (_, __, index) => (currentPage - 1) * itemsPerPage + index + 1 },
+    { title: "Nama", dataIndex: "name" },
+    { title: "Posisi", dataIndex: "position" },
+    { title: "Deskripsi", dataIndex: "description" },
+    {
+      title: "Foto",
+      dataIndex: "photo_url",
+      render: (text) => text && <img src={`http://localhost:8000${text}`} alt="Foto" style={{ width: 50, height: 50 }} />,
+    },
+    {
+      title: "Aksi",
+      render: (record) => (
+        <div style={{ display: "flex", gap: "10px" }}>
+          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+          <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(record)} />
+        </div>
+      ),
+    },
+  ];
+
+  const handleEdit = (record) => {
+    setModalType("edit");
+    setSelectedData(record);
+    setShowModal(true);
+    form.setFieldsValue(record);
+  };
+
+  const handleDelete = (record) => {
+    Modal.confirm({
+      title: "Hapus Data",
+      content: "Apakah Anda yakin ingin menghapus data ini?",
+      okText: "Ya",
+      cancelText: "Tidak",
+      onOk: () => deleteTeam(record.id_team),
+    });
+  };
+
+  const handleCreate = () => {
+    setModalType("create");
+    setSelectedData(null);
+    form.resetFields();
+    setShowModal(true);
+  };
 
   return (
-    <div className="container mx-auto">
-      {/* Search and Create */}
-      <div className="flex justify-between items-center mb-4">
-        <input
-          type="text"
-          placeholder="Cari di semua kolom"
-          value={searchTerm}
-          onChange={handleSearch}
-          className="p-2 border rounded"
-        />
-        <button onClick={handleCreate} className="p-2 bg-blue-500 text-white rounded">Tambah Data</button>
+    <div className="container">
+      <div style={{ marginBottom: 16, display: "flex", justifyContent: "space-between" }}>
+        <Input placeholder="Cari di semua kolom" value={searchTerm} onChange={handleSearch} style={{ width: 300 }} />
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
+          Tambah Data
+        </Button>
       </div>
-
-      {/* Table */}
-      <div className="overflow-x-scroll w-full">
-        <table className="min-w-full w-full bg-white border border-gray-200">
-          <thead>
-            <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">No</th>
-              <th className="py-3 px-6 text-left">Nama</th>
-              <th className="py-3 px-6 text-left">Posisi</th>
-              <th className="py-3 px-6 text-left">Deskripsi</th>
-              <th className="py-3 px-6 text-left">Images</th>
-              <th className="py-3 px-6 text-left">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-600 text-sm font-light">
-            {currentData.map((item, index) => (
-              <tr key={item.id_team} className="border-b border-gray-200 hover:bg-gray-100">
-                <td className="py-3 px-6 text-left h-16">{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td className="py-3 px-6 text-left h-16 max-w-xs overflow-hidden whitespace-nowrap text-ellipsis">
-                  {item.name}
-                </td>
-                <td className="py-3 px-6 text-left h-16 max-w-xs overflow-hidden whitespace-nowrap text-ellipsis">
-                  {item.position}
-                </td>
-                <td className="py-3 px-6 text-left h-16 max-w-xs overflow-hidden whitespace-nowrap text-ellipsis">
-                  {item.description}
-                </td>
-                <td className="py-3 px-6 text-left h-16">
-                  {item.photo_url && (
-                    <img 
-                      // src={item.photo_url} 
-                      src={`http://localhost:8000${item.photo_url}`} 
-                      alt="Team" 
-                      className="w-16 h-16 object-cover rounded" 
-                    />
-                  )}
-                </td>
-                <td className="py-3 px-6 text-center">
-                  <div className="flex items-center space-x-4">
-                    <button onClick={() => handleEdit(item)} className="text-blue-500 hover:text-blue-700">
-                      <FaEdit />
-                    </button>
-                    <button onClick={() => handleDelete(item)} className="text-red-500 hover:text-red-700">
-                      <FaTrashAlt />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination and Items Per Page */}
-      <div className="flex justify-between items-center mt-4">
-        <div className="flex items-center">
-          <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-4 py-2 mx-1 bg-gray-200 rounded disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span className="mx-2">Page {currentPage} of {totalPages}</span>
-          <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 mx-1 bg-gray-200 rounded disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
-
-        <div className="flex items-center">
-          <span className="mr-2">View:</span>
-          <select
-            value={itemsPerPage}
-            onChange={(e) => setItemsPerPage(Number(e.target.value))}
-            className="p-2 border rounded"
-          >
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={30}>30</option>
-            <option value={50}>50</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Modal Overlay */}
-      {showModal && (
-        <ModalTeam
-          type={modalType}
-          data={selectedData}
-          onClose={handleModalClose}
-          onSubmit={handleModalSubmit}
-        />
-      )}
+      <Table
+        columns={columns}
+        dataSource={filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)}
+        pagination={false}
+        rowKey="id_team"
+      />
+      <Modal
+        title={modalType === "create" ? "Tambah Data Team" : "Edit Data Team"}
+        visible={showModal}
+        onCancel={() => setShowModal(false)}
+        onOk={handleModalSubmit}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item name="name" label="Nama" rules={[{ required: true, message: "Nama wajib diisi" }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="position" label="Posisi" rules={[{ required: true, message: "Posisi wajib diisi" }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="description" label="Deskripsi">
+            <Input.TextArea />
+          </Form.Item>
+          <Form.Item label="Foto">
+            <Upload
+              maxCount={1}
+              beforeUpload={(file) => {
+                setPhoto(file);
+                return false;
+              }}
+              accept="image/*"
+            >
+              <Button icon={<UploadOutlined />}>Upload Foto</Button>
+            </Upload>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

@@ -46,14 +46,15 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
     // Buat FormData untuk mengirim data dengan file
     const formDataToSubmit = new FormData();
     for (const key in formData) {
-      formDataToSubmit.append(key, formData[key]);
+        formDataToSubmit.append(key, formData[key]);
     }
+    // Hanya tambahkan foto jika ada foto baru yang dipilih
     if (photo) {
-      formDataToSubmit.append('photo_url', photo); // Tambahkan foto ke FormData
+        formDataToSubmit.append('photo_url', photo);
     }
 
     onSubmit(formDataToSubmit); // Kirim FormData ke fungsi handleModalSubmit di parent
-  };
+};
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4 sm:px-6 md:px-8">
@@ -107,6 +108,14 @@ const Modal = ({ type, data, onClose, onSubmit }) => {
             </div>
             <div className="mb-4">
               <label className="block text-gray-700">Foto</label>
+              {data?.photo_url && (
+                <img
+                  // src={data.photo_url}
+                  src={`http://localhost:8000${data.photo_url}`}
+                  alt="Preview"
+                  className="w-16 h-16 object-cover rounded mb-2"
+                />
+              )}
               <input
                 type="file"
                 name="photo_url"
