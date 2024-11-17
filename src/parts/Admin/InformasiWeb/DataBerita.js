@@ -308,7 +308,7 @@ const DataBerita = () => {
             label="Gambar"
             rules={[
               {
-                required: modalType === "edit", // Wajib diisi hanya saat edit
+                required: true,
                 message: "Gambar harus diupload",
               },
             ]}

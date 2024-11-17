@@ -1,6 +1,5 @@
 /* eslint-disable */
 import { Route, Routes } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 
 import LandingPage from 'pages/LandingPage';
 import BeritaPage from 'pages/BeritaPage';
@@ -25,24 +24,9 @@ import { ProjectDetailPage } from 'pages/BeritaDetailPage';
 import { DiscussProjectPage } from 'pages/DiscussProjectPage';
 
 import PrivateRoute from 'PrivateRoute';
-import LoadingScreen from './LoadingScreen';
 import './assets/css/styles.css';
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
-
   return (
     <Routes>
       {/* Rute Publik */}

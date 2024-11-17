@@ -1,20 +1,26 @@
 /* eslint-disable */
 import React, { useEffect, useState } from 'react';
-import { FaEdit, FaTrashAlt } from 'react-icons/fa';
-import Modal from '../Modal/PanelModal';
+import { Table, Button, Modal, Form, Input, notification } from 'antd';
+import { EditOutlined, DeleteOutlined, PlusOutlined, ExportOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 const DataPanel = () => {
   const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState(data);
+  const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [selectedData, setSelectedData] = useState(null);
+  const [form] = Form.useForm();
+  const [isPercentView, setIsPercentView] = useState(true);
 
   const authToken = localStorage.getItem('authToken');
+
+  useEffect(() => {
+    getPanels();
+  }, []);
 
   const getPanels = async () => {
     try {
@@ -24,256 +30,298 @@ const DataPanel = () => {
         },
       });
       setData(response.data);
+      setFilteredData(response.data);
     } catch (error) {
       console.error('Error fetching data:', error);
+      notification.error({ message: 'Gagal memuat data panel' });
     }
   };
 
-  const createPanel = async (formData) => {
-    try {
-      await axios.post('http://localhost:8000/api/panels', formData, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      getPanels();
-    } catch (error) {
-      console.error('Error creating data:', error);
-    }
+  const formatToPercent = (value) => {
+    if (isNaN(value)) return '-';
+    return `${Math.round(value * 100)}%`;
   };
 
-  const updatePanel = async (id, formData) => {
-    try {
-      await axios.post(`http://localhost:8000/api/panels/${id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      getPanels();
-    } catch (error) {
-      console.error('Error updating data:', error);
-    }
+  const handlePercentToggle = () => {
+    setIsPercentView(!isPercentView);
   };
 
-  const deletePanel = async (id) => {
-    try {
-      await axios.delete(`http://localhost:8000/api/panels/${id}`, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-      getPanels();
-    } catch (error) {
-      console.error('Error deleting data:', error);
-    }
-  };
-
-  useEffect(() => {
-    getPanels();
-  }, []);
-
-  useEffect(() => {
-    setFilteredData(data);
-  }, [data]);
-
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1);
-    const searchValue = e.target.value.toLowerCase();
-    setFilteredData(data.filter(item =>
-      Object.values(item).some(val =>
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+    const searchValue = value.toLowerCase();
+    const filtered = data.filter((item) =>
+      Object.values(item).some((val) =>
         String(val).toLowerCase().includes(searchValue)
       )
-    ));
+    );
+    setFilteredData(filtered);
+    setCurrentPage(1);
+  };
+
+  const handleModalSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      if (modalType === 'create') {
+        await axios.post('http://localhost:8000/api/panels', values, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        notification.success({ message: 'Data Panel berhasil ditambahkan' });
+      } else if (modalType === 'edit') {
+        await axios.post(`http://localhost:8000/api/panels/${selectedData.id_panel}`, values, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        notification.success({ message: 'Data Panel berhasil diperbarui' });
+      }
+      getPanels();
+      setShowModal(false);
+    } catch (error) {
+      console.error('Error submitting data:', error);
+      notification.error({ message: 'Gagal menyimpan data panel' });
+    }
+  };
+
+  const handleDelete = async (record) => {
+    Modal.confirm({
+      title: 'Hapus Data Panel',
+      content: `Apakah Anda yakin ingin menghapus data panel ini?`,
+      okText: 'Ya',
+      cancelText: 'Batal',
+      onOk: async () => {
+        try {
+          await axios.delete(`http://localhost:8000/api/panels/${record.id_panel}`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          });
+          notification.success({ message: 'Data Panel berhasil dihapus' });
+          getPanels();
+        } catch (error) {
+          console.error('Error deleting data:', error);
+          notification.error({ message: 'Gagal menghapus data panel' });
+        }
+      },
+    });
   };
 
   const handleCreate = () => {
     setModalType('create');
     setSelectedData(null);
+    form.resetFields();
     setShowModal(true);
   };
 
-  const handleEdit = (item) => {
+  const handleEdit = (record) => {
     setModalType('edit');
-    setSelectedData(item);
+    setSelectedData(record);
+    form.setFieldsValue(record);
     setShowModal(true);
   };
 
-  const handleDelete = (item) => {
-    setModalType('delete');
-    setSelectedData(item);
-    setShowModal(true);
-  };
+  const handleExport = () => {
+    window.open('http://localhost:8000/api/panels/export', '_blank');
+  };  
 
-  const handleModalClose = () => {
-    setShowModal(false);
-    setSelectedData(null);
-  };
-
-  const handleModalSubmit = async (formData) => {
-    try {
-      if (modalType === 'create') {
-        await createPanel(formData);
-      } else if (modalType === 'edit') {
-        await updatePanel(selectedData.id_panel, formData);
-      } else if (modalType === 'delete') {
-        await deletePanel(selectedData.id_panel);
-      }
-      handleModalClose();
-    } catch (error) {
-      console.error('Error submitting form:', error);
-    }
-  };
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const currentData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const columns = [
+    { title: 'No', dataIndex: 'id_panel', render: (_, __, index) => (currentPage - 1) * itemsPerPage + index + 1 },
+    { title: 'Lapisan', dataIndex: 'lapisan', render: (text) => text || '-' },
+    { title: 'No APP', dataIndex: 'no_app', render: (text) => text || '-' },
+    { title: 'Longitude', dataIndex: 'longitude', render: (text) => text || '-' },
+    { title: 'Latitude', dataIndex: 'latitude', render: (text) => text || '-' },
+    { title: 'ABD No', dataIndex: 'abd_no', render: (text) => text || '-' },
+    { title: 'No Pondasi Tiang', dataIndex: 'no_pondasi_tiang', render: (text) => text || '-' },
+    { title: 'Line 1 (120W)', dataIndex: 'line1_120w', render: (text) => text || '-' },
+    { title: 'Line 1 (120W) 2L', dataIndex: 'line1_120w_2l', render: (text) => text || '-' },
+    { title: 'Line 1 (90W)', dataIndex: 'line1_90w', render: (text) => text || '-' },
+    { title: 'Line 1 (60W)', dataIndex: 'line1_60w', render: (text) => text || '-' },
+    { title: 'Line 2 (120W)', dataIndex: 'line2_120w', render: (text) => text || '-' },
+    { title: 'Line 2 (120W) 2L', dataIndex: 'line2_120w_2l', render: (text) => text || '-' },
+    { title: 'Line 2 (90W)', dataIndex: 'line2_90w', render: (text) => text || '-' },
+    { title: 'Line 2 (60W)', dataIndex: 'line2_60w', render: (text) => text || '-' },
+    { title: 'Jumlah PJU', dataIndex: 'jumlah_pju', render: (text) => text || '-' },
+    { title: 'Total Daya Beban', dataIndex: 'total_daya_beban', render: (text) => text || '-' },
+    { title: 'Daya APP', dataIndex: 'daya_app', render: (text) => text || '-' },
+    // { title: 'Daya Terpakai', dataIndex: 'daya_terpakai', render: (text) => text || '-' },
+    { title: 'Daya Terpakai (%)', 
+      dataIndex: 'daya_terpakai',
+      render: (value) =>
+        isPercentView
+          ? <span style={{ cursor: 'pointer', color: 'blue' }} onClick={handlePercentToggle}>
+              {formatToPercent(value)}
+            </span>
+          : <span style={{ cursor: 'pointer', color: 'blue' }} onClick={handlePercentToggle}>
+              {value}
+            </span>,
+    },
+    { title: 'Arus Beban', dataIndex: 'arus_beban', render: (text) => text || '-' },
+    { title: 'Nama Jalan', dataIndex: 'nama_jalan', render: (text) => text || '-' },
+    { title: 'Desa/Kel', dataIndex: 'desa_kel', render: (text) => text || '-' },
+    { title: 'Kecamatan', dataIndex: 'kecamatan', render: (text) => text || '-' },
+    { title: 'IDPEL', dataIndex: 'idpel', render: (text) => text || '-' },
+    { title: 'No KWH', dataIndex: 'no_kwh', render: (text) => text || '-' },
+    { title: 'No Kunci', dataIndex: 'no_kunci', render: (text) => text || '-' },
+    { title: 'Magnetik Kontaktor', dataIndex: 'magnetik_kontaktor', render: (text) => text || '-' },
+    { title: 'Timer', dataIndex: 'timer', render: (text) => text || '-' },
+    { title: 'MCB KWH', dataIndex: 'mcb_kwh', render: (text) => text || '-' },
+    { title: 'Terminal Block', dataIndex: 'terminal_block', render: (text) => text || '-' },
+    { title: 'RCCB', dataIndex: 'rccb', render: (text) => text || '-' },
+    { title: 'Pilot Lamp', dataIndex: 'pilot_lamp', render: (text) => text || '-' },
+    {
+      title: 'Aksi',
+      key: 'aksi',
+      render: (_, record) => (
+        <div>
+          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+          <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(record)} />
+        </div>
+      ),
+    },
+  ];  
 
   return (
-    <div className="container mx-auto">
-      <div className="flex justify-between items-center mb-4">
-        <input
-          type="text"
-          placeholder="Cari di semua kolom"
+    <div className="container">
+      {/* Search and Create (Fixed Position) */}
+      <div
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 1,
+          backgroundColor: '#fff',
+          padding: '10px 0',
+          marginBottom: '16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: '1px solid #f0f0f0',
+        }}
+      >
+        {/* Input Search */}
+        <Input.Search
+          placeholder="Cari semua data"
           value={searchTerm}
-          onChange={handleSearch}
-          className="p-2 border rounded"
+          onChange={(e) => handleSearch(e.target.value)}
+          allowClear
+          style={{ width: 300 }}
         />
-        <button onClick={handleCreate} className="p-2 bg-blue-500 text-white rounded">Tambah Data</button>
-      </div>
 
-      <div className="overflow-x-auto w-full">
-        <table className="min-w-full w-full bg-white border border-gray-200">
-          <thead>
-            <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">No</th>
-              <th className="py-3 px-6 text-left">Lapisan</th>
-              <th className="py-3 px-6 text-left">No APP</th>
-              <th className="py-3 px-6 text-left">Longitude</th>
-              <th className="py-3 px-6 text-left">Latitude</th>
-              <th className="py-3 px-6 text-left">ABD No</th>
-              <th className="py-3 px-6 text-left">No Pondasi Tiang</th>
-              <th className="py-3 px-6 text-left">Line 1 (120W)</th>
-              <th className="py-3 px-6 text-left">Line 1 (120W) 2L</th>
-              <th className="py-3 px-6 text-left">Line 1 (90W)</th>
-              <th className="py-3 px-6 text-left">Line 1 (60W)</th>
-              <th className="py-3 px-6 text-left">Line 2 (120W)</th>
-              <th className="py-3 px-6 text-left">Line 2 (120W) 2L</th>
-              <th className="py-3 px-6 text-left">Line 2 (90W)</th>
-              <th className="py-3 px-6 text-left">Line 2 (60W)</th>
-              <th className="py-3 px-6 text-left">Jumlah PJU</th>
-              <th className="py-3 px-6 text-left">Total Daya Beban (W)</th>
-              <th className="py-3 px-6 text-left">Daya APP</th>
-              <th className="py-3 px-6 text-left">Daya Terpakai (%)</th>
-              <th className="py-3 px-6 text-left">Arus Beban (A)</th>
-              <th className="py-3 px-6 text-left">Nama Jalan</th>
-              <th className="py-3 px-6 text-left">Desa/Kel</th>
-              <th className="py-3 px-6 text-left">Kecamatan</th>
-              <th className="py-3 px-6 text-left">IDPEL</th>
-              <th className="py-3 px-6 text-left">No KWH</th>
-              <th className="py-3 px-6 text-left">No Kunci</th>
-              <th className="py-3 px-6 text-left">Magnetik Kontaktor</th>
-              <th className="py-3 px-6 text-left">Timer</th>
-              <th className="py-3 px-6 text-left">MCB KWH</th>
-              <th className="py-3 px-6 text-left">Terminal Block</th>
-              <th className="py-3 px-6 text-left">RCCB</th>
-              <th className="py-3 px-6 text-left">Pilot Lamp</th>
-              <th className="py-3 px-6 text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-600 text-sm font-light">
-            {currentData.map((item, index) => (
-              <tr key={item.id_panel} className="border-b border-gray-200 hover:bg-gray-100">
-                <td className="py-3 px-6 text-left">{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td className="py-3 px-6 text-left">{item.lapisan || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.no_app || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.longitude || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.latitude || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.abd_no || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.no_pondasi_tiang || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.line1_120w || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.line1_120w_2l || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.line1_90w || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.line1_60w || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.line2_120w || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.line2_120w_2l || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.line2_90w || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.line2_60w || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.jumlah_pju || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.total_daya_beban || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.daya_app || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.daya_terpakai || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.arus_beban || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.nama_jalan || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.desa_kel || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.kecamatan || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.idpel || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.no_kwh || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.no_kunci || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.magnetik_kontaktor || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.timer || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.mcb_kwh || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.terminal_block || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.rccb || '-'}</td>
-                <td className="py-3 px-6 text-left">{item.pilot_lamp || '-'}</td>
-                <td className="py-3 px-6 text-center">
-                    <div className="flex items-center space-x-4">
-                        <button onClick={() => handleEdit(item)} className="text-blue-500 hover:text-blue-700">
-                            <FaEdit />
-                        </button>
-                        <button onClick={() => handleDelete(item)} className="text-red-500 hover:text-red-700">
-                            <FaTrashAlt />
-                        </button>
-                    </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex justify-between items-center mt-4">
-        <div className="flex items-center">
-          <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-4 py-2 mx-1 bg-gray-200 rounded disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span className="mx-2">Page {currentPage} of {totalPages}</span>
-          <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 mx-1 bg-gray-200 rounded disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
-
-        <div className="flex items-center">
-          <span className="mr-2">View:</span>
-          <select
-            value={itemsPerPage}
-            onChange={(e) => setItemsPerPage(Number(e.target.value))}
-            className="p-2 border rounded"
-          >
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-          </select>
+        {/* Grouping Buttons */}
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <Button type="default" icon={<ExportOutlined />} onClick={handleExport}>
+            Export Data
+          </Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
+            Tambah Data
+          </Button>
         </div>
       </div>
+      {/* Table */}
+      <Table
+        columns={columns}
+        dataSource={filteredData.map((item, index) => ({ ...item, key: index }))}
+        pagination={{
+          current: currentPage,
+          pageSize: itemsPerPage,
+          total: filteredData.length,
+          showSizeChanger: true,
+          onChange: (page, pageSize) => {
+            setCurrentPage(page);
+            setItemsPerPage(pageSize);
+          },
+        }}
+        scroll={{ x: 'max-content' }}
+      />
 
-      {showModal && (
-        <Modal
-          type={modalType}
-          data={selectedData}
-          onClose={handleModalClose}
-          onSubmit={handleModalSubmit}
-        />
-      )}
+      {/* Modal */}
+      <Modal
+        title={modalType === 'create' ? 'Tambah Data Panel' : 'Edit Data Panel'}
+        visible={showModal}
+        onCancel={() => setShowModal(false)}
+        onOk={() => form.submit()}
+      >
+        <Form form={form} layout="vertical" onFinish={handleModalSubmit}>
+          {Object.keys(data[0] || {})
+            .filter((field) => field !== 'id_panel')
+            .filter((field) => field !== 'created_at') 
+            .filter((field) => field !== 'updated_at') 
+            .map((field) => {
+              let rules = []; // Default empty rules
+              let placeholder = ''; // Default placeholder
+
+              // Add specific validation rules based on field names
+              if (field === 'lapisan' || field === 'no_app') {
+                rules.push({ required: true, message: `${field.replace(/_/g, ' ')} wajib diisi` });
+              }
+
+              if (field === 'longitude' || field === 'latitude') {
+                rules.push({
+                  type: 'number',
+                  transform: (value) => (value ? parseFloat(value) : value),
+                  message: `${field.replace(/_/g, ' ')} harus berupa angka desimal`,
+                });
+                placeholder = field === 'longitude' ? 'Contoh: 123.4567890 ( max 3 angka depan koma)' : 'Contoh: -98.7654321 ( max 3 angka depan koma)';
+              }
+
+              if (
+                [
+                  'line1_120w',
+                  'line1_120w_2l',
+                  'line1_90w',
+                  'line1_60w',
+                  'line2_120w',
+                  'line2_120w_2l',
+                  'line2_90w',
+                  'line2_60w',
+                  'jumlah_pju',
+                  'total_daya_beban',
+                  'daya_app',
+                ].includes(field)
+              ) {
+                rules.push({
+                  type: 'number',
+                  transform: (value) => (value ? Number(value) : value),
+                  message: `${field.replace(/_/g, ' ')} harus berupa angka`,
+                });
+              }
+
+              if (['daya_terpakai', 'arus_beban'].includes(field)) {
+                rules.push({ max: 255, message: `${field.replace(/_/g, ' ')} tidak boleh lebih dari 255 karakter` });
+              }
+
+              if (
+                [
+                  'nama_jalan',
+                  'desa_kel',
+                  'kecamatan',
+                  'idpel',
+                  'no_kwh',
+                  'no_kunci',
+                  'magnetik_kontaktor',
+                  'timer',
+                  'mcb_kwh',
+                  'terminal_block',
+                  'rccb',
+                  'pilot_lamp',
+                ].includes(field)
+              ) {
+                rules.push({ max: 255, message: `${field.replace(/_/g, ' ')} tidak boleh lebih dari 255 karakter` });
+              }
+
+              return (
+                <Form.Item
+                  key={field}
+                  name={field}
+                  label={field.replace(/_/g, ' ').toUpperCase()}
+                  rules={rules}
+                >
+                  <Input placeholder={placeholder || `Masukkan ${field.replace(/_/g, ' ')}`} />
+                </Form.Item>
+              );
+            })}
+        </Form>
+      </Modal>
     </div>
   );
 };
