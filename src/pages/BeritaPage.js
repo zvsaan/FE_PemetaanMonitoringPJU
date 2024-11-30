@@ -6,7 +6,7 @@ import React, { Component } from 'react';
 
 import Header from 'parts/Header';
 import HeroPortfolio from 'parts/Hero/HeroBerita';
-import Discuss from 'parts/Home/Contact';
+import Discuss from 'parts/Home/PengaduanCard';
 import Footer from 'parts/Footer';
 import AllPortfolio from 'parts/Berita/AllBerita';
 

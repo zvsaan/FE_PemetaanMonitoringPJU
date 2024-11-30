@@ -14,7 +14,14 @@ import DashboardPage from 'pages/Admin/DashboardPage';
 
 import DataPJUPage from 'pages/Admin/InformasiPJU/DataPJUPage';
 import DataPanelPage from 'pages/Admin/InformasiPJU/DataPanelPage';
-import PemetaanPJUPage from 'pages/Admin/InformasiPJU/PemetaanPJUPage';
+
+import PemetaanPJUPage from 'pages/Admin/Pemetaan/PemetaanPJUPage';
+import PemetaanPanelPage from 'pages/Admin/Pemetaan/PemetaanPanelPage';
+
+import DataKontruksiPage from 'pages/Admin/InformasiPJU/DataPanelKontruksi';
+
+import DataRiwayatPJUPage from 'pages/Admin/InformasiPJU/DataRiwayatPJUPage';
+import DataRiwayatPanelPage from 'pages/Admin/InformasiPJU/DataRiwayatPanelPage';
 
 import DataTeamPage from 'pages/Admin/InformasiWeb/DataTeamPage';
 import DataBeritaPage from 'pages/Admin/InformasiWeb/DataBeritaPage';
@@ -42,13 +49,23 @@ function App() {
 
       {/* Rute yang Diproteksi */}
       <Route element={<PrivateRoute />}>
-        <Route path="/admin/dashboard" element={<DashboardPage />} />
-        <Route path="/admin/data-pju" element={<DataPJUPage />} />
-        <Route path="/admin/data-panel" element={<DataPanelPage />} />
-        <Route path="/admin/pemetaan-pju" element={<PemetaanPJUPage />} />
-        <Route path="/admin/data-team" element={<DataTeamPage />} />
-        <Route path="/admin/data-berita" element={<DataBeritaPage />} />
-        <Route path="/admin/edit-profile" element={<AdminProfilePage />} />
+        <Route path="/app/admin/dashboard" element={<DashboardPage />} />
+        
+        <Route path="/app/admin/data-pju" element={<DataPJUPage />} />
+        <Route path="/app/admin/data-panel" element={<DataPanelPage />} />
+
+        <Route path="/app/admin/pemetaan-pju" element={<PemetaanPJUPage />} />
+        <Route path="/app/admin/pemetaan-panel" element={<PemetaanPanelPage />} />
+
+        <Route path="/app/admin/data-kontruksi" element={<DataKontruksiPage />} />
+
+        <Route path="/app/admin/data-riwayat-pju/:id" element={<DataRiwayatPJUPage />} />
+        <Route path="/app/admin/data-riwayat-panel/:id" element={<DataRiwayatPanelPage />} />
+
+        <Route path="/app/admin/data-team" element={<DataTeamPage />} />
+        <Route path="/app/admin/data-berita" element={<DataBeritaPage />} />
+
+        <Route path="/app/admin/edit-profile" element={<AdminProfilePage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

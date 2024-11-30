@@ -17,7 +17,7 @@ const LoginPage = () => {
       const { token } = response.data;
 
       localStorage.setItem('authToken', token);
-      navigate('/admin/dashboard');
+      navigate('/app/admin/dashboard');
     } catch (error) {
       setError(error.response?.data?.message || 'Login gagal');
     }
@@ -71,7 +71,7 @@ const LoginPage = () => {
                 onClick={() => setShowPassword((prev) => !prev)}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none"
               >
-                {showPassword ? '🙈' : '👁️'}
+                {showPassword ? '🙈' : '🙏🏻'}
               </button>
             </div>
           </div>

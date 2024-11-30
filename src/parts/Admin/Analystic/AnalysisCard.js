@@ -12,7 +12,7 @@ const AnalysisCard = () => {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
     datasets: [
       {
-        label: 'Tren Perbaikan PJU',
+        label: 'Tren Perbaikan APJ',
         data: [65, 59, 80, 81, 56, 55],
         fill: false,
         backgroundColor: 'rgba(75,192,192,1)',

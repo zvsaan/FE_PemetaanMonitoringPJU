@@ -2,10 +2,14 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faChartLine,
+  faTachometerAlt,
+  faHistory,
   faMapMarkerAlt,
   faLightbulb,
   faPlug,
+  faTools,
+  faBuilding,
+  faUsers,
   faNewspaper,
   faTimes,
   faBars,
@@ -15,19 +19,27 @@ import {
 import { Link } from 'react-router-dom';
 
 const SidebarAdmin = ({ isOpen, toggleSidebar }) => {
-  const [openMenu, setOpenMenu] = useState({
-    dataPemetaan: false,
-    informasiPJU: false,
-    informasiPanel: false,
-    informasiWebsite: false,
-  });
+  const [openMenu, setOpenMenu] = useState('');
 
   const toggleSubMenu = (menu) => {
-    setOpenMenu((prevMenu) => ({
-      ...prevMenu,
-      [menu]: !prevMenu[menu],
-    }));
+    setOpenMenu((prevMenu) => (prevMenu === menu ? '' : menu));
   };
+
+  const MenuItem = ({ label, icon, children, menuKey }) => (
+    <div>
+      <button
+        onClick={() => toggleSubMenu(menuKey)}
+        className="flex items-center justify-between w-full p-3 rounded-lg hover:bg-blue-600 transition"
+      >
+        <div className="flex items-center space-x-3">
+          <FontAwesomeIcon icon={icon} />
+          <span>{label}</span>
+        </div>
+        <FontAwesomeIcon icon={openMenu === menuKey ? faAngleUp : faAngleDown} />
+      </button>
+      {openMenu === menuKey && <div className="ml-6 mt-2 space-y-2">{children}</div>}
+    </div>
+  );
 
   return (
     <>
@@ -38,146 +50,54 @@ const SidebarAdmin = ({ isOpen, toggleSidebar }) => {
         } transition-transform duration-300 ease-in-out z-40`}
       >
         <div className="p-6">
-          {/* Logo and Title */}
           <div className="flex flex-col items-center mb-8">
             <div className="text-2xl font-bold mb-6">PT TTMT</div>
-            {/* Navigation Links */}
             <nav className="flex flex-col space-y-4 w-full">
-              <Link
-                to="/admin/dashboard"
-                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-600 transition"
-              >
-                <FontAwesomeIcon icon={faChartLine} />
+              <Link to="/app/admin/dashboard" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-600 transition">
+                <FontAwesomeIcon icon={faTachometerAlt} />
                 <span>Dashboard</span>
               </Link>
 
-              {/* Data Pemetaan */}
-              <div>
-                <button
-                  onClick={() => toggleSubMenu('dataPemetaan')}
-                  className="flex items-center justify-between w-full p-3 rounded-lg hover:bg-blue-600 transition"
-                >
-                  <div className="flex items-center space-x-3">
-                    <FontAwesomeIcon icon={faMapMarkerAlt} />
-                    <span>Data Pemetaan</span>
-                  </div>
-                  <FontAwesomeIcon
-                    icon={openMenu.dataPemetaan ? faAngleUp : faAngleDown}
-                  />
-                </button>
-                {openMenu.dataPemetaan && (
-                  <div className="ml-6 mt-2 space-y-2">
-                    <Link
-                      to="/admin/pemetaan-pju"
-                      className="block p-2 rounded-lg hover:bg-blue-500 transition"
-                    >
-                      Pemetaan PJU
-                    </Link>
-                    <Link
-                      to="/admin/pemetaan-panel"
-                      className="block p-2 rounded-lg hover:bg-blue-500 transition"
-                    >
-                      Pemetaan Panel
-                    </Link>
-                  </div>
-                )}
-              </div>
+              <MenuItem label="Kelola Data" icon={faTools} menuKey="manajemenData">
+                <Link to="/app/admin/data-panel" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                  <FontAwesomeIcon icon={faPlug} /> Data Panel
+                </Link>
+                <Link to="/app/admin/data-pju" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                  <FontAwesomeIcon icon={faLightbulb} /> Data APJ
+                </Link>
+              </MenuItem>
 
-              {/* Informasi PJU */}
-              <div>
-                <button
-                  onClick={() => toggleSubMenu('informasiPJU')}
-                  className="flex items-center justify-between w-full p-3 rounded-lg hover:bg-blue-600 transition"
-                >
-                  <div className="flex items-center space-x-3">
-                    <FontAwesomeIcon icon={faLightbulb} />
-                    <span>Informasi PJU</span>
-                  </div>
-                  <FontAwesomeIcon
-                    icon={openMenu.informasiPJU ? faAngleUp : faAngleDown}
-                  />
-                </button>
-                {openMenu.informasiPJU && (
-                  <div className="ml-6 mt-2 space-y-2">
-                    <Link
-                      to="/admin/data-pju"
-                      className="block p-2 rounded-lg hover:bg-blue-500 transition"
-                    >
-                      Data PJU
-                    </Link>
-                    <Link
-                      to="/admin/riwayat-pju"
-                      className="block p-2 rounded-lg hover:bg-blue-500 transition"
-                    >
-                      Riwayat PJU
-                    </Link>
-                  </div>
-                )}
-              </div>
+              {/* <MenuItem label="Riwayat Data" icon={faHistory} menuKey="riwayatData">
+                <Link to="/app/admin/riwayat-panel" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                  <FontAwesomeIcon icon={faPlug} /> Riwayat Panel
+                </Link>
+                <Link to="/app/admin/riwayat-pju" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                  <FontAwesomeIcon icon={faLightbulb} /> Riwayat PJU
+                </Link>
+              </MenuItem> */}
 
-              {/* Informasi Panel */}
-              <div>
-                <button
-                  onClick={() => toggleSubMenu('informasiPanel')}
-                  className="flex items-center justify-between w-full p-3 rounded-lg hover:bg-blue-600 transition"
-                >
-                  <div className="flex items-center space-x-3">
-                    <FontAwesomeIcon icon={faPlug} />
-                    <span>Informasi Panel</span>
-                  </div>
-                  <FontAwesomeIcon
-                    icon={openMenu.informasiPanel ? faAngleUp : faAngleDown}
-                  />
-                </button>
-                {openMenu.informasiPanel && (
-                  <div className="ml-6 mt-2 space-y-2">
-                    <Link
-                      to="/admin/data-panel"
-                      className="block p-2 rounded-lg hover:bg-blue-500 transition"
-                    >
-                      Data Panel
-                    </Link>
-                    <Link
-                      to="/admin/riwayat-panel"
-                      className="block p-2 rounded-lg hover:bg-blue-500 transition"
-                    >
-                      Riwayat Panel
-                    </Link>
-                  </div>
-                )}
-              </div>
+              <MenuItem label="Pemetaan" icon={faMapMarkerAlt} menuKey="pemetaanPJU">
+                <Link to="/app/admin/pemetaan-panel" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                  <FontAwesomeIcon icon={faPlug} /> Pemetaan Panel
+                </Link>
+                <Link to="/app/admin/pemetaan-pju" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                  <FontAwesomeIcon icon={faLightbulb} /> Pemetaan APJ
+                </Link>
+              </MenuItem>
 
-              {/* Informasi Website */}
-              <div>
-                <button
-                  onClick={() => toggleSubMenu('informasiWebsite')}
-                  className="flex items-center justify-between w-full p-3 rounded-lg hover:bg-blue-600 transition"
-                >
-                  <div className="flex items-center space-x-3">
-                    <FontAwesomeIcon icon={faNewspaper} />
-                    <span>Data Company</span>
-                  </div>
-                  <FontAwesomeIcon
-                    icon={openMenu.informasiWebsite ? faAngleUp : faAngleDown}
-                  />
-                </button>
-                {openMenu.informasiWebsite && (
-                  <div className="ml-6 mt-2 space-y-2">
-                    <Link
-                      to="/admin/data-team"
-                      className="block p-2 rounded-lg hover:bg-blue-500 transition"
-                    >
-                      Data Tim
-                    </Link>
-                    <Link
-                      to="/admin/data-berita"
-                      className="block p-2 rounded-lg hover:bg-blue-500 transition"
-                    >
-                      Berita Terkini
-                    </Link>
-                  </div>
-                )}
-              </div>
+              <MenuItem label="Data Company" icon={faBuilding} menuKey="dataPerusahaan">
+                <Link to="/app/admin/data-team" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                  <FontAwesomeIcon icon={faUsers} /> Data Tim
+                </Link>
+                <Link to="/app/admin/data-berita" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                  <FontAwesomeIcon icon={faNewspaper} /> Berita Terkini
+                </Link>
+              </MenuItem>
+
+              {/* <Link to="/app/admin/estimasi-biaya" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-600 transition">
+                <FontAwesomeIcon icon={faTachometerAlt} />
+                <span>Estimasi Biaya</span>
+              </Link> */}
             </nav>
           </div>
         </div>

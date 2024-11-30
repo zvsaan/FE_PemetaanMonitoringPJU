@@ -13,7 +13,7 @@ export default function BrandIcon() {
       type="link"
       href="/"
     >
-      <p className="text-theme-blue text-1xl font-medium ">
+      <p className="text-white text-1xl font-medium ">
         PT TRI TUNGGAL MADIUN TERANG
       </p>
     </Button>

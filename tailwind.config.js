@@ -45,6 +45,7 @@ module.exports = {
       },
       animation: {
         'bounce-x': 'bouncex 1s infinite',
+        'brutal-move': 'brutalMove 4s infinite ease-in-out',
       },
       keyframes: {
         bouncex: {
@@ -56,6 +57,19 @@ module.exports = {
             transform: 'translateY(0)',
             animationTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)',
           },
+        },
+        brutalMove: {
+          '0%': { transform: 'translate(0, 0)', opacity: '1' },
+      '10%': { transform: 'translate(80px, -150px)', opacity: '0.9' },
+      '20%': { transform: 'translate(-100px, 120px)', opacity: '0.8' },
+      '30%': { transform: 'translate(120px, 60px)', opacity: '0.7' },
+      '40%': { transform: 'translate(-140px, -90px)', opacity: '0.6' },
+      '50%': { transform: 'translate(160px, 140px)', opacity: '0.5' },
+      '60%': { transform: 'translate(-120px, 160px)', opacity: '0.6' },
+      '70%': { transform: 'translate(100px, -130px)', opacity: '0.7' },
+      '80%': { transform: 'translate(-80px, 100px)', opacity: '0.8' },
+      '90%': { transform: 'translate(50px, -80px)', opacity: '0.9' },
+      '100%': { transform: 'translate(0, 0)', opacity: '1' },
         },
       },
       spacing: {

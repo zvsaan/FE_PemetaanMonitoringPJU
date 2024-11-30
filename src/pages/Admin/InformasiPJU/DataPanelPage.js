@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 
 import SidebarAdmin from 'parts/SidebarAdmin';
 import HeaderAdmin from 'parts/HeaderAdmin';
-import DataPanel from 'parts/Admin/InformasiPJU/DataPanel';
+import DataPanel from 'parts/Admin/ManageData/DataPJUPanel/DataPanel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 

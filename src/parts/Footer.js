@@ -7,12 +7,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons'; // Update here
 import { faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons';
 
-import Button from '../elements/Button';
+// import Button from '../elements/Button';
 
 export default function Footer() {
   return (
-    <div className="bg-black text-white py-8">
-      <div className="container mx-auto flex flex-col md:flex-row justify-between px-4">
+    <div className="bg-black text-white py-8 px-5 lg:px-28">
+      <div className="container mx-auto flex flex-col md:flex-row justify-between">
         {/* Company Information */}
         <div className="md:w-1/3 mb-8 md:mb-0">
           <h1 className="text-3xl font-semibold mb-4">
@@ -55,18 +55,6 @@ export default function Footer() {
               <FontAwesomeIcon icon={faInstagram} className="text-lg" />
             </a>
           </div>
-        </div>
-
-        <div className="md:w-1/3 mb-8 md:mb-0 md:ml-8"> {/* Adjusted margin to 'ml-8' */}
-          <h2 className="text-lg font-semibold mb-4">Kunjungi yang Lainnya</h2>
-          <ul className="text-gray-400 space-y-2">
-            <li><Button href="/about" type="link" className="hover:underline">Tentang Kami</Button></li>
-            <li><Button href="/projects" type="link" className="hover:underline">Tim Kami</Button></li>
-            <li><Button href="/projects" type="link" className="hover:underline">Data PJU</Button></li>
-            <li><Button href="/projects" type="link" className="hover:underline">Pemetaan PJU</Button></li>
-            <li><Button href="/contact" type="link" className="hover:underline">Hubungi Kami</Button></li>
-            <li><Button href="/contact" type="link" className="hover:underline">Kabar Terkini</Button></li>
-          </ul>
         </div>
       </div>
 

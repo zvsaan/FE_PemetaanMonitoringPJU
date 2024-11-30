@@ -1,13 +1,16 @@
 /* eslint-disable */
-/* eslint-disable */
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Form, Input, Select, notification } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { Table, Button, Modal, Form, Input, Select, notification, Descriptions, Spin } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined, ExportOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 const DataPJU = () => {
-  const [allData, setAllData] = useState([]); // Semua data dari backend
-  const [filteredData, setFilteredData] = useState([]); // Data yang ditampilkan
+  const navigate = useNavigate();
+  const [allData, setAllData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [showConstructionModal, setShowConstructionModal] = useState(false);
+  const [constructionData, setConstructionData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedKecamatan, setSelectedKecamatan] = useState('');
   const [kecamatanList, setKecamatanList] = useState([]);
@@ -16,6 +19,7 @@ const DataPJU = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [selectedData, setSelectedData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [panels, setPanels] = useState([]);
   const [form] = Form.useForm();
 
@@ -81,9 +85,7 @@ const DataPJU = () => {
 
     if (searchTerm) {
       tempData = tempData.filter(item =>
-        Object.values(item).some(value =>
-          String(value).toLowerCase().includes(searchTerm.toLowerCase())
-        )
+        item.no_tiang_baru && String(item.no_tiang_baru).toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -111,7 +113,6 @@ const DataPJU = () => {
     currentPage * itemsPerPage
   );
 
-  // Handle form submit untuk create/edit
   const handleModalSubmit = async () => {
     try {
       const values = await form.validateFields();
@@ -129,11 +130,26 @@ const DataPJU = () => {
       getPjus();
       setShowModal(false);
     } catch (error) {
-      console.error('Error submitting data:', error);
-      notification.error({ message: 'Gagal menyimpan data PJU' });
+      if (error.response && error.response.data) {
+        // Mapping pesan error ke Bahasa Indonesia
+        const errorMessage = error.response.data.no_tiang_baru?.[0] || 'Gagal menyimpan data PJU';
+        const translatedErrorMessage =
+          errorMessage === 'The no tiang baru has already been taken.'
+            ? 'No Tiang Baru sudah terdaftar.'
+            : errorMessage;
+  
+        form.setFields([
+          {
+            name: 'no_tiang_baru',
+            errors: [translatedErrorMessage], // Tampilkan pesan dalam Bahasa Indonesia
+          },
+        ]);
+      } else {
+        notification.error({ message: 'Gagal menyimpan data PJU' });
+      }
     }
   };
-
+  
   // Hapus data
   const handleDelete = (record) => {
     Modal.confirm({
@@ -156,9 +172,62 @@ const DataPJU = () => {
     });
   };
 
-  const handleExport = () => {
-    window.open('http://localhost:8000/api/pjus/export', '_blank');
+  const handleViewConstructionData = async (id, noTiang) => {
+    setShowConstructionModal(true);
+    setConstructionData([]); // Clear previous data
+    setIsLoading(true); // Set loading to true when data fetching starts
+    
+    try {
+      const response = await axios.get(`http://localhost:8000/api/pjus/${id}`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      const data = response.data;
+      if (data.data_konstruksis && data.data_konstruksis.length > 0) {
+        setConstructionData(data.data_konstruksis);
+        setIsLoading(false); // Stop loading once data is fetched
+      } else {
+        notification.info({ message: 'Tidak ada data di konstruksi di PJU ini' });
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error('Error fetching construction data:', error);
+      notification.error({ message: 'Failed to load construction data' });
+      setIsLoading(false); // Stop loading on error
+    }
   };  
+
+  const handleExport = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/api/export/pju', {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+        },
+        responseType: 'blob',
+      });
+
+      const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const link = document.createElement('a');
+      const url = window.URL.createObjectURL(blob);
+      link.href = url;
+      link.setAttribute('download', 'data_pju.xlsx');
+      document.body.appendChild(link);
+      link.click(); 
+      document.body.removeChild(link);
+  
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      notification.error({
+        message: 'Gagal Ekspor Data',
+        description: 'Terjadi kesalahan saat mengekspor data.',
+      });
+    }
+  };
+  
+
+  const handleViewRiwayatData = (id) => {
+    navigate(`/app/admin/data-riwayat-pju/${id}`);
+  };
 
   // Buka modal untuk create
   const handleCreate = () => {
@@ -181,7 +250,7 @@ const DataPJU = () => {
     { title: 'Panel', dataIndex: 'panel', render: (panel) => panel ? `Panel ${panel.id_panel}` : '-' },
     { title: 'Lapisan', dataIndex: 'lapisan' },
     // { title: 'No APP', dataIndex: 'no_app' },
-    { title: 'No Tiang Lama', dataIndex: 'no_tiang_lama' },
+    // { title: 'No Tiang Lama', dataIndex: 'no_tiang_lama' },
     { title: 'No Tiang Baru', dataIndex: 'no_tiang_baru' },
     { title: 'Nama Jalan', dataIndex: 'nama_jalan' },
     { title: 'Kecamatan', dataIndex: 'kecamatan' },
@@ -190,12 +259,37 @@ const DataPJU = () => {
     { title: 'Daya Lampu', dataIndex: 'daya_lampu' },
     { title: 'Status Jalan', dataIndex: 'status_jalan' },
     {
+      title: 'Detail Riwayat',
+      key: 'data_riwayaat',
+      render: (_, record) => (
+        <Button 
+          type="primary" 
+          onClick={() => handleViewRiwayatData(record.id_pju)} // Pindah ke halaman riwayat
+        >
+          Lihat
+        </Button>
+      ),
+    },
+    {
+      title: 'Data Konstruksi',
+      key: 'data_konstruksi',
+      render: (_, record) => (
+        <Button 
+          type="default" 
+          onClick={() => handleViewConstructionData(record.id_pju)}
+        >
+          Lihat Konstruksi
+        </Button>
+      ),
+    },
+    {
       title: 'Aksi',
       key: 'aksi',
       render: (_, record) => (
         <div>
           <Button className='mr-1' icon={<EditOutlined />} onClick={() => handleEdit(record)} />
           <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(record)} />
+          {/* <Button icon={<ExportOutlined />} onClick={() => handleViewConstructionData(record.id_pju)} /> */}
         </div>
       ),
     },
@@ -204,42 +298,41 @@ const DataPJU = () => {
   return (
     <div className="container">
       <div
-  style={{
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: '10px',
-    marginBottom: '16px',
-  }}
->
-  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
-    <Input.Search
-      placeholder="Cari berdasarkan data PJU"
-      value={searchTerm}
-      onChange={(e) => handleSearch(e.target.value)}
-      allowClear
-      style={{ width: '300px', flexShrink: 0 }}
-    />
-    <Select
-      placeholder="Filter Kecamatan"
-      value={selectedKecamatan}
-      onChange={handleKecamatanChange}
-      options={kecamatanList}
-      allowClear
-      style={{ width: '200px', flexShrink: 0 }}
-    />
-  </div>
-  <div style={{ display: 'flex', gap: '10px' }}>
-    <Button type="default" icon={<ExportOutlined />} onClick={handleExport}>
-      Export
-    </Button>
-    <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-      Tambah Data
-    </Button>
-  </div>
-</div>
-
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: '10px',
+        marginBottom: '16px',
+      }}
+    >
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
+        <Input.Search
+          placeholder="Cari berdasarkan data PJU"
+          value={searchTerm}
+          onChange={(e) => handleSearch(e.target.value)}
+          allowClear
+          style={{ width: '300px', flexShrink: 0 }}
+        />
+        <Select
+          placeholder="Filter Kecamatan"
+          value={selectedKecamatan}
+          onChange={handleKecamatanChange}
+          options={kecamatanList}
+          allowClear
+          style={{ width: '200px', flexShrink: 0 }}
+        />
+      </div>
+      <div style={{ display: 'flex', gap: '10px' }}>
+        <Button type="default" icon={<ExportOutlined />} onClick={handleExport}>
+          Export
+        </Button>
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
+          Tambah Data
+        </Button>
+      </div>
+    </div>
       <Table
         columns={columns}
         dataSource={paginatedData.map((item, index) => ({ ...item, key: index }))}
@@ -272,20 +365,18 @@ const DataPJU = () => {
               showSearch
               optionFilterProp="label" // Properti label digunakan untuk pencarian
               filterOption={(input, option) =>
-                option?.label.toLowerCase().includes(input.toLowerCase()) // Menyesuaikan filter
+                option?.label.toLowerCase().includes(input.toLowerCase())
               }
             />
           </Form.Item>
               <Form.Item name="lapisan" label="Lapisan" rules={[{ required: true, message: 'Lapisan wajib diisi' }]}>
                 <Input placeholder="Masukkan Lapisan" />
               </Form.Item>
-              {/* <Form.Item name="no_app" label="No APP" rules={[{ required: true, message: 'No APP wajib di isi' }]}>
-                <Input placeholder="Masukkan No APP" />
-              </Form.Item> */}
-              <Form.Item name="no_tiang_lama" label="No Tiang Lama">
-                <Input placeholder="Masukkan No Tiang Lama" />
-              </Form.Item>
-              <Form.Item name="no_tiang_baru" label="No Tiang Baru">
+              <Form.Item
+                name="no_tiang_baru"
+                label="No Tiang Baru"
+                rules={[{ required: true, message: 'No Tiang wajib diisi' }]}
+              >
                 <Input placeholder="Masukkan No Tiang Baru" />
               </Form.Item>
               <Form.Item name="nama_jalan" label="Nama Jalan" rules={[{ required: true, message: 'Nama Jalan wajib diisi' }]}>
@@ -300,26 +391,11 @@ const DataPJU = () => {
               <Form.Item name="jenis_tiang" label="Jenis Tiang" rules={[{ required: true, message: 'Jenis Tiang wajib diisi' }]}>
                 <Input placeholder="Masukkan Jenis Tiang" />
               </Form.Item>
-              <Form.Item name="spesifikasi_tiang" label="Spesifikasi Tiang">
-                <Input placeholder="Masukkan Spesifikasi Tiang" />
-              </Form.Item>
               <Form.Item name="daya_lampu" label="Daya Lampu" rules={[{ required: true, message: 'Daya Lampu wajib diisi' }]}>
                 <Input type="number" placeholder="Masukkan Daya Lampu (watt)" />
               </Form.Item>
               <Form.Item name="status_jalan" label="Status Jalan" rules={[{ required: true, message: 'Status Jalan wajib diisi' }]}>
                 <Input placeholder="Masukkan Status Jalan" />
-              </Form.Item>
-              <Form.Item name="tanggal_pemasangan_tiang" label="Tanggal Pemasangan Tiang">
-                <Input type="date" />
-              </Form.Item>
-              <Form.Item name="tanggal_pemasangan_lampu" label="Tanggal Pemasangan Lampu">
-                <Input type="date" />
-              </Form.Item>
-              <Form.Item name="lifetime_tiang" label="Lifetime Tiang">
-                <Input type="number" placeholder="Masukkan Lifetime Tiang (tahun)" />
-              </Form.Item>
-              <Form.Item name="lifetime_lampu" label="Lifetime Lampu">
-                <Input type="number" placeholder="Masukkan Lifetime Lampu (tahun)" />
               </Form.Item>
               <Form.Item name="longitude" label="Longitude" rules={[{ required: true, message: 'Longitude wajib diisi' }]}>
                 <Input type="number" placeholder="Masukkan Longitude" />
@@ -329,6 +405,29 @@ const DataPJU = () => {
               </Form.Item>
           </Form>
         </Modal>
+        <Modal
+      title={`Data Konstruksi No Tiang ${selectedData?.no_tiang_baru || ''}`}
+      visible={showConstructionModal}
+      onCancel={() => setShowConstructionModal(false)}
+      footer={null}
+    >
+      {isLoading ? (
+        <Spin tip="Loading..." /> // Show loading spinner while fetching data
+      ) : (
+        <Descriptions bordered>
+          {constructionData.map((data, index) => (
+            <Descriptions.Item label={`Konstruksi ${index + 1}`} span={3} key={data.id_konstruksi}>
+              <strong>Tanggal Penggalian:</strong> {data.tanggal_penggalian} <br />
+              <strong>Tanggal Pengecoran:</strong> {data.tanggal_pengecoran} <br />
+              <strong>Pemasangan Tiang:</strong> {data.pemasangan_tiang} <br />
+              <strong>Grounding Finishing:</strong> {data.grounding_finishing} <br />
+              <strong>Pemasangan Aksesories:</strong> {data.pemasangan_aksesories} <br />
+              <strong>Pemasangan MCB:</strong> {data.pemasangan_mcb}
+            </Descriptions.Item>
+          ))}
+        </Descriptions>
+      )}
+    </Modal>
       </div>
     );
   };

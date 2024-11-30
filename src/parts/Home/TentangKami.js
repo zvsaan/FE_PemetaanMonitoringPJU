@@ -1,125 +1,108 @@
+/* eslint-disable */
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Fade } from 'react-awesome-reveal';
-import PropTypes from 'prop-types';
+import image from '../../assets/images/tujuanKami/imag2.jpg';
 
-import TentangKami from '../../assets/video/TentangKami.mp4';
-import TentangKamiFoto from '../../assets/images/TentangKami.png';
-
-export default function AboutUs() {
+const TentangKami = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate();
 
-  const handleClick = () => {
-    navigate('/tentangkami');
-  };
-
-  const handleOpenModal = () => {
+  const handleVideoClick = () => {
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
+  const closeModal = () => {
     setIsModalOpen(false);
   };
 
   return (
     <div
+      className="bg-white text-black py-32 px-5 lg:px-28 relative"
       style={{
-        backgroundImage: "url('https://dishub.kulonprogokab.go.id/files/news/normal/494f457ee813aa4d40ea2d22b4ee5dc0.jpg')",
+        backgroundImage: `url(${image})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        backgroundAttachment: 'fixed', // Membuat background tetap fixed
+        backgroundRepeat: 'no-repeat',
+        backgroundColor: 'rgba(255, 255, 255, 0.7)', // Memberikan lapisan transparan putih
       }}
-      className="relative text-white py-24"
     >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black opacity-50"></div>
+      {/* Overlay transparan */}
+      <div className="absolute inset-0 bg-black opacity-30"></div>
 
-      {/* Content */}
-      <div className="container relative mx-auto px-4 lg:px-20 text-center lg:text-left lg:flex lg:justify-start">
-        <div className="lg:w-2/3">
-          <Fade direction="up" triggerOnce>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">Tentang Kami</h1>
-          </Fade>
-          <Fade direction="up" delay={300} triggerOnce>
-            <p className="text-base md:text-lg lg:text-xl mb-8 max-w-2xl">
-              PT Tri Tunggal Madiun Terang berkomitmen untuk menerangi jalan-jalan di wilayah 
-              Kabupaten Madiun dengan sistem penerangan yang handal dan efisien, 
-              memberikan rasa aman dan nyaman untuk semua pengguna jalan.
-            </p>
-          </Fade>
+      <div
+        className="absolute inset-0 bg-white opacity-70 z-10" // Background putih dengan transparansi
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.9)', // Atur transparansi
+        }}
+      ></div>
 
-          <Fade direction="up" delay={600} triggerOnce>
-            <button
-              className="bg-yellow-500 text-black px-6 py-3 font-semibold rounded-lg hover:bg-yellow-600 transition duration-200 mb-8"
-              type="button"
-              onClick={handleClick}
-            >
-              Selengkapnya
-            </button>
-          </Fade>
-
-          {/* Video Section (Resized and Improved Responsiveness) */}
-{/* Video Section (Left-Aligned on Large Screens, Centered on Small Screens) */}
-<Fade direction="up" delay={900} triggerOnce>
-  <div
-    className="mt-4 cursor-pointer max-w-[220px] md:max-w-[280px] lg:max-w-[320px] lg:pl-0 mx-auto lg:mx-0"
-    onClick={handleOpenModal}
-  >
-    <div className="relative">
-      <img
-        src={TentangKamiFoto}
-        alt="Video Preview"
-        className="rounded-lg w-full"
-      />
-      {/* Play Button Icon */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <svg
-          className="w-10 h-10 text-white bg-black bg-opacity-50 p-2 rounded-full"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-        >
-          <path d="M8 5v14l11-7z" />
-        </svg>
-      </div>
-    </div>
-  </div>
-</Fade>
+      {/* Section Title */}
+      <div className="relative z-10 text-left flex justify-between items-start">
+        <div className="w-full lg:w-1/2">
+          <h2 className="text-3xl font-bold">Tentang Kami</h2>
+          <p className="text-lg mt-4">
+            PT Tri Tunggal Madiun Terang berkomitmen untuk menerangi jalan-jalan di wilayah
+            Kabupaten Madiun dengan sistem penerangan yang handal dan efisien,
+            memberikan rasa aman dan nyaman untuk semua pengguna jalan.
+          </p>
         </div>
       </div>
 
-      {/* Video Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-          <div className="relative bg-black rounded-lg shadow-lg overflow-hidden w-full max-w-3xl p-4">
-            {/* Close Button */}
-            <button
-              className="absolute top-1 right-1 text-white text-2xl"
-              onClick={handleCloseModal}
-            >
-              &times;
-            </button>
+      <div className="relative z-10 my-6">
+        <button
+          className="bg-theme-purple text-white py-2 px-6 rounded-lg hover:bg-dark-theme-purple"
+        >
+          Selengkapnya
+        </button>
+      </div>
 
-            {/* Local Video */}
-            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-            <video
-              src={TentangKami}
-              controls
-              autoPlay
-              className="w-full h-full rounded-lg"
+      {/* Video Box */}
+      <div className="relative z-10 flex justify-start md:justify-between gap-6">
+        <div
+          className="relative"
+          style={{
+            backgroundImage: `url(${image})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            height: '200px', // Ukuran kotak video
+            width: '350px', // Lebar kotak video
+            borderRadius: '8px',
+            cursor: 'pointer',
+          }}
+          onClick={handleVideoClick}
+        >
+          <div className="w-full h-full flex items-center justify-center bg-black bg-opacity-50 text-white text-xl font-bold">
+            Play Video
+          </div>
+        </div>
+      </div>
+
+      {/* Modal Popup for Video */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg w-11/12 sm:w-1/2">
+            <h2 className="text-2xl font-bold mb-4">Tentang Kami PT Tri Tunggal Madiun Terang Gitu</h2>
+            <iframe
+              width="100%"
+              height="315"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ" // Ganti dengan link video YouTube Anda
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
             />
+            <div className="mt-4 text-center">
+              <button
+                className="bg-red-500 text-white py-2 px-6 rounded-full hover:bg-red-600"
+                onClick={closeModal}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
     </div>
   );
-}
-
-AboutUs.propTypes = {
-  data: PropTypes.shape({
-    title: PropTypes.string,
-    description: PropTypes.string,
-    buttonText: PropTypes.string,
-    imageUrl: PropTypes.string,
-  }).isRequired,
 };
+
+export default TentangKami;

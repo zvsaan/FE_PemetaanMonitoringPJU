@@ -2,26 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
-section {
-  @apply mb-28;
+/* Global Styles - CSS */
+.hero, .tentang-kami {
+  position: relative;
+  overflow: hidden;
 }
 
+.hero::before, .tentang-kami::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit; /* Apply background from the parent */
+  z-index: -1;
+}
+
+.tentang-kami {
+  background-color: rgba(0, 0, 0, 0.25); /* Black with transparency */
+}
+
+.text-white {
+  transition: opacity 0.5s ease;
+}
+
+.hero, .tentang-kami {
+  transition: background-color 0.5s ease;
+}
+
+section {
+  transition: background-color 0.5s ease, opacity 0.5s ease;
+}
+
+section:target {
+  opacity: 0.5; /* Transparant effect on scroll */
+}
+
+/* section {
+  @apply mb-28;
+} */
+/* 
 .active-link {
   @apply text-theme-purple;
-}
-
+} */
+/* 
 .header {
   @apply flex flex-col py-4 mb-4 justify-between;
-}
+} */
 
-.hero {
+/* .header {
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  transition: background-color 0.3s ease;
+} */
+
+/* .hero {
   @apply container px-5 flex flex-col mx-auto;
-}
+} */
 
-.portofolio-card:hover .img-hover {
+/* .portofolio-card:hover .img-hover {
   @apply opacity-25;
-}
-
+} */
+/* 
 @media (min-width: 1024px) {
   .header {
     @apply container w-full flex-row py-8 px-10 mt-2 mb-4 mx-auto items-center content-center border-b border-gray-100;
@@ -29,6 +73,29 @@ section {
 
   .hero {
     @apply container flex-row mx-auto mt-8;
+  }
+} */
+
+@keyframes randomMove {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  25% {
+    transform: translate(20px, -30px);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(-40px, 50px);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translate(30px, -20px);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translate(0, 0);
+    opacity: 0;
   }
 }
 

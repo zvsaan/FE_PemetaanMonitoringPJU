@@ -6,7 +6,7 @@ const InactivityTimer = () => {
   const navigate = useNavigate();
   const [inactive, setInactive] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const INACTIVITY_LIMIT = 1 * 60 * 60 * 1000;
+  const INACTIVITY_LIMIT = 2 * 60 * 60 * 1000;
 
   // Cek apakah user sudah login
   const isAuthenticated = localStorage.getItem('authToken');

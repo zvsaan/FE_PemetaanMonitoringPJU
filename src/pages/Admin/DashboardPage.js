@@ -6,24 +6,65 @@ import 'react-calendar/dist/Calendar.css';
 import SidebarAdmin from 'parts/SidebarAdmin';
 import HeaderAdmin from 'parts/HeaderAdmin';
 import AdminImage from '../../assets/images/admin.png';
+import axios from 'axios'; // Import axios for API calls
 import AnalysisCard from 'parts/Admin/Analystic/AnalysisCard';
 import ProblemPercentageCard from 'parts/Admin/Analystic/ProblemPercentageCard';
+import CountUp from 'react-countup'; // Importing react-countup
 
 export default class DashboardPage extends Component {
   state = {
     isOpen: true,
+    dashboardData: {
+      total_pju: 0,
+      total_panel: 0,
+      total_riwayat_pju: 0,
+      total_riwayat_panel: 0,
+    },
+  };
+
+  componentDidMount() {
+    window.scrollTo(0, 0);
+
+    // Cek apakah data sudah ada di localStorage
+    const storedData = localStorage.getItem('dashboardData');
+    if (storedData) {
+      // Jika ada, gunakan data yang sudah disimpan
+      this.setState({ dashboardData: JSON.parse(storedData) });
+    } else {
+      // Jika belum ada di localStorage, ambil data dari API
+      this.fetchDashboardData();
+    }
+  }
+
+  fetchDashboardData = () => {
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      axios.get('http://localhost:8000/api/dashboard-data', {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      })
+      .then((response) => {
+        const dashboardData = response.data;
+        // Simpan data ke localStorage
+        localStorage.setItem('dashboardData', JSON.stringify(dashboardData));
+        // Update state dengan data terbaru
+        this.setState({ dashboardData });
+      })
+      .catch((error) => {
+        console.error('Error fetching dashboard data:', error);
+      });
+    } else {
+      console.error('No auth token found in localStorage');
+    }
   };
 
   toggleSidebar = () => {
     this.setState({ isOpen: !this.state.isOpen });
   };
 
-  componentDidMount() {
-    window.scrollTo(0, 0);
-  }
-
   render() {
-    const { isOpen } = this.state;
+    const { isOpen, dashboardData } = this.state;
 
     return (
       <div className="flex">
@@ -40,9 +81,7 @@ export default class DashboardPage extends Component {
 
         {/* Main Content Area */}
         <div
-          className={`flex-1 min-h-screen transition-all duration-300 ${
-            isOpen ? 'md:ml-64' : 'ml-0'
-          }`}
+          className={`flex-1 min-h-screen transition-all duration-300 ${isOpen ? 'md:ml-64' : 'ml-0'}`}
         >
           {/* Header */}
           <HeaderAdmin />
@@ -71,26 +110,26 @@ export default class DashboardPage extends Component {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <ReportCard
                 icon={<FontAwesomeIcon icon={faLightbulb} />}
-                title="Total PJU"
-                number="250"
+                title="Total APJ"
+                number={dashboardData.total_pju}
                 bgColor="bg-indigo-500"
               />
               <ReportCard
                 icon={<FontAwesomeIcon icon={faCheckCircle} />}
-                title="Lampu Berfungsi"
-                number="220"
+                title="Total Panel"
+                number={dashboardData.total_panel}
                 bgColor="bg-teal-400"
               />
               <ReportCard
                 icon={<FontAwesomeIcon icon={faTimesCircle} />}
-                title="Lampu Rusak"
-                number="30"
+                title="Riwayat APJ"
+                number={dashboardData.total_riwayat_pju}
                 bgColor="bg-red-400"
               />
               <ReportCard
                 icon={<FontAwesomeIcon icon={faTools} />}
-                title="Perbaikan"
-                number="15"
+                title="Riwayat Panel"
+                number={dashboardData.total_riwayat_panel}
                 bgColor="bg-orange-400"
               />
             </div>
@@ -124,7 +163,7 @@ export default class DashboardPage extends Component {
   }
 }
 
-// Component untuk ReportCard
+// Component untuk ReportCard dengan CountUp
 const ReportCard = ({ icon, title, number, bgColor }) => (
   <div className="bg-white p-4 md:p-6 rounded-lg shadow flex flex-col items-center text-center">
     <div
@@ -133,6 +172,9 @@ const ReportCard = ({ icon, title, number, bgColor }) => (
       {icon}
     </div>
     <h4 className="text-sm font-semibold">{title}</h4>
-    <p className="text-lg md:text-2xl font-bold">{number}</p>
+    <p className="text-lg md:text-2xl font-bold">
+      {/* Apply CountUp to animate the number */}
+      <CountUp start={0} end={number} duration={2.5} separator="," />
+    </p>
   </div>
-);
+)
