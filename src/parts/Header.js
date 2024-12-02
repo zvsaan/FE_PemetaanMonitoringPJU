@@ -1,6 +1,7 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import { FaBars, FaTimes, FaBell, FaSearch, FaFacebook, FaLinkedin, FaYoutube } from 'react-icons/fa';
+import logo from 'assets/images/logo/logo.png'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -57,11 +58,15 @@ const Header = () => {
       <hr className="mx-5 lg:mx-28" style={{ height: '0.2px', backgroundColor: '#ccc', border: 'none' }} />
 
       {/* Navbar utama dengan logo dan menu */}
-      <div className="flex items-center justify-between px-3 lg:px-28 py-3 gap-4 w-full">
+      <div className="flex items-center justify-between px-5 lg:px-28 py-3 gap-4 w-full">
         {/* Logo Section */}
         <a href="javascript:void(0)" className='flex items-center space-x-3 rtl:space-x-reverse'>
-          <img src="https://flowbite.com/docs/images/logo.svg" className="h-8" alt="Flowbite Logo" />
-          <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">PT TTMT</span>
+          <img src={logo} className="h-8" alt="TTMT Logo" />
+          <span className="self-center text-xl font-semibold whitespace-nowrap text-white">
+            {/* Responsif, berubah teks saat di layar kecil */}
+            <span className="hidden lg:inline">PT TRI TUNGGAL MADIUN TERANG</span>
+            <span className="lg:hidden">PT TTMT</span>
+          </span>
         </a>
 
         {/* Menu Toggle for mobile */}
@@ -84,41 +89,40 @@ const Header = () => {
 
           <ul className='lg:flex lg:gap-x-10 max-lg:space-y-3 max-lg:fixed max-lg:bg-black max-lg:w-1/2 max-lg:min-w-[300px] max-lg:top-0 max-lg:left-0 max-lg:p-6 max-lg:h-full max-lg:shadow-md max-lg:overflow-auto z-50'>
             <li className='max-lg:border-b max-lg:border-white max-lg:py-3'>
-              <a href='javascript:void(0)' className='text-white hover:text-blue-400 text-[15px] font-bold block'>Home</a>
+              <a href='/' className='text-white hover:text-blue-400 text-[15px] font-bold block'>Home</a>
             </li>
             <li className='group max-lg:border-b max-lg:border-white max-lg:py-3 relative'>
-              <a href='javascript:void(0)' className='text-white hover:text-blue-400 text-[15px] font-bold lg:hover:fill-[#007bff] block'>
+              <a href='/tentangkami' className='text-white hover:text-blue-400 text-[15px] font-bold lg:hover:fill-[#007bff] block'>
                 Tentang Kami
                 <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" className="ml-1 inline-block" viewBox="0 0 24 24">
                   <path d="M12 16a1 1 0 0 1-.71-.29l-6-6a1 1 0 0 1 1.42-1.42l5.29 5.3 5.29-5.29a1 1 0 0 1 1.41 1.41l-6 6a1 1 0 0 1-.7.29z" fill="white" />
                 </svg>
               </a>
               <ul className='absolute shadow-lg bg-white space-y-3 lg:top-5 max-lg:top-8 -left-6 min-w-[250px] z-50 max-h-0 overflow-hidden group-hover:opacity-100 group-hover:max-h-[700px] px-6 group-hover:pb-4 group-hover:pt-6 transition-all duration-500'>
-                <li className='border-b py-2'><a href='javascript:void(0)' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Sekilas Tentang Kami</a></li>
-                <li className='border-b py-2'><a href='javascript:void(0)' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Area Operasi Kami</a></li>
-                <li className='border-b py-2'><a href='javascript:void(0)' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Sejarah Kami</a></li>
-                <li className='border-b py-2'><a href='javascript:void(0)' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Visi dan Misi</a></li>
-                <li className='border-b py-2'><a href='javascript:void(0)' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Team Kami</a></li>
-                <li className='border-b py-2'><a href='javascript:void(0)' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Layanan Kami</a></li>
+                <li className='border-b py-2'><a href='/tentangkami/sekilas' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Sekilas Tentang Kami</a></li>
+                <li className='border-b py-2'><a href='/tentangkami/sejarah' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Sejarah Kami</a></li>
+                <li className='border-b py-2'><a href='/tentangkami/area-persebaran' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Area Persebaran APJ</a></li>
+                <li className='border-b py-2'><a href='/tentangkami/layanan' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Layanan Kami</a></li>
+                {/* <li className='border-b py-2'><a href='/tentangkami/visi-misi' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Visi dan Misi</a></li> */}
+                <li className='border-b py-2'><a href='/tentangkami/team' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Team Kami</a></li>
+                <li className='border-b py-2'><a href='/tentangkami/konsorsium' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>PT Konsorsium Kami</a></li>
               </ul>
             </li>
             <li className='group max-lg:border-b max-lg:border-white max-lg:py-3 relative'>
-              <a href='javascript:void(0)' className='text-white hover:text-blue-400 text-[15px] font-bold lg:hover:fill-[#007bff] block'>
+              <a href='/media' className='text-white hover:text-blue-400 text-[15px] font-bold lg:hover:fill-[#007bff] block'>
                 Media
                 <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" className="ml-1 inline-block" viewBox="0 0 24 24">
                   <path d="M12 16a1 1 0 0 1-.71-.29l-6-6a1 1 0 0 1 1.42-1.42l5.29 5.3 5.29-5.29a1 1 0 0 1 1.41 1.41l-6 6a1 1 0 0 1-.7.29z" fill="white" />
                 </svg>
               </a>
               <ul className='absolute shadow-lg bg-white space-y-3 lg:top-5 max-lg:top-8 -left-6 min-w-[250px] z-50 max-h-0 overflow-hidden group-hover:opacity-100 group-hover:max-h-[700px] px-6 group-hover:pb-4 group-hover:pt-6 transition-all duration-500'>
-                <li className='border-b py-2'><a href='javascript:void(0)' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Berita</a></li>
-                <li className='border-b py-2'><a href='javascript:void(0)' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Publikasi</a></li>
-                <li className='border-b py-2'><a href='javascript:void(0)' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Fakta PT TTMT</a></li>
-                <li className='border-b py-2'><a href='javascript:void(0)' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Sign up</a></li>
-                <li className='border-b py-2'><a href='javascript:void(0)' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Blog</a></li>
+                <li className='border-b py-2'><a href='/media/berita' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Berita</a></li>
+                <li className='border-b py-2'><a href='/media/publikasi' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Publikasi</a></li>
+                <li className='border-b py-2'><a href='/media/foto-video' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Foto dan Video</a></li>
               </ul>
             </li>
             <li className='max-lg:border-b max-lg:border-white max-lg:py-3'>
-              <a href='javascript:void(0)' className='text-white hover:text-blue-400 text-[15px] font-bold block'>Contact</a>
+              <a href='/contact' className='text-white hover:text-blue-400 text-[15px] font-bold block'>Contact</a>
             </li>
           </ul>
         </div>

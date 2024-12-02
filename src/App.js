@@ -2,14 +2,18 @@
 import { Route, Routes } from 'react-router-dom';
 
 import LandingPage from 'pages/LandingPage';
-import BeritaPage from 'pages/BeritaPage';
-import DetailTentangKamiPage from 'pages/DetailTentangKamiPage';
-import NotFoundPage from 'pages/NotFoundPage';
-import TeamPage from 'pages/TeamPage';
-import DataPJUUserPage from 'pages/DataPJUPage';
-import PemetaanPJUUSerPage from 'pages/PemetaanPJUPage';
 
+import DetailTentangKamiPage from 'pages/TentangKami/DetailTentangKamiPage';
+import SekilasTentangKamiPage from 'pages/TentangKami/SekilasTentangKamiPage';
+import AreaOperasiKamiPage from 'pages/TentangKami/AreaOperasiKamiPage';
+import LayananKamiPage from 'pages/TentangKami/LayananKamiPage';
+import SejarahKamiPage from 'pages/TentangKami/SejarahKamiPage';
+import TeamKamiPage from 'pages/TentangKami/TeamKamiPage';
+
+import ContactPage from 'pages/ContactPage';
+import NotFoundPage from 'pages/NotFoundPage';
 import LoginPage from 'pages/LoginPage';
+
 import DashboardPage from 'pages/Admin/DashboardPage';
 
 import DataPJUPage from 'pages/Admin/InformasiPJU/DataPJUPage';
@@ -27,9 +31,6 @@ import DataTeamPage from 'pages/Admin/InformasiWeb/DataTeamPage';
 import DataBeritaPage from 'pages/Admin/InformasiWeb/DataBeritaPage';
 import AdminProfilePage from 'pages/Admin/AdminProfilePage';
 
-import { ProjectDetailPage } from 'pages/BeritaDetailPage';
-import { DiscussProjectPage } from 'pages/DiscussProjectPage';
-
 import PrivateRoute from 'PrivateRoute';
 import './assets/css/styles.css';
 
@@ -38,13 +39,16 @@ function App() {
     <Routes>
       {/* Rute Publik */}
       <Route exact path="/" element={<LandingPage />} />
-      <Route path="/berita" element={<BeritaPage />} />
+
       <Route path="/tentangkami" element={<DetailTentangKamiPage />} />
-      <Route exact path="/berita/:id" element={<ProjectDetailPage />} />
-      <Route exact path="/team" element={<TeamPage />} />
-      <Route exact path="/data/pemetaan-pju" element={<PemetaanPJUUSerPage />} />
-      <Route exact path="/data/data-pju" element={<DataPJUUserPage />} />
-      <Route exact path="/discuss-project" element={<DiscussProjectPage />} />
+      <Route path="/tentangkami/sekilas" element={<SekilasTentangKamiPage />} />
+      <Route path="/tentangkami/area-persebaran" element={<AreaOperasiKamiPage />} />
+      <Route path="/tentangkami/layanan" element={<LayananKamiPage />} />
+      <Route path="/tentangkami/sejarah" element={<SejarahKamiPage />} />
+      <Route path="/tentangkami/team" element={<TeamKamiPage />} />
+
+      <Route path="/contact" element={<ContactPage />} />
+
       <Route exact path="/login" element={<LoginPage />} />
 
       {/* Rute yang Diproteksi */}

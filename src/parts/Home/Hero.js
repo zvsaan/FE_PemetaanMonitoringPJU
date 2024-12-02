@@ -3,44 +3,42 @@ import React, { useState, useEffect } from "react";
 import Button from "elements/Button";
 import { Fade } from "react-awesome-reveal";
 
-// Data untuk gambar dan teks
 const heroData = [
   {
-    image: require("../../assets/images/hero/herolandingpage/image1.jpg"),
-    title: "Welcome to Our Company",
-    description: "Your trusted partner for innovation and growth.",
+    image: require("../../assets/images/hero/herolandingpage/hero1.jpeg"),
+    title: "Selamat Datang di PT Tri Tunggal Madiun Terang",
+    description: "Mitra terpercaya Anda dalam penerangan jalan umum yang aman dan efisien.",
   },
   {
-    image: require("../../assets/images/hero/herolandingpage/image2.jpg"),
-    title: "Innovating for the Future",
-    description: "We build solutions that shape the future of industries.",
+    image: require("../../assets/images/hero/herolandingpage/hero2.jpg"),
+    title: "Inovasi untuk Penerangan yang Lebih Baik",
+    description: "Kami menciptakan solusi untuk penerangan jalan umum yang ramah lingkungan dan hemat energi.",
   },
   {
-    image: require("../../assets/images/hero/herolandingpage/image-3.jpg"),
-    title: "Global Reach, Local Expertise",
-    description: "Delivering solutions to clients across the globe.",
+    image: require("../../assets/images/hero/herolandingpage/hero3.jpeg"),
+    title: "Jangkauan Global, Keahlian Lokal",
+    description: "Menghadirkan solusi penerangan jalan umum untuk berbagai daerah dengan pengalaman yang terpercaya.",
   },
   {
-    image: require("../../assets/images/hero/herolandingpage/image4.jpg"),
-    title: "Sustainability at Our Core",
-    description: "Our commitment to a sustainable future is unwavering.",
+    image: require("../../assets/images/hero/herolandingpage/hero4.jpeg"),
+    title: "Keberlanjutan Adalah Inti dari Visi Kami",
+    description: "Kami berkomitmen untuk membangun infrastruktur penerangan yang mendukung lingkungan dan berkelanjutan.",
   },
 ];
 
 const Hero = () => {
-  const [currentIndex, setCurrentIndex] = useState(0); // Menyimpan index gambar yang sedang tampil
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Fungsi untuk mengganti gambar dan teks setiap 5 detik
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % heroData.length); // Ganti gambar dan teks
-    }, 20000); // Ganti setiap 5 detik
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % heroData.length);
+    }, 10000);
 
     // Bersihkan interval saat komponen dibersihkan
     return () => clearInterval(interval);
   }, []);
 
-  const { image, title, description } = heroData[currentIndex]; // Ambil gambar dan teks berdasarkan index
+  const { image, title, description } = heroData[currentIndex];
 
   return (
     <section
