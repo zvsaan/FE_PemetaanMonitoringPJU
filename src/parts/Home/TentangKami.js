@@ -90,9 +90,9 @@ const TentangKami = () => {
       {/* Modal Popup for Video */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg w-11/12 sm:w-1/2">
+          <div className="bg-black p-6 rounded-lg w-11/12 sm:w-1/2">
             <Fade triggerOnce direction="up">
-              <h2 className="text-2xl font-bold mb-4">Tentang Kami PT Tri Tunggal Madiun Terang Gitu</h2>
+              <h2 className="text-2xl font-bold text-white mb-4">Tentang Kami PT Tri Tunggal Madiun Terang</h2>
             </Fade>
             <iframe
               width="100%"

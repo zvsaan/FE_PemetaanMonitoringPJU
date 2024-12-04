@@ -10,6 +10,10 @@ import LayananKamiPage from 'pages/TentangKami/LayananKamiPage';
 import SejarahKamiPage from 'pages/TentangKami/SejarahKamiPage';
 import TeamKamiPage from 'pages/TentangKami/TeamKamiPage';
 
+import DetailMediaPage from 'pages/Media/DetailMediaPage';
+import BeritaPage from 'pages/Media/BeritaPage';
+import DetailBeritaPage from 'pages/Media/DetailBeritaPage';
+
 import ContactPage from 'pages/ContactPage';
 import NotFoundPage from 'pages/NotFoundPage';
 import LoginPage from 'pages/LoginPage';
@@ -31,6 +35,8 @@ import DataTeamPage from 'pages/Admin/InformasiWeb/DataTeamPage';
 import DataBeritaPage from 'pages/Admin/InformasiWeb/DataBeritaPage';
 import AdminProfilePage from 'pages/Admin/AdminProfilePage';
 
+import Coba from 'pages/Coba';
+
 import PrivateRoute from 'PrivateRoute';
 import './assets/css/styles.css';
 
@@ -47,7 +53,12 @@ function App() {
       <Route path="/tentangkami/sejarah" element={<SejarahKamiPage />} />
       <Route path="/tentangkami/team" element={<TeamKamiPage />} />
 
+      <Route path="/media" element={<DetailMediaPage />} />
+      <Route path="/media/berita" element={<BeritaPage />} />
+      <Route path="/media/berita/:slug" element={<DetailBeritaPage />} />
+
       <Route path="/contact" element={<ContactPage />} />
+      <Route path="/coba" element={<Coba />} />
 
       <Route exact path="/login" element={<LoginPage />} />
 

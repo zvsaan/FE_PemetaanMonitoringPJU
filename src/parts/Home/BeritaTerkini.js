@@ -1,9 +1,23 @@
 /* eslint-disable */
-import React from 'react';
-import { Fade, Zoom } from 'react-awesome-reveal';
-import image from '../../assets/images/tujuanKami/thumbnailTujuanKami.jpeg';
+import React, { useState, useEffect } from 'react';
+import { Zoom, Fade } from 'react-awesome-reveal';
+import axios from 'axios';
+import ComponentBeritaTerkini from './ComponentBeritaTerkini';
 
 const BeritaTerkini = () => {
+  const [beritaTerkini, setBeritaTerkini] = useState([]);
+  
+  useEffect(() => {
+    // Fetch the latest 3 news articles when the component mounts
+    axios.get('http://localhost:8000/api/userberitaterbaru')
+      .then(response => {
+        setBeritaTerkini(response.data); // Set the fetched berita to the state
+      })
+      .catch(error => {
+        console.error("Error fetching berita terkini:", error);
+      });
+  }, []);
+
   return (
     <div className="bg-gray-900 text-white py-32 px-5 lg:px-28">
       {/* Section Title with Fade Animation */}
@@ -21,58 +35,7 @@ const BeritaTerkini = () => {
       </div>
 
       {/* Card Section with Fade and ZoomIn Animation */}
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Card 1 */}
-        <Zoom triggerOnce delay={600}>
-          <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg relative aspect-[3/2]">
-            <img
-              src={image}
-              alt="Penerangan Jalan"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute bottom-0 left-0 w-full p-6">
-              <h3 className="text-xl font-semibold mb-2 text-left text-white">Penerangan Jalan Desa Sumberdadi</h3>
-              <a href="#" className="text-blue-400 hover:text-blue-500">
-                Selengkapnya
-              </a>
-            </div>
-          </div>
-        </Zoom>
-
-        {/* Card 2 */}
-        <Zoom triggerOnce delay={800}>
-          <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg relative aspect-[3/2]">
-            <img
-              src={image}
-              alt="Operasional"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute bottom-0 left-0 w-full p-6">
-              <h3 className="text-xl font-semibold mb-2 text-left text-white">Pemasangan PJU di Jalan Raya Madiun</h3>
-              <a href="#" className="text-blue-400 hover:text-blue-500">
-                Selengkapnya
-              </a>
-            </div>
-          </div>
-        </Zoom>
-
-        {/* Card 3 */}
-        <Zoom triggerOnce delay={1000}>
-          <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg relative aspect-[3/2]">
-            <img
-              src={image}
-              alt="PJU Tahan Badai"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute bottom-0 left-0 w-full p-6">
-              <h3 className="text-xl font-semibold mb-2 text-left text-white">Teknologi PJU Tahan Badai</h3>
-              <a href="#" className="text-blue-400 hover:text-blue-500">
-                Selengkapnya
-              </a>
-            </div>
-          </div>
-        </Zoom>
-      </div>
+      <ComponentBeritaTerkini/>
     </div>
   );
 };
