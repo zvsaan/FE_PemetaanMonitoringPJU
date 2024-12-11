@@ -9,7 +9,7 @@ import { faBars } from '@fortawesome/free-solid-svg-icons';
 
 export default class DataBeritaPage extends Component {
   state = {
-    isOpen: true, // Sidebar default terbuka
+    isOpen: true,
   };
 
   toggleSidebar = () => {
@@ -24,14 +24,22 @@ export default class DataBeritaPage extends Component {
     const { isOpen } = this.state;
 
     return (
-      <div className="flex overflow-hidden">
+      <div className="flex overflow-hidden relative">
         {/* Sidebar */}
         <SidebarAdmin isOpen={isOpen} toggleSidebar={this.toggleSidebar} />
+
+        {/* Overlay untuk Mobile */}
+        {isOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden transition-opacity duration-2000 ease-in-out"
+            onClick={this.toggleSidebar}
+          ></div>
+        )}
 
         {/* Main Content Area */}
         <div
           className={`flex-1 min-h-screen overflow-y-auto transition-all duration-300 ${
-            isOpen ? 'ml-64' : 'ml-0'
+            isOpen ? 'md:ml-64 ml-0' : 'ml-0'
           }`}
         >
           {/* Header */}

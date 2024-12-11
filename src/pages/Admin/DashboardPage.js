@@ -1,7 +1,7 @@
 /* eslint-disable */
 import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLightbulb, faCheckCircle, faTimesCircle, faTools, faBars } from '@fortawesome/free-solid-svg-icons';
+import { faLightbulb, faCheckCircle, faTimesCircle, faTools, faThLarge, faBolt, faBars, faHistory } from '@fortawesome/free-solid-svg-icons';
 import 'react-calendar/dist/Calendar.css';
 import SidebarAdmin from 'parts/SidebarAdmin';
 import HeaderAdmin from 'parts/HeaderAdmin';
@@ -24,36 +24,29 @@ export default class DashboardPage extends Component {
 
   componentDidMount() {
     window.scrollTo(0, 0);
+    this.fetchDashboardData(); // Initial fetch
+    this.interval = setInterval(this.fetchDashboardData, 30000); // Polling setiap 30 detik
+  }
 
-    // Cek apakah data sudah ada di localStorage
-    const storedData = localStorage.getItem('dashboardData');
-    if (storedData) {
-      // Jika ada, gunakan data yang sudah disimpan
-      this.setState({ dashboardData: JSON.parse(storedData) });
-    } else {
-      // Jika belum ada di localStorage, ambil data dari API
-      this.fetchDashboardData();
-    }
+  componentWillUnmount() {
+    clearInterval(this.interval); // Bersihkan interval saat komponen di-unmount
   }
 
   fetchDashboardData = () => {
-    const authToken = localStorage.getItem('authToken');
+    const authToken = localStorage.getItem('authToken'); // Pastikan auth token tersedia
     if (authToken) {
-      axios.get('http://localhost:8000/api/dashboard-data', {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      })
-      .then((response) => {
-        const dashboardData = response.data;
-        // Simpan data ke localStorage
-        localStorage.setItem('dashboardData', JSON.stringify(dashboardData));
-        // Update state dengan data terbaru
-        this.setState({ dashboardData });
-      })
-      .catch((error) => {
-        console.error('Error fetching dashboard data:', error);
-      });
+      axios
+        .get('http://localhost:8000/api/dashboard-data', {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        })
+        .then((response) => {
+          this.setState({ dashboardData: response.data });
+        })
+        .catch((error) => {
+          console.error('Error fetching dashboard data:', error);
+        });
     } else {
       console.error('No auth token found in localStorage');
     }
@@ -107,32 +100,32 @@ export default class DashboardPage extends Component {
             </div>
 
             {/* Report Section */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <ReportCard
-                icon={<FontAwesomeIcon icon={faLightbulb} />}
-                title="Total APJ"
-                number={dashboardData.total_pju}
-                bgColor="bg-indigo-500"
-              />
-              <ReportCard
-                icon={<FontAwesomeIcon icon={faCheckCircle} />}
-                title="Total Panel"
-                number={dashboardData.total_panel}
-                bgColor="bg-teal-400"
-              />
-              <ReportCard
-                icon={<FontAwesomeIcon icon={faTimesCircle} />}
-                title="Riwayat APJ"
-                number={dashboardData.total_riwayat_pju}
-                bgColor="bg-red-400"
-              />
-              <ReportCard
-                icon={<FontAwesomeIcon icon={faTools} />}
-                title="Riwayat Panel"
-                number={dashboardData.total_riwayat_panel}
-                bgColor="bg-orange-400"
-              />
-            </div>
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+  <ReportCard
+    icon={<FontAwesomeIcon icon={faBolt} />}
+    title="Total APJ"
+    number={dashboardData.total_pju}
+    bgColor="bg-indigo-500"
+  />
+  <ReportCard
+    icon={<FontAwesomeIcon icon={faThLarge} />}
+    title="Total Panel"
+    number={dashboardData.total_panel}
+    bgColor="bg-teal-400"
+  />
+  <ReportCard
+    icon={<FontAwesomeIcon icon={faHistory} />}
+    title="Riwayat APJ"
+    number={dashboardData.total_riwayat_pju}
+    bgColor="bg-red-400"
+  />
+  <ReportCard
+    icon={<FontAwesomeIcon icon={faHistory} />}
+    title="Riwayat Panel"
+    number={dashboardData.total_riwayat_panel}
+    bgColor="bg-orange-400"
+  />
+</div>
 
             {/* Analysis Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">

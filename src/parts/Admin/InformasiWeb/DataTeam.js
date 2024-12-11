@@ -166,7 +166,16 @@ const DataTeam = () => {
 
   return (
     <div className="container">
-      <div style={{ marginBottom: 16, display: "flex", justifyContent: "space-between" }}>
+      <div 
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '10px',
+          marginBottom: '16px',
+        }}
+      >
         <Input placeholder="Cari di semua kolom" value={searchTerm} onChange={handleSearch} style={{ width: 300 }} />
         <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
           Tambah Data

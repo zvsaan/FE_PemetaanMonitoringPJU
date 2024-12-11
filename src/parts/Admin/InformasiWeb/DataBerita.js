@@ -210,7 +210,16 @@ const DataBerita = () => {
 
   return (
     <div className="container">
-      <div className="flex justify-between mb-4">
+      <div 
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '10px',
+          marginBottom: '16px',
+        }}
+      >
         <Input.Search
           placeholder="Cari di semua kolom"
           value={searchTerm}
@@ -316,8 +325,14 @@ const DataBerita = () => {
             <Upload
               maxCount={1}
               beforeUpload={(file) => {
-                setPreviewImage(URL.createObjectURL(file)); // Update preview image
-                return false; // Mencegah upload langsung
+                const isLessThan2MB = file.size / 1024 / 1024 < 2;
+                if (!isLessThan2MB) {
+                  message.error("Ukuran file tidak boleh lebih dari 2MB!");
+                  return Upload.LIST_IGNORE;
+                }
+
+                setPreviewImage(URL.createObjectURL(file));
+                return false;
               }}
               accept="image/*"
             >

@@ -1,10 +1,17 @@
 /* eslint-disable */
-import React, { useEffect, useState } from 'react';
-// import { Table, Button, Modal, Form, Input, notification } from 'antd';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Button, Modal, Form, Input, InputNumber, notification } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined, ExportOutlined } from '@ant-design/icons';
 import axios from 'axios';
+
+const debounce = (func, delay) => {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => func(...args), delay);
+  };
+};
 
 const DataPanel = () => {
   const navigate = useNavigate();
@@ -16,8 +23,11 @@ const DataPanel = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [selectedData, setSelectedData] = useState(null);
-  const [form] = Form.useForm();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPercentView, setIsPercentView] = useState(true);
+  const [form] = Form.useForm();
 
   const authToken = localStorage.getItem('authToken');
 
@@ -26,17 +36,23 @@ const DataPanel = () => {
   }, []);
 
   const getPanels = async () => {
+    if (!authToken) {
+      notification.error({ message: 'Token otentikasi tidak ditemukan' });
+      return;
+    }
+
+    setIsLoading(true);
     try {
       const response = await axios.get('http://localhost:8000/api/panels', {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
+        headers: { Authorization: `Bearer ${authToken}` },
       });
       setData(response.data);
       setFilteredData(response.data);
     } catch (error) {
       console.error('Error fetching data:', error);
       notification.error({ message: 'Gagal memuat data panel' });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -49,41 +65,47 @@ const DataPanel = () => {
     setIsPercentView(!isPercentView);
   };
 
-  const handleSearch = (value) => {
-    setSearchTerm(value);
-    const searchValue = value.toLowerCase();
-    const filtered = data.filter((item) =>
-      Object.values(item).some((val) =>
-        String(val).toLowerCase().includes(searchValue)
-      )
-    );
-    setFilteredData(filtered);
-    setCurrentPage(1);
-  };
+  const handleSearch = useMemo(
+    () =>
+      debounce((value) => {
+        if (!value) {
+          setFilteredData(data);
+        } else {
+          const searchValue = value.toLowerCase();
+          const filtered = data.filter((item) =>
+            Object.values(item).some((val) =>
+              String(val).toLowerCase().includes(searchValue)
+            )
+          );
+          setFilteredData(filtered);
+        }
+        setCurrentPage(1);
+      }, 300),
+    [data]
+  );
 
   const handleModalSubmit = async () => {
+    setIsSubmitting(true);
     try {
       const values = await form.validateFields();
       if (modalType === 'create') {
         await axios.post('http://localhost:8000/api/panels', values, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
+          headers: { Authorization: `Bearer ${authToken}` },
         });
         notification.success({ message: 'Data Panel berhasil ditambahkan' });
       } else if (modalType === 'edit') {
         await axios.post(`http://localhost:8000/api/panels/${selectedData.id_panel}`, values, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
+          headers: { Authorization: `Bearer ${authToken}` },
         });
         notification.success({ message: 'Data Panel berhasil diperbarui' });
       }
       getPanels();
       setShowModal(false);
     } catch (error) {
-      console.error('Error submitting data:', error);
-      notification.error({ message: 'Gagal menyimpan data panel' });
+      const message = error.response?.data?.message || 'Terjadi kesalahan pada server';
+      notification.error({ message: `Error: ${message}` });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -96,9 +118,7 @@ const DataPanel = () => {
       onOk: async () => {
         try {
           await axios.delete(`http://localhost:8000/api/panels/${record.id_panel}`, {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
+            headers: { Authorization: `Bearer ${authToken}` },
           });
           notification.success({ message: 'Data Panel berhasil dihapus' });
           getPanels();
@@ -108,6 +128,30 @@ const DataPanel = () => {
         }
       },
     });
+  };
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    notification.info({ message: 'Sedang mengekspor data...', description: 'Harap tunggu beberapa saat.' });
+    try {
+      const response = await axios.get('http://localhost:8000/api/export/panel', {
+        headers: { Authorization: `Bearer ${authToken}` },
+        responseType: 'blob',
+      });
+      const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.setAttribute('download', 'data_panel.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      notification.success({ message: 'Data Berhasil Diekspor', description: 'File data_panel.xlsx berhasil diunduh.' });
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      notification.error({ message: 'Gagal Mengekspor Data', description: 'Terjadi kesalahan saat mengekspor data.' });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handleCreate = () => {
@@ -128,39 +172,8 @@ const DataPanel = () => {
     navigate(`/app/admin/data-riwayat-panel/${id}`);
   };
 
-  const handleExport = async () => {
-    try {
-      // Kirim permintaan GET untuk mengekspor data dengan header authorization
-      const response = await axios.get('http://localhost:8000/api/export/panel', {
-        headers: {
-          Authorization: `Bearer ${authToken}`, // Menambahkan token ke header
-          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // Tentukan jenis konten file
-        },
-        responseType: 'blob', // Tentukan response sebagai blob (file)
-      });
-  
-      // Buat URL objek untuk file Excel yang diterima
-      const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const link = document.createElement('a');
-      const url = window.URL.createObjectURL(blob);
-      link.href = url;
-      link.setAttribute('download', 'data_pju.xlsx'); // Nama file yang diunduh
-      document.body.appendChild(link);
-      link.click(); // Menyimulasikan klik untuk mengunduh file
-      document.body.removeChild(link); // Hapus elemen setelah digunakan
-  
-    } catch (error) {
-      console.error('Error exporting data:', error);
-      notification.error({
-        message: 'Gagal Ekspor Data',
-        description: 'Terjadi kesalahan saat mengekspor data.',
-      });
-    }
-  };
-
   const columns = [
     { title: 'No', dataIndex: 'id_panel', render: (_, __, index) => (currentPage - 1) * itemsPerPage + index + 1 },
-    // { title: 'Lapisan', dataIndex: 'lapisan', render: (text) => text || '-' },
     { title: 'No APP', dataIndex: 'no_app', render: (text) => text || '-' },
     { title: 'Longitude', dataIndex: 'longitude', render: (text) => text || '-' },
     { title: 'Latitude', dataIndex: 'latitude', render: (text) => text || '-' },
@@ -218,12 +231,21 @@ const DataPanel = () => {
       title: 'Aksi',
       key: 'aksi',
       render: (_, record) => (
-        <div>
-          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-          <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(record)} />
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)}>
+            Edit
+          </Button>
+          <Button
+            icon={<DeleteOutlined />}
+            danger
+            onClick={() => handleDelete(record)}
+          >
+            Hapus
+          </Button>
         </div>
       ),
     },
+    
   ];  
 
   return (
@@ -231,41 +253,37 @@ const DataPanel = () => {
       {/* Search and Create (Fixed Position) */}
       <div
         style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 1,
-          backgroundColor: '#fff',
-          padding: '10px 0',
-          marginBottom: '16px',
           display: 'flex',
+          flexWrap: 'wrap',
           justifyContent: 'space-between',
           alignItems: 'center',
-          borderBottom: '1px solid #f0f0f0',
+          gap: '10px',
+          marginBottom: '16px',
         }}
       >
-        {/* Input Search */}
         <Input.Search
           placeholder="Cari semua data"
           value={searchTerm}
-          onChange={(e) => handleSearch(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            handleSearch(e.target.value);
+          }}
           allowClear
           style={{ width: 300 }}
         />
-
-        {/* Grouping Buttons */}
         <div style={{ display: 'flex', gap: '10px' }}>
-          <Button type="default" icon={<ExportOutlined />} onClick={handleExport}>
-            Export Data
-          </Button>
+        <Button icon={<ExportOutlined />} loading={isExporting} onClick={handleExport}>
+          {isExporting ? 'Mengekspor...' : 'Export Data'}
+        </Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
             Tambah Data
           </Button>
         </div>
       </div>
-      {/* Table */}
       <Table
         columns={columns}
         dataSource={filteredData.map((item, index) => ({ ...item, key: index }))}
+        loading={isLoading}
         pagination={{
           current: currentPage,
           pageSize: itemsPerPage,
@@ -278,73 +296,59 @@ const DataPanel = () => {
         }}
         scroll={{ x: 'max-content' }}
       />
-
-      {/* Modal */}
-          <Modal
-      title={modalType === 'create' ? 'Tambah Data Panel' : 'Edit Data Panel'}
-      visible={showModal}
-      onCancel={() => setShowModal(false)}
-      onOk={() => form.submit()}
-    >
+      <Modal
+        title={modalType === 'edit' ? 'Edit Data Panel' : 'Tambah Data Panel'}
+        visible={showModal}
+        onCancel={() => setShowModal(false)}
+        confirmLoading={isSubmitting}
+        okButtonProps={{ loading: isSubmitting }}
+        onOk={() => form.submit()}
+      >
       <Form form={form} layout="vertical" onFinish={handleModalSubmit} onValuesChange={(changedValues, allValues) => {
-      // Hitung total nilai PJU
-      const fieldsToSum = [
-        'line1_120w',
-        'line1_120w_2l',
-        'line1_90w',
-        'line1_60w',
-        'line2_120w',
-        'line2_120w_2l',
-        'line2_90w',
-        'line2_60w',
-      ];
-      const totalPJU = fieldsToSum.reduce(
-        (sum, field) => sum + (parseInt(allValues[field], 10) || 0),
-        0
-      );
-
-      // Update jumlah_pju field
-      form.setFieldsValue({ jumlah_pju: totalPJU });
-    }}
-  >
-        <Form.Item
-          name="lapisan"
-          label="Lapisan"
-          rules={[{ required: true, message: 'Lapisan wajib diisi' }]}
+        const fieldsToSum = [
+          'line1_120w',
+          'line1_120w_2l',
+          'line1_90w',
+          'line1_60w',
+          'line2_120w',
+          'line2_120w_2l',
+          'line2_90w',
+          'line2_60w',
+        ];
+        const totalPJU = fieldsToSum.reduce(
+          (sum, field) => sum + (parseInt(allValues[field], 10) || 0),
+          0
+        );
+          form.setFieldsValue({ jumlah_pju: totalPJU });
+        }}
         >
-          <Input placeholder="Masukkan Lapisan" />
-        </Form.Item>
-        <Form.Item
-          name="no_app"
-          label="No APP"
-          rules={[{ required: true, message: 'No APP wajib diisi' }]}
-        >
-          <Input placeholder="Masukkan No APP" />
-        </Form.Item>
-        <Form.Item
-          name="longitude"
-          label="Longitude"
-          rules={[
-            {
-              type: 'number',
-              message: 'Longitude harus berupa angka desimal',
-            },
-          ]}
-        >
-          <Input placeholder="Masukkan Longitude (Contoh: 123.4567890)" />
-        </Form.Item>
-        <Form.Item
-          name="latitude"
-          label="Latitude"
-          rules={[
-            {
-              type: 'number',
-              message: 'Latitude harus berupa angka desimal',
-            },
-          ]}
-        >
-          <Input placeholder="Masukkan Latitude (Contoh: -98.7654321)" />
-        </Form.Item>
+          <Form.Item
+            name="no_app"
+            label="No APP"
+            rules={[{ required: true, message: 'No APP wajib diisi' }]}
+          >
+            <Input placeholder="Masukkan No APP" />
+          </Form.Item>
+          <Form.Item
+            name="longitude"
+            label="Longitude"
+            rules={[
+              { required: true, message: 'Longitude wajib diisi' },
+              // { type: 'number', min: -180, max: 180, message: 'Longitude harus antara -180 dan 180' },
+            ]}
+          >
+            <InputNumber placeholder="Masukkan Longitude" style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item
+            name="latitude"
+            label="Latitude"
+            rules={[
+              { required: true, message: 'Latitude wajib diisi' },
+              // { type: 'number', min: -90, max: 90, message: 'Latitude harus antara -90 dan 90' },
+            ]}
+          >
+            <InputNumber placeholder="Masukkan Latitude" style={{ width: '100%' }} />
+          </Form.Item>
         <Form.Item name="abd_no" label="ABD No">
           <Input placeholder="Masukkan ABD No (Opsional)" />
         </Form.Item>
@@ -399,24 +403,12 @@ const DataPanel = () => {
         <Form.Item
           name="total_daya_beban"
           label="Total Daya Beban"
-          rules={[
-            {
-              type: 'number',
-              message: 'Total Daya Beban harus berupa angka',
-            },
-          ]}
         >
           <Input placeholder="Masukkan Total Daya Beban" />
         </Form.Item>
         <Form.Item
           name="daya_app"
           label="Daya APP"
-          rules={[
-            {
-              type: 'number',
-              message: 'Daya APP harus berupa angka',
-            },
-          ]}
         >
           <Input placeholder="Masukkan Daya APP" />
         </Form.Item>

@@ -204,13 +204,22 @@ const DataRiwayatPJU = () => {
 
   return (
     <div className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '10px',
+          marginBottom: '16px',
+        }}
+      >
         <Input.Search
           placeholder="Cari berdasarkan data PJU"
           onSearch={handleSearch}
           style={{ width: '300px' }}
         />
-        <div>
+        <div style={{ display: 'flex', gap: '10px' }}>
           <Button type="default" icon={<ExportOutlined />}>
             Export
           </Button>

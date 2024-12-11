@@ -9,8 +9,6 @@ const DataPJU = () => {
   const navigate = useNavigate();
   const [allData, setAllData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  const [showConstructionModal, setShowConstructionModal] = useState(false);
-  const [constructionData, setConstructionData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedKecamatan, setSelectedKecamatan] = useState('');
   const [kecamatanList, setKecamatanList] = useState([]);
@@ -21,6 +19,8 @@ const DataPJU = () => {
   const [selectedData, setSelectedData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [panels, setPanels] = useState([]);
+  const [isExporting, setIsExporting] = useState(false);
+  const [sortOrder, setSortOrder] = useState(null);
   const [form] = Form.useForm();
 
   const authToken = localStorage.getItem('authToken');
@@ -33,6 +33,7 @@ const DataPJU = () => {
 
   // Fetch semua data PJU
   const getPjus = async () => {
+    setIsLoading(true); // Mulai loading
     try {
       const response = await axios.get('http://localhost:8000/api/pjus', {
         headers: { Authorization: `Bearer ${authToken}` },
@@ -42,8 +43,10 @@ const DataPJU = () => {
     } catch (error) {
       console.error('Error fetching data:', error);
       notification.error({ message: 'Gagal memuat data PJU' });
+    } finally {
+      setIsLoading(false); // Selesai loading
     }
-  };
+  };  
 
   // Fetch daftar kecamatan
   const getKecamatanList = async () => {
@@ -63,7 +66,7 @@ const DataPJU = () => {
       const response = await axios.get('http://localhost:8000/api/dropdownpanels', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      console.log('API Response:', response.data);
+      // console.log('API Response:', response.data);
       setPanels(
         response.data.map((panel) => ({
           value: panel.value,
@@ -73,41 +76,61 @@ const DataPJU = () => {
     } catch (error) {
       console.error('Error fetching panels:', error);
     }
-  };  
+  }; 
 
-  // Filter data berdasarkan kecamatan dan pencarian
   const filterData = () => {
     let tempData = allData;
-
+  
     if (selectedKecamatan) {
       tempData = tempData.filter(item => item.kecamatan === selectedKecamatan);
     }
-
+  
     if (searchTerm) {
       tempData = tempData.filter(item =>
         item.no_tiang_baru && String(item.no_tiang_baru).toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
+  
     setFilteredData(tempData);
-  };
+    setSortOrder(null);
+  };  
 
-  // Update data yang ditampilkan setiap kali filter berubah
+  const sortData = (order) => {
+    let sortedData = [...allData]; // Salin data asli
+    if (order === 'asc') {
+      sortedData.sort((a, b) => {
+        const numA = parseFloat(a.no_tiang_baru) || 0; // Konversi ke angka, fallback ke 0
+        const numB = parseFloat(b.no_tiang_baru) || 0; // Konversi ke angka, fallback ke 0
+        return numA - numB; // Urutkan secara ascending
+      });
+    } else if (order === 'desc') {
+      sortedData.sort((a, b) => {
+        const numA = parseFloat(a.no_tiang_baru) || 0; // Konversi ke angka, fallback ke 0
+        const numB = parseFloat(b.no_tiang_baru) || 0; // Konversi ke angka, fallback ke 0
+        return numB - numA; // Urutkan secara descending
+      });
+    }
+    setFilteredData(sortedData); // Atur data yang ditampilkan
+    setSortOrder(order); // Perbarui status urutan
+  };  
+
   useEffect(() => {
     filterData();
   }, [searchTerm, selectedKecamatan]);
 
-  // Handle pencarian
   const handleSearch = (value) => {
     setSearchTerm(value);
   };
 
-  // Handle dropdown kecamatan
   const handleKecamatanChange = (value) => {
-    setSelectedKecamatan(value);
-  };
+    setSelectedKecamatan(value || '');
+  };  
 
-  // Paginasi data
+  // const resetFilters = () => {
+  //   setSearchTerm('');
+  //   setSelectedKecamatan('');
+  // };  
+
   const paginatedData = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -141,7 +164,7 @@ const DataPJU = () => {
         form.setFields([
           {
             name: 'no_tiang_baru',
-            errors: [translatedErrorMessage], // Tampilkan pesan dalam Bahasa Indonesia
+            errors: [translatedErrorMessage],
           },
         ]);
       } else {
@@ -172,58 +195,31 @@ const DataPJU = () => {
     });
   };
 
-  const handleViewConstructionData = async (id, noTiang) => {
-    setShowConstructionModal(true);
-    setConstructionData([]); // Clear previous data
-    setIsLoading(true); // Set loading to true when data fetching starts
-    
-    try {
-      const response = await axios.get(`http://localhost:8000/api/pjus/${id}`, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
-      const data = response.data;
-      if (data.data_konstruksis && data.data_konstruksis.length > 0) {
-        setConstructionData(data.data_konstruksis);
-        setIsLoading(false); // Stop loading once data is fetched
-      } else {
-        notification.info({ message: 'Tidak ada data di konstruksi di PJU ini' });
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.error('Error fetching construction data:', error);
-      notification.error({ message: 'Failed to load construction data' });
-      setIsLoading(false); // Stop loading on error
-    }
-  };  
-
   const handleExport = async () => {
+    setIsExporting(true);
     try {
       const response = await axios.get('http://localhost:8000/api/export/pju', {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
-        },
+        headers: { Authorization: `Bearer ${authToken}` },
         responseType: 'blob',
       });
-
-      const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
       const link = document.createElement('a');
-      const url = window.URL.createObjectURL(blob);
-      link.href = url;
+      link.href = window.URL.createObjectURL(blob);
       link.setAttribute('download', 'data_pju.xlsx');
       document.body.appendChild(link);
-      link.click(); 
+      link.click();
       document.body.removeChild(link);
-  
+      notification.success({ message: 'Data berhasil diekspor!' });
     } catch (error) {
-      console.error('Error exporting data:', error);
-      notification.error({
-        message: 'Gagal Ekspor Data',
-        description: 'Terjadi kesalahan saat mengekspor data.',
-      });
+      const errorMsg = error.response?.data?.message || 'Terjadi kesalahan saat mengekspor data.';
+      notification.error({ message: 'Gagal mengekspor data!', description: errorMsg });
+    } finally {
+      setIsExporting(false);
     }
-  };
-  
+  };  
 
   const handleViewRiwayatData = (id) => {
     navigate(`/app/admin/data-riwayat-pju/${id}`);
@@ -248,10 +244,10 @@ const DataPJU = () => {
   const columns = [
     { title: 'No', dataIndex: 'id_pju', render: (_, __, index) => (currentPage - 1) * itemsPerPage + index + 1 },
     { title: 'Panel', dataIndex: 'panel', render: (panel) => panel ? `Panel ${panel.id_panel}` : '-' },
-    { title: 'Lapisan', dataIndex: 'lapisan' },
-    // { title: 'No APP', dataIndex: 'no_app' },
-    // { title: 'No Tiang Lama', dataIndex: 'no_tiang_lama' },
-    { title: 'No Tiang Baru', dataIndex: 'no_tiang_baru' },
+    {
+      title: 'No Tiang Baru',
+      dataIndex: 'no_tiang_baru',
+    },
     { title: 'Nama Jalan', dataIndex: 'nama_jalan' },
     { title: 'Kecamatan', dataIndex: 'kecamatan' },
     { title: 'Tinggi Tiang', dataIndex: 'tinggi_tiang' },
@@ -264,21 +260,9 @@ const DataPJU = () => {
       render: (_, record) => (
         <Button 
           type="primary" 
-          onClick={() => handleViewRiwayatData(record.id_pju)} // Pindah ke halaman riwayat
+          onClick={() => handleViewRiwayatData(record.id_pju)}
         >
           Lihat
-        </Button>
-      ),
-    },
-    {
-      title: 'Data Konstruksi',
-      key: 'data_konstruksi',
-      render: (_, record) => (
-        <Button 
-          type="default" 
-          onClick={() => handleViewConstructionData(record.id_pju)}
-        >
-          Lihat Konstruksi
         </Button>
       ),
     },
@@ -286,10 +270,17 @@ const DataPJU = () => {
       title: 'Aksi',
       key: 'aksi',
       render: (_, record) => (
-        <div>
-          <Button className='mr-1' icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-          <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(record)} />
-          {/* <Button icon={<ExportOutlined />} onClick={() => handleViewConstructionData(record.id_pju)} /> */}
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)}>
+            Edit
+          </Button>
+          <Button
+            icon={<DeleteOutlined />}
+            danger
+            onClick={() => handleDelete(record)}
+          >
+            Hapus
+          </Button>
         </div>
       ),
     },
@@ -309,7 +300,7 @@ const DataPJU = () => {
     >
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
         <Input.Search
-          placeholder="Cari berdasarkan data PJU"
+          placeholder="Cari berdasarkan No Tiang"
           value={searchTerm}
           onChange={(e) => handleSearch(e.target.value)}
           allowClear
@@ -319,14 +310,25 @@ const DataPJU = () => {
           placeholder="Filter Kecamatan"
           value={selectedKecamatan}
           onChange={handleKecamatanChange}
-          options={kecamatanList}
+          options={[{ value: '', label: 'Semua Kecamatan' }, ...kecamatanList]}
           allowClear
           style={{ width: '200px', flexShrink: 0 }}
         />
+        <Select
+          placeholder="Urutkan No Tiang"
+          value={sortOrder}
+          onChange={sortData}
+          allowClear
+          options={[
+            { value: 'asc', label: 'Terkecil ke Terbesar' },
+            { value: 'desc', label: 'Terbesar ke Terkecil' },
+          ]}
+        />
       </div>
       <div style={{ display: 'flex', gap: '10px' }}>
-        <Button type="default" icon={<ExportOutlined />} onClick={handleExport}>
-          Export
+        {/* <Button onClick={resetFilters}>Reset Filter</Button> */}
+        <Button type="default" icon={<ExportOutlined />} loading={isExporting} onClick={handleExport}>
+          {isExporting ? 'Sedang Mengekspor...' : 'Export'}
         </Button>
         <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
           Tambah Data
@@ -335,6 +337,7 @@ const DataPJU = () => {
     </div>
       <Table
         columns={columns}
+        loading={isLoading}
         dataSource={paginatedData.map((item, index) => ({ ...item, key: index }))}
         pagination={{
           current: currentPage,
@@ -369,13 +372,20 @@ const DataPJU = () => {
               }
             />
           </Form.Item>
-              <Form.Item name="lapisan" label="Lapisan" rules={[{ required: true, message: 'Lapisan wajib diisi' }]}>
-                <Input placeholder="Masukkan Lapisan" />
-              </Form.Item>
               <Form.Item
                 name="no_tiang_baru"
                 label="No Tiang Baru"
-                rules={[{ required: true, message: 'No Tiang wajib diisi' }]}
+                rules={[
+                  { required: true, message: 'No Tiang wajib diisi' },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || allData.every(data => data.no_tiang_baru !== value || data.id_pju === selectedData?.id_pju)) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('No Tiang Baru sudah terdaftar!'));
+                    },
+                  }),
+                ]}
               >
                 <Input placeholder="Masukkan No Tiang Baru" />
               </Form.Item>
@@ -405,29 +415,6 @@ const DataPJU = () => {
               </Form.Item>
           </Form>
         </Modal>
-        <Modal
-      title={`Data Konstruksi No Tiang ${selectedData?.no_tiang_baru || ''}`}
-      visible={showConstructionModal}
-      onCancel={() => setShowConstructionModal(false)}
-      footer={null}
-    >
-      {isLoading ? (
-        <Spin tip="Loading..." /> // Show loading spinner while fetching data
-      ) : (
-        <Descriptions bordered>
-          {constructionData.map((data, index) => (
-            <Descriptions.Item label={`Konstruksi ${index + 1}`} span={3} key={data.id_konstruksi}>
-              <strong>Tanggal Penggalian:</strong> {data.tanggal_penggalian} <br />
-              <strong>Tanggal Pengecoran:</strong> {data.tanggal_pengecoran} <br />
-              <strong>Pemasangan Tiang:</strong> {data.pemasangan_tiang} <br />
-              <strong>Grounding Finishing:</strong> {data.grounding_finishing} <br />
-              <strong>Pemasangan Aksesories:</strong> {data.pemasangan_aksesories} <br />
-              <strong>Pemasangan MCB:</strong> {data.pemasangan_mcb}
-            </Descriptions.Item>
-          ))}
-        </Descriptions>
-      )}
-    </Modal>
       </div>
     );
   };

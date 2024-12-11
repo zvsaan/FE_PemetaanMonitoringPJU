@@ -22,11 +22,10 @@ import DashboardPage from 'pages/Admin/DashboardPage';
 
 import DataPJUPage from 'pages/Admin/InformasiPJU/DataPJUPage';
 import DataPanelPage from 'pages/Admin/InformasiPJU/DataPanelPage';
+import DataKonstruksiPage from 'pages/Admin/InformasiPJU/DataKonstruksiPage';
 
 import PemetaanPJUPage from 'pages/Admin/Pemetaan/PemetaanPJUPage';
 import PemetaanPanelPage from 'pages/Admin/Pemetaan/PemetaanPanelPage';
-
-import DataKontruksiPage from 'pages/Admin/InformasiPJU/DataPanelKontruksi';
 
 import DataRiwayatPJUPage from 'pages/Admin/InformasiPJU/DataRiwayatPJUPage';
 import DataRiwayatPanelPage from 'pages/Admin/InformasiPJU/DataRiwayatPanelPage';
@@ -68,11 +67,10 @@ function App() {
         
         <Route path="/app/admin/data-pju" element={<DataPJUPage />} />
         <Route path="/app/admin/data-panel" element={<DataPanelPage />} />
+        <Route path="/app/admin/data-konstruksi" element={<DataKonstruksiPage />} />
 
         <Route path="/app/admin/pemetaan-pju" element={<PemetaanPJUPage />} />
         <Route path="/app/admin/pemetaan-panel" element={<PemetaanPanelPage />} />
-
-        <Route path="/app/admin/data-kontruksi" element={<DataKontruksiPage />} />
 
         <Route path="/app/admin/data-riwayat-pju/:id" element={<DataRiwayatPJUPage />} />
         <Route path="/app/admin/data-riwayat-panel/:id" element={<DataRiwayatPanelPage />} />

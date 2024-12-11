@@ -11,46 +11,16 @@ const Berita = () => {
     lastPage: 1,
     totalPages: 1,
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/userberita?page=1') 
-      .then((response) => {
-        setBerita(response.data.data); 
-        setPagination({
-          currentPage: response.data.current_page,
-          lastPage: response.data.last_page,
-          totalPages: response.data.total_pages,
-        });
-      })
-      .catch((error) => {
-        console.error("Error fetching berita:", error);
-      });
+    fetchBerita(1); // Load berita on initial render
   }, []);
 
-  const sortBerita = (beritaData, option) => {
-    if (!Array.isArray(beritaData)) return beritaData;
-
-    return beritaData.filter(item => item.published_date && item.title)
-                     .sort((a, b) => {
-                        switch (option) {
-                          case 'terbaru':
-                            return new Date(b.published_date) - new Date(a.published_date);
-                          case 'terlama':
-                            return new Date(a.published_date) - new Date(b.published_date);
-                          case 'az':
-                            return a.title.localeCompare(b.title);
-                          case 'za':
-                            return b.title.localeCompare(a.title);
-                          default:
-                            return 0;
-                        }
-                      });
-  };
-
-  const sortedBerita = sortBerita(berita, sortOption);
-
-  const handlePagination = (page) => {
-    axios.get(`http://localhost:8000/api/userberita?page=${page}`)
+  const fetchBerita = (page) => {
+    setIsLoading(true); // Start loading
+    axios
+      .get(`http://localhost:8000/api/userberita?page=${page}`)
       .then((response) => {
         setBerita(response.data.data);
         setPagination({
@@ -58,10 +28,40 @@ const Berita = () => {
           lastPage: response.data.last_page,
           totalPages: response.data.total_pages,
         });
+        setIsLoading(false); // End loading
       })
       .catch((error) => {
         console.error("Error fetching berita:", error);
+        setIsLoading(false); // End loading
       });
+  };
+
+  const sortBerita = (beritaData, option) => {
+    if (!Array.isArray(beritaData)) return beritaData;
+
+    return beritaData
+      .filter((item) => item.published_date && item.title)
+      .sort((a, b) => {
+        switch (option) {
+          case 'terbaru':
+            return new Date(b.published_date) - new Date(a.published_date);
+          case 'terlama':
+            return new Date(a.published_date) - new Date(b.published_date);
+          case 'az':
+            return a.title.localeCompare(b.title);
+          case 'za':
+            return b.title.localeCompare(a.title);
+          default:
+            return 0;
+        }
+      });
+  };
+
+  const sortedBerita = sortBerita(berita, sortOption);
+
+  const handlePagination = (page) => {
+    if (page < 1 || page > pagination.lastPage) return;
+    fetchBerita(page);
   };
 
   return (
@@ -69,7 +69,9 @@ const Berita = () => {
       <div className="flex justify-between items-center mb-5">
         <h1 className="text-3xl font-bold">Semua Berita</h1>
         <div className="ml-auto">
-          <label htmlFor="sort" className="mr-3 text-sm text-gray-700">Urutkan:</label>
+          <label htmlFor="sort" className="mr-3 text-sm text-gray-700">
+            Urutkan:
+          </label>
           <select
             id="sort"
             className="border border-gray-300 rounded py-2"
@@ -84,10 +86,8 @@ const Berita = () => {
         </div>
       </div>
 
-      {/* Display Skeleton Loader if berita is empty */}
-      {berita.length === 0 ? (
+      {isLoading ? (
         <div>
-          {/* Skeleton Loader for each news item */}
           {[...Array(5)].map((_, index) => (
             <div key={index} className="flex mb-10">
               <div className="w-1/3 mr-5">
@@ -102,6 +102,10 @@ const Berita = () => {
               </div>
             </div>
           ))}
+        </div>
+      ) : berita.length === 0 ? (
+        <div className="text-center text-gray-600 mt-10">
+          <p>Tidak ada berita yang tersedia.</p>
         </div>
       ) : (
         sortedBerita.map((item) => (
@@ -119,7 +123,10 @@ const Berita = () => {
               <p className="text-base text-gray-700 mb-4">
                 {item.content.slice(0, 150)}...
               </p>
-              <Link to={`/media/berita/${item.slug}`} className="text-blue-500 hover:text-blue-700">
+              <Link
+                to={`/media/berita/${item.slug}`}
+                className="text-blue-500 hover:text-blue-700"
+              >
                 Selengkapnya
               </Link>
             </div>
@@ -127,25 +134,27 @@ const Berita = () => {
         ))
       )}
 
-      <div className="flex justify-between items-center mt-10">
-        <button
-          onClick={() => handlePagination(pagination.currentPage - 1)}
-          disabled={pagination.currentPage === 1}
-          className="bg-blue-500 text-white py-2 px-4 rounded"
-        >
-          Previous
-        </button>
-        <span className="text-sm text-gray-700">
-          Page {pagination.currentPage} of {pagination.totalPages}
-        </span>
-        <button
-          onClick={() => handlePagination(pagination.currentPage + 1)}
-          disabled={pagination.currentPage === pagination.totalPages}
-          className="bg-blue-500 text-white py-2 px-4 rounded"
-        >
-          Next
-        </button>
-      </div>
+      {berita.length > 0 && (
+        <div className="flex justify-between items-center mt-10">
+          <button
+            onClick={() => handlePagination(pagination.currentPage - 1)}
+            disabled={pagination.currentPage === 1}
+            className="bg-blue-500 text-white py-2 px-4 rounded"
+          >
+            Previous
+          </button>
+          <span className="text-sm text-gray-700">
+            Page {pagination.currentPage} of {pagination.totalPages}
+          </span>
+          <button
+            onClick={() => handlePagination(pagination.currentPage + 1)}
+            disabled={pagination.currentPage === pagination.lastPage}
+            className="bg-blue-500 text-white py-2 px-4 rounded"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -22,7 +22,7 @@ const PrivateRoute = () => {
         );
 
         setIsAuthenticated(response.data.success);
-        console.log("Data", response.data.user);
+        // console.log("Data", response.data.user);
       } catch (error) {
         setIsAuthenticated(false);
       }

@@ -3,11 +3,11 @@ import React, { Component } from 'react';
 
 import SidebarAdmin from 'parts/SidebarAdmin';
 import HeaderAdmin from 'parts/HeaderAdmin';
-import DataPanel from 'parts/Admin/ManageData/DataPJUPanel/DataPanel';
+import DataKonstruksi from 'parts/Admin/ManageData/DataPJUPanel/DataKonstruksi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 
-export default class DataPJUPage extends Component {
+export default class DataKonstruksiPage extends Component {
   state = {
     isOpen: true,
   };
@@ -49,7 +49,7 @@ export default class DataPJUPage extends Component {
           <main className="p-6">
             <h1 className="text-3xl font-bold text-blue-700">Data Panel</h1>
             <div className="overflow-x-auto">
-              <DataPanel />
+              <DataKonstruksi />
             </div>
           </main>
         </div>

@@ -45,10 +45,10 @@ const SidebarAdmin = ({ isOpen, toggleSidebar }) => {
     <>
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow-lg transform ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        } transition-transform duration-300 ease-in-out z-40`}
-      >
+  className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow-lg transform ${
+    isOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'
+  } transition-all duration-500 ease-in-out z-50`}
+>
         <div className="p-6">
           <div className="flex flex-col items-center mb-8">
             <div className="text-2xl font-bold mb-6">PT TTMT</div>
@@ -64,6 +64,9 @@ const SidebarAdmin = ({ isOpen, toggleSidebar }) => {
                 </Link>
                 <Link to="/app/admin/data-pju" className="block p-2 rounded-lg hover:bg-blue-500 transition">
                   <FontAwesomeIcon icon={faLightbulb} /> Data APJ
+                </Link>
+                <Link to="/app/admin/data-konstruksi" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                  <FontAwesomeIcon icon={faLightbulb} /> Data Konstruksi
                 </Link>
               </MenuItem>
 
@@ -102,6 +105,14 @@ const SidebarAdmin = ({ isOpen, toggleSidebar }) => {
           </div>
         </div>
       </div>
+
+      {/* Overlay untuk Mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={toggleSidebar}
+        ></div>
+      )}
 
       {/* Floating Button */}
       <button
