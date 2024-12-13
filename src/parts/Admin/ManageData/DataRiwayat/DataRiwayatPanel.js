@@ -1,369 +1,447 @@
 /* eslint-disable */
-import React, { useEffect, useState } from 'react';
-import { Table, Button, notification, Input, Modal, Form, Input as AntInput, DatePicker, Select, TimePicker } from 'antd';
-import axios from 'axios';
-import { useParams } from 'react-router-dom';
-import { EditOutlined, DeleteOutlined, PlusOutlined, ExportOutlined } from '@ant-design/icons';
-import moment from 'moment';
-
-const { TextArea } = AntInput;
+import React, { useEffect, useState } from "react";
+import {
+  Table,
+  Button,
+  Tag,
+  notification,
+  Modal,
+  Form,
+  Input,
+  DatePicker,
+  TimePicker,
+  Select,
+} from "antd";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import { EditOutlined, DeleteOutlined, PlusOutlined, ExportOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 
 const DataRiwayatPanel = () => {
   const { id } = useParams();
-  const [riwayatData, setRiwayatData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState('');
-  const [pagination, setPagination] = useState({ current: 1, pageSize: 5 });
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedRiwayat, setSelectedRiwayat] = useState(null);
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [modalType, setModalType] = useState("");
+  const [selectedData, setSelectedData] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [noApp, setnoApp] = useState("");
+  const [isInfoModalVisible, setIsInfoModalVisible] = useState(true);
   const [form] = Form.useForm();
 
+  const authToken = localStorage.getItem("authToken");
+
   useEffect(() => {
-    const fetchRiwayatPanel = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(`http://localhost:8000/api/riwayat-panel/${id}?search=${searchText}&page=${pagination.current}&pageSize=${pagination.pageSize}`);
-        
-        if (response.data.message) {
-          notification.info({
-            message: 'Informasi Riwayat Panel',
-            description: response.data.message,
-          });
-          setRiwayatData([]);
-        } else {
-          setRiwayatData(response.data.data);
-          setPagination(prev => ({
-            ...prev,
-            total: response.data.total,
-          }));
+    if (id) {
+      fetchRiwayatPanel(id);
+    }
+  }, [id]);
+
+  const fetchRiwayatPanel = async (panelId) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/api/riwayat-panel/${panelId}`,
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
         }
-      } catch (error) {
-        console.error('Error fetching riwayat panel:', error);
-        notification.error({
-          message: 'Gagal Mengambil Data',
-          description: 'Terjadi kesalahan saat mengambil data riwayat panel.',
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
+      );
 
-    fetchRiwayatPanel();
-  }, [id, searchText, pagination.current, pagination.pageSize]);
+      const { no_app = "" } = response.data; 
+      setnoApp(no_app); 
 
-  const columns = [
-    {
-      title: 'No',
-      key: 'index',
-      render: (_, __, index) => index + 1 + (pagination.current - 1) * pagination.pageSize,
-    },
-    {
-      title: 'Lokasi',
-      dataIndex: 'lokasi',
-      key: 'lokasi',
-    },
-    {
-      title: 'Keterangan Masalah',
-      dataIndex: 'keterangan_masalah',
-      key: 'keterangan_masalah',
-    },
-    {
-      title: 'Uraian Masalah',
-      dataIndex: 'uraian_masalah',
-      key: 'uraian_masalah',
-    },
-    {
-      title: 'Tanggal Penyelesaian',
-      dataIndex: 'tanggal_penyelesaian',
-      key: 'tanggal_penyelesaian',
-      render: (date) => (date ? new Date(date).toLocaleDateString() : '-'),
-    },
-    {
-      title: 'Durasi Penyelesaian',
-      dataIndex: 'durasi_penyelesaian',
-      key: 'durasi_penyelesaian',
-    },
-    {
-      title: 'Penyelesaian Masalah',
-      dataIndex: 'penyelesaian_masalah',
-      key: 'penyelesaian_masalah',
-    },
-    {
-      title: 'Nomer Rujukan',
-      dataIndex: 'nomer_rujukan',
-      key: 'nomer_rujukan',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-    },
-    {
-      title: 'Aksi',
-      key: 'aksi',
-      render: (_, record) => (
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-          <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(record.id_riwayat_panel)} />
-        </div>
-      ),
-    },
-  ];
+      if (no_app) setIsInfoModalVisible(true);
 
-  const handleSearch = (value) => {
-    setSearchText(value);
+      const { riwayat_panels = [], pengaduan_details = [] } = response.data;
+
+      const riwayatData = riwayat_panels.map((item) => ({
+        ...item,
+        source: "Riwayat",
+      }));
+
+      const pengaduanData = pengaduan_details.map((detail) => ({
+        id_riwayat_panel: detail.id_detail_pengaduan,
+        lokasi: detail.pengaduan?.lokasi || "",
+        tanggal_masalah: detail.pengaduan?.tanggal_pengaduan || "",
+        jam_masalah: detail.pengaduan?.jam_aduan || "",
+        keterangan_masalah: detail.pengaduan?.keterangan_masalah || "",
+        uraian_masalah: detail.pengaduan?.uraian_masalah || "",
+        tanggal_penyelesaian: detail.pengaduan?.tanggal_penyelesaian || "",
+        jam_penyelesaian: detail.pengaduan?.jam_penyelesaian || "",
+        durasi_penyelesaian: detail.pengaduan?.durasi_penyelesaian || "",
+        penyelesaian_masalah: detail.pengaduan?.penyelesaian_masalah || "",
+        pencegahan: detail.pengaduan?.pencegahan_masalah || "",
+        nomor_rujukan: detail.pengaduan?.nomor_pengaduan || "",
+        status: detail.pengaduan?.status || "",
+        source: "Pengaduan",
+      }));
+
+      const combinedData = [...riwayatData, ...pengaduanData];
+      setData(combinedData);
+    } catch (error) {
+      console.error("Error fetching Riwayat panel:", error);
+      notification.error({ message: "Gagal memuat data Riwayat panel" });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handlePageChange = (pagination) => {
-    setPagination(pagination);
-  };
-
-  const handleEdit = (record) => {
-    setSelectedRiwayat(record);
-    form.setFieldsValue({
-      ...record,
-      tanggal_masalah: record.tanggal_masalah ? moment(record.tanggal_masalah) : null,
-      tanggal_penyelesaian: record.tanggal_penyelesaian ? moment(record.tanggal_penyelesaian) : null,
-      jam_masalah: record.jam_masalah ? moment(record.jam_masalah, 'HH:mm') : null,
-      jam_penyelesaian: record.jam_penyelesaian ? moment(record.jam_penyelesaian, 'HH:mm') : null,
-    }); // Populate form fields with the record data
-    setIsModalVisible(true);
-  };
-
-  const handleDelete = (id) => {
+  const handleDelete = async (idRiwayat) => {
     Modal.confirm({
-      title: 'Apakah Anda yakin ingin menghapus riwayat ini?',
+      title: "Hapus Riwayat panel",
+      content: "Apakah Anda yakin ingin menghapus riwayat ini?",
+      okText: "Ya",
+      cancelText: "Batal",
       onOk: async () => {
         try {
-          await axios.delete(`http://localhost:8000/api/riwayat-panel/${id}`);
-          notification.success({ message: 'Riwayat Panel berhasil dihapus' });
-          setRiwayatData(riwayatData.filter(item => item.id_riwayat_panel !== id));
+          await axios.delete(
+            `http://localhost:8000/api/riwayat-panel/${idRiwayat}`,
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+          notification.success({ message: "Riwayat panel berhasil dihapus" });
+          fetchRiwayatPanel(id);
         } catch (error) {
-          notification.error({ message: 'Gagal menghapus data' });
+          console.error("Error deleting Riwayat panel:", error);
+          notification.error({ message: "Gagal menghapus data" });
         }
       },
     });
   };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    setSelectedRiwayat(null);
+  const handleOpenModal = (type, record = null) => {
+    setModalType(type);
+    setSelectedData(record);
     form.resetFields();
+    if (record) {
+      form.setFieldsValue({
+        lokasi: record.lokasi || "",
+        tanggal_masalah: record.tanggal_masalah ? dayjs(record.tanggal_masalah) : null,
+        jam_masalah: record.jam_masalah ? dayjs(record.jam_masalah, "HH:mm") : null,
+        tanggal_penyelesaian: record.tanggal_penyelesaian
+          ? dayjs(record.tanggal_penyelesaian)
+          : null,
+        jam_penyelesaian: record.jam_penyelesaian ? dayjs(record.jam_penyelesaian, "HH:mm") : null,
+        keterangan_masalah: record.keterangan_masalah || "",
+        uraian_masalah: record.uraian_masalah || "",
+        durasi_penyelesaian: record.durasi_penyelesaian || "",
+        penyelesaian_masalah: record.penyelesaian_masalah || "",
+        pencegahan: record.pencegahan || "",
+        nomor_rujukan: record.nomor_rujukan || "",
+        status: record.status || "",
+      });
+    }
+    setShowModal(true);
   };
 
   const handleModalSubmit = async () => {
     try {
-      const updatedData = form.getFieldsValue();
-      updatedData.panel_id = id; // Add the `panel_id` automatically from the URL
-  
-      // Ensure date format is correct before sending to the backend
-      updatedData.tanggal_masalah = updatedData.tanggal_masalah ? updatedData.tanggal_masalah.format('YYYY-MM-DD') : null;
-      updatedData.tanggal_penyelesaian = updatedData.tanggal_penyelesaian ? updatedData.tanggal_penyelesaian.format('YYYY-MM-DD') : null;
-      updatedData.jam_masalah = updatedData.jam_masalah ? updatedData.jam_masalah.format('HH:mm') : null;
-      updatedData.jam_penyelesaian = updatedData.jam_penyelesaian ? updatedData.jam_penyelesaian.format('HH:mm') : null;
-  
-      // Calculate durasi_penyelesaian if jam_masalah and jam_penyelesaian are provided
-      if (updatedData.jam_masalah && updatedData.jam_penyelesaian) {
-        const jamMasalah = moment(updatedData.jam_masalah, 'HH:mm');
-        const jamPenyelesaian = moment(updatedData.jam_penyelesaian, 'HH:mm');
-        const durasi = moment.duration(jamPenyelesaian.diff(jamMasalah));
-        
-        const durasiFormatted = `${durasi.hours()} jam ${durasi.minutes()} menit`;
-        updatedData.durasi_penyelesaian = durasiFormatted;
-      }
-  
-      if (selectedRiwayat) {
-        // Edit existing data
-        await axios.post(`http://localhost:8000/api/riwayat-panel/${selectedRiwayat.id_riwayat_panel}`, updatedData);
-        notification.success({ message: 'Data berhasil diperbarui' });
-        setRiwayatData(riwayatData.map(item => (item.id_riwayat_panel === selectedRiwayat.id_riwayat_panel ? { ...item, ...updatedData } : item)));
+      const values = await form.validateFields();
+      const payload = {
+        ...values,
+        panel_id: id,
+        tanggal_masalah: values.tanggal_masalah
+          ? values.tanggal_masalah.format("YYYY-MM-DD")
+          : null,
+        jam_masalah: values.jam_masalah
+          ? values.jam_masalah.format("HH:mm:ss")
+          : null,
+        tanggal_penyelesaian: values.tanggal_penyelesaian
+          ? values.tanggal_penyelesaian.format("YYYY-MM-DD")
+          : null,
+        jam_penyelesaian: values.jam_penyelesaian
+          ? values.jam_penyelesaian.format("HH:mm:ss")
+          : null,
+      };
+
+      if (modalType === "create") {
+        await axios.post(`http://localhost:8000/api/riwayat-panel`, payload, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        notification.success({ message: "Riwayat panel berhasil ditambahkan" });
       } else {
-        // Create new data
-        await axios.post('http://localhost:8000/api/riwayat-panel', updatedData);
-        notification.success({ message: 'Data berhasil ditambahkan' });
+        await axios.put(
+          `http://localhost:8000/api/riwayat-panel/${selectedData.id_riwayat_panel}`,
+          payload,
+          { headers: { Authorization: `Bearer ${authToken}` } }
+        );
+        notification.success({ message: "Riwayat panel berhasil diperbarui" });
       }
-      setIsModalVisible(false);
-      setSelectedRiwayat(null);
-      form.resetFields();
+
+      fetchRiwayatPanel(id);
+      setShowModal(false);
     } catch (error) {
-      notification.error({ message: 'Gagal memperbarui data' });
-    }
-  };
-  
-  const handleTimeChange = () => {
-    const updatedData = form.getFieldsValue();
-    if (updatedData.jam_masalah && updatedData.jam_penyelesaian) {
-      const jamMasalah = moment(updatedData.jam_masalah, 'HH:mm');
-      const jamPenyelesaian = moment(updatedData.jam_penyelesaian, 'HH:mm');
-      const durasi = moment.duration(jamPenyelesaian.diff(jamMasalah));
-      
-      const durasiFormatted = `${durasi.hours()} jam ${durasi.minutes()} menit`;
-      form.setFieldsValue({ durasi_penyelesaian: durasiFormatted });
+      console.error("Error submitting form:", error);
+      notification.error({ message: "Gagal menyimpan data Riwayat panel" });
     }
   };
 
   const handleExport = async () => {
+    setIsExporting(true);
     try {
-      // Kirim permintaan GET untuk mengekspor data berdasarkan panel_id
-      const response = await axios.get(`http://localhost:8000/api/export/riwayat-panel/${id}`, {
-        headers: {
-          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        },
-        responseType: 'blob',
-      });
-  
-      // Buat URL objek untuk file Excel yang diterima
-      const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const link = document.createElement('a');
-      const url = window.URL.createObjectURL(blob);
-      link.href = url;
-      link.setAttribute('download', `riwayat_panel_${id}.xlsx`); // Nama file yang diunduh sesuai dengan panelId
-      document.body.appendChild(link);
-      link.click(); // Menyimulasikan klik untuk mengunduh file
-      document.body.removeChild(link); // Hapus elemen setelah digunakan
-  
+        const response = await axios.get(`http://localhost:8000/api/export-riwayat-panel/riwayat/${id}`, {
+            headers: { Authorization: `Bearer ${authToken}` },
+            responseType: 'blob',
+        });
+
+        const blob = new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+
+        // Tentukan nama file berdasarkan noApp
+        const filename = `Riwayat Panel No APP ${noApp || "Unknown"}.xlsx`;
+
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        notification.success({ message: 'Data berhasil diekspor!' });
     } catch (error) {
-      console.error('Error exporting data:', error);
-      notification.error({
-        message: 'Gagal Ekspor Data',
-        description: 'Terjadi kesalahan saat mengekspor data.',
-      });
+        const errorMsg = error.response?.data?.message || 'Terjadi kesalahan saat mengekspor data.';
+        notification.error({ message: 'Gagal mengekspor data!', description: errorMsg });
+    } finally {
+        setIsExporting(false);
+    }
+  };
+
+  const calculateDurationInHours = (startDate, startTime, endDate, endTime) => {
+    if (startDate && startTime && endDate && endTime) {
+      const start = dayjs(`${startDate.format("YYYY-MM-DD")} ${startTime.format("HH:mm:ss")}`);
+      const end = dayjs(`${endDate.format("YYYY-MM-DD")} ${endTime.format("HH:mm:ss")}`);
+      const duration = end.diff(start, "hours", true);
+      return duration.toFixed(2);
+    }
+    return null;
+  };
+
+  const handleFormValuesChange = (_, allValues) => {
+    const { tanggal_masalah, jam_masalah, tanggal_penyelesaian, jam_penyelesaian } = allValues;
+  
+    // Hitung durasi otomatis jika data lengkap
+    const duration = calculateDurationInHours(
+      tanggal_masalah,
+      jam_masalah,
+      tanggal_penyelesaian,
+      jam_penyelesaian
+    );
+  
+    if (duration) {
+      form.setFieldsValue({ durasi_penyelesaian: duration });
     }
   };
   
 
+  const columns = [
+    {
+      title: "No",
+      dataIndex: "id_riwayat_panel",
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: "Lokasi",
+      dataIndex: "lokasi",
+      render: (lokasi) => (lokasi ? lokasi : "-"),
+    },
+    {
+      title: "Tanggal Masalah",
+      dataIndex: "tanggal_masalah",
+      render: (date) => (date ? dayjs(date).format("DD MMMM YYYY") : "-"),
+    },
+    {
+      title: "Jam Masalah",
+      dataIndex: "jam_masalah",
+      render: (time) => (time ? time : "-"),
+    },
+    {
+      title: "Keterangan Masalah",
+      dataIndex: "keterangan_masalah",
+      render: (text) => (text ? text : "-"),
+    },
+    {
+      title: "Uraian Masalah",
+      dataIndex: "uraian_masalah",
+      render: (text) => (text ? text : "-"),
+    },
+    {
+      title: "Tanggal Penyelesaian",
+      dataIndex: "tanggal_penyelesaian",
+      render: (date) => (date ? dayjs(date).format("DD MMMM YYYY") : "-"),
+    },
+    {
+      title: "Jam Penyelesaian",
+      dataIndex: "jam_penyelesaian",
+      render: (time) => (time ? time : "-"),
+    },
+    {
+      title: "Durasi Penyelesaian (Menit)",
+      dataIndex: "durasi_penyelesaian",
+      render: (duration) => (duration ? duration : "-"),
+    },
+    {
+      title: "Penyelesaian Masalah",
+      dataIndex: "penyelesaian_masalah",
+      render: (text) => (text ? text : "-"),
+    },
+    {
+      title: "Pencegahan",
+      dataIndex: "pencegahan",
+      render: (text) => (text ? text : "-"),
+    },
+    {
+      title: "Nomor Rujukan",
+      dataIndex: "nomor_rujukan",
+      render: (text) => (text ? text : "-"),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (status) => {
+        if (!status) {
+          return <Tag color="default">-</Tag>;
+        }
+        let color;
+        switch (status) {
+          case "Pending":
+            color = "gold";
+            break;
+          case "Proses":
+            color = "blue";
+            break;
+          case "Selesai":
+            color = "green";
+            break;
+          default:
+            color = "default";
+        }
+        return <Tag color={color}>{status}</Tag>;
+      },
+    },
+    {
+      title: "Sumber Data",
+      dataIndex: "source",
+      render: (text) => <Tag>{text}</Tag>,
+    },
+    {
+      title: "Aksi",
+      key: "aksi",
+      render: (_, record) =>
+        record.source === "Riwayat" ? (
+          <div style={{ display: "flex", gap: "8px" }}>
+            <Button
+              icon={<EditOutlined />}
+              onClick={() => handleOpenModal("edit", record)}
+            >
+              Edit
+            </Button>
+            <Button
+              icon={<DeleteOutlined />}
+              danger
+              onClick={() => handleDelete(record.id_riwayat_panel)}
+            >
+              Hapus
+            </Button>
+          </div>
+        ) : null,
+    },
+  ];
+
   return (
     <div className="container">
+      {/* Search and Create (Fixed Position) */}
       <div
-      style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        gap: '10px',
-        marginBottom: '16px',
-      }}
-    >
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
-        <Input.Search
-          placeholder="Cari berdasarkan data Panel"
-          // value={searchTerm}
-          onChange={(e) => handleSearch(e.target.value)}
-          allowClear
-          style={{ width: '300px', flexShrink: 0 }}
-        />
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '10px',
+          marginBottom: '16px',
+        }}
+      >
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => handleOpenModal("create")}
+        >
+          Tambah Riwayat
+        </Button>
+        <Button type="default" icon={<ExportOutlined />} loading={isExporting} onClick={handleExport}>
+          {isExporting ? 'Sedang Mengekspor...' : 'Export'}
+        </Button>
       </div>
-      <div style={{ display: 'flex', gap: '10px' }}>
-          <Button type="default" icon={<ExportOutlined />} onClick={handleExport}>
-            Export Data
-          </Button>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
-            Tambah Data
-          </Button>
-        </div>
-    </div>
       <Table
         columns={columns}
-        dataSource={riwayatData}
-        rowKey="id_riwayat_panel"
-        pagination={pagination}
-        loading={loading}
-        onChange={handlePageChange}
+        dataSource={data.map((item) => ({ ...item, key: item.id_riwayat_panel }))}
+        loading={isLoading}
+        pagination={{
+          current: currentPage,
+          pageSize: itemsPerPage,
+          total: data.length,
+          onChange: (page) => setCurrentPage(page),
+        }}
+        scroll={{ x: "max-content" }}
       />
-
-      {/* Modal untuk Create dan Edit */}
       <Modal
-        title={selectedRiwayat ? 'Edit Riwayat Panel' : 'Tambah Riwayat Panel'}
-        visible={isModalVisible}
-        onCancel={handleCancel}
-        onOk={handleModalSubmit}
-        confirmLoading={loading}
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          name="riwayat_panel_form"
+          title="Informasi"
+          visible={isInfoModalVisible}
+          onOk={() => setIsInfoModalVisible(false)}
+          onCancel={() => setIsInfoModalVisible(false)}
+          okText="Oke"
+          cancelButtonProps={{ style: { display: "none" } }}
         >
-          <Form.Item
-            name="lokasi"
-            label="Lokasi"
-            rules={[{ required: true, message: 'Lokasi tidak boleh kosong' }]}
-          >
-            <AntInput />
+          <p>Data Riwayat Panel No APP {noApp || "Unknown"}</p>
+        </Modal>
+      <Modal
+        title={modalType === "create" ? "Tambah Riwayat panel" : "Edit Riwayat panel"}
+        visible={showModal}
+        onCancel={() => setShowModal(false)}
+        onOk={() => form.submit()}
+      >
+        <Form form={form} layout="vertical" onFinish={handleModalSubmit} onValuesChange={handleFormValuesChange}>
+          <Form.Item name="lokasi" label="Lokasi" rules={[{ required: true, message: "Lokasi wajib diisi" }]}>
+            <Input placeholder="Masukkan Lokasi" />
           </Form.Item>
-
-          <Form.Item
-            name="keterangan_masalah"
-            label="Keterangan Masalah"
-            rules={[{ required: true, message: 'Keterangan masalah tidak boleh kosong' }]}
-          >
-            <AntInput />
+          <Form.Item name="tanggal_masalah" label="Tanggal Masalah">
+            <DatePicker style={{ width: "100%" }} />
           </Form.Item>
-
-          <Form.Item
-            name="uraian_masalah"
-            label="Uraian Masalah"
-          >
-            <TextArea rows={4} />
+          <Form.Item name="jam_masalah" label="Jam Masalah">
+            <TimePicker style={{ width: "100%" }} />
           </Form.Item>
-
-          <Form.Item
-            name="tanggal_masalah"
-            label="Tanggal Masalah"
-          >
-            <DatePicker style={{ width: '100%' }} />
+          <Form.Item name="keterangan_masalah" label="Keterangan Masalah">
+            <Input.TextArea placeholder="Masukkan Keterangan Masalah" />
           </Form.Item>
-
-          <Form.Item
-            name="jam_masalah"
-            label="Jam Masalah"
-          >
-            <TimePicker format="HH:mm" style={{ width: '100%' }} onChange={handleTimeChange} />
+          <Form.Item name="uraian_masalah" label="Uraian Masalah">
+            <Input.TextArea placeholder="Masukkan Uraian Masalah" />
           </Form.Item>
-
-          <Form.Item
-            name="tanggal_penyelesaian"
-            label="Tanggal Penyelesaian"
-          >
-            <DatePicker style={{ width: '100%' }} />
+          <Form.Item name="tanggal_penyelesaian" label="Tanggal Penyelesaian">
+            <DatePicker style={{ width: "100%" }} />
           </Form.Item>
-
-          <Form.Item
-            name="jam_penyelesaian"
-            label="Jam Penyelesaian"
-          >
-            <TimePicker format="HH:mm" style={{ width: '100%' }} onChange={handleTimeChange} />
+          <Form.Item name="jam_penyelesaian" label="Jam Penyelesaian">
+            <TimePicker style={{ width: "100%" }} />
           </Form.Item>
-
-          <Form.Item
-            name="durasi_penyelesaian"
-            label="Durasi Penyelesaian"
-          >
-            <AntInput disabled />
+          <Form.Item name="durasi_penyelesaian" label="Durasi Penyelesaian (Jam)">
+            <Input disabled placeholder="Durasi otomatis berdasarkan waktu masalah dan penyelesaian" />
           </Form.Item>
-
-          <Form.Item
-            name="penyelesaian_masalah"
-            label="Penyelesaian Masalah"
-          >
-            <AntInput />
+          <Form.Item name="penyelesaian_masalah" label="Penyelesaian Masalah">
+            <Input.TextArea placeholder="Masukkan Penyelesaian Masalah" />
           </Form.Item>
-
-          <Form.Item
-            name="nomer_rujukan"
-            label="Nomer Rujukan"
-          >
-            <AntInput />
+          <Form.Item name="pencegahan" label="Pencegahan">
+            <Input.TextArea placeholder="Masukkan Pencegahan" />
           </Form.Item>
-
-          <Form.Item
-            name="status"
-            label="Status"
-          >
-            <Select defaultValue="Pending">
+          <Form.Item name="nomor_rujukan" label="Nomor Rujukan">
+            <Input placeholder="Masukkan Nomor Rujukan" />
+          </Form.Item>
+          <Form.Item name="status" label="Status" rules={[{ required: true, message: "Status wajib diisi" }]}>
+            <Select placeholder="Pilih Status">
               <Select.Option value="Pending">Pending</Select.Option>
-              <Select.Option value="Selesai">Selesai</Select.Option>
               <Select.Option value="Proses">Proses</Select.Option>
+              <Select.Option value="Selesai">Selesai</Select.Option>
             </Select>
           </Form.Item>
         </Form>

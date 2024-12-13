@@ -47,7 +47,7 @@ export default class DataKonstruksiPage extends Component {
 
           {/* Main Content */}
           <main className="p-6">
-            <h1 className="text-3xl font-bold text-blue-700">Data Panel</h1>
+            <h1 className="text-3xl font-bold text-blue-700">Data Konstruksi APJ</h1>
             <div className="overflow-x-auto">
               <DataKonstruksi />
             </div>

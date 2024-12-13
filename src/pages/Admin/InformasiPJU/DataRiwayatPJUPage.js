@@ -47,7 +47,7 @@ export default class DataRiwayatPJUPage extends Component {
 
           {/* Main Content */}
           <main className="p-6">
-            <h1 className="text-3xl font-bold text-blue-700">Data Riwayat PJU</h1>
+            <h1 className="text-3xl font-bold text-blue-700">Data Riwayat APJ</h1>
             <div className="overflow-x-auto">
               <DataRiwayatPJU />
             </div>

@@ -47,7 +47,7 @@ export default class DataPJUPage extends Component {
 
           {/* Main Content */}
           <main className="p-6">
-            <h1 className="text-3xl font-bold text-blue-700">Data PJU</h1>
+            <h1 className="text-3xl font-bold text-blue-700">Data APJ</h1>
             <div className="overflow-x-auto">
               <DataPju />
             </div>
