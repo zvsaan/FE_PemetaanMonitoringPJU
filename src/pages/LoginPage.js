@@ -6,7 +6,7 @@ import axios from 'axios';
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 

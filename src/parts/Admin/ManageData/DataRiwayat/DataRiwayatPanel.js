@@ -137,48 +137,6 @@ const DataRiwayatPanel = () => {
     setShowModal(true);
   };
 
-  const handleModalSubmit = async () => {
-    try {
-      const values = await form.validateFields();
-      const payload = {
-        ...values,
-        panel_id: id,
-        tanggal_masalah: values.tanggal_masalah
-          ? values.tanggal_masalah.format("YYYY-MM-DD")
-          : null,
-        jam_masalah: values.jam_masalah
-          ? values.jam_masalah.format("HH:mm:ss")
-          : null,
-        tanggal_penyelesaian: values.tanggal_penyelesaian
-          ? values.tanggal_penyelesaian.format("YYYY-MM-DD")
-          : null,
-        jam_penyelesaian: values.jam_penyelesaian
-          ? values.jam_penyelesaian.format("HH:mm:ss")
-          : null,
-      };
-
-      if (modalType === "create") {
-        await axios.post(`http://localhost:8000/api/riwayat-panel`, payload, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        });
-        notification.success({ message: "Riwayat panel berhasil ditambahkan" });
-      } else {
-        await axios.put(
-          `http://localhost:8000/api/riwayat-panel/${selectedData.id_riwayat_panel}`,
-          payload,
-          { headers: { Authorization: `Bearer ${authToken}` } }
-        );
-        notification.success({ message: "Riwayat panel berhasil diperbarui" });
-      }
-
-      fetchRiwayatPanel(id);
-      setShowModal(false);
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      notification.error({ message: "Gagal menyimpan data Riwayat panel" });
-    }
-  };
-
   const handleExport = async () => {
     setIsExporting(true);
     try {
@@ -210,21 +168,11 @@ const DataRiwayatPanel = () => {
     }
   };
 
-  const calculateDurationInHours = (startDate, startTime, endDate, endTime) => {
-    if (startDate && startTime && endDate && endTime) {
-      const start = dayjs(`${startDate.format("YYYY-MM-DD")} ${startTime.format("HH:mm:ss")}`);
-      const end = dayjs(`${endDate.format("YYYY-MM-DD")} ${endTime.format("HH:mm:ss")}`);
-      const duration = end.diff(start, "hours", true);
-      return duration.toFixed(2);
-    }
-    return null;
-  };
-
   const handleFormValuesChange = (_, allValues) => {
     const { tanggal_masalah, jam_masalah, tanggal_penyelesaian, jam_penyelesaian } = allValues;
   
     // Hitung durasi otomatis jika data lengkap
-    const duration = calculateDurationInHours(
+    const duration = calculateDurationInHoursAndMinutes(
       tanggal_masalah,
       jam_masalah,
       tanggal_penyelesaian,
@@ -236,6 +184,72 @@ const DataRiwayatPanel = () => {
     }
   };
   
+  const calculateDurationInHoursAndMinutes = (startDate, startTime, endDate, endTime) => {
+    if (startDate && startTime && endDate && endTime) {
+      const start = dayjs(`${startDate.format("YYYY-MM-DD")} ${startTime.format("HH:mm:ss")}`);
+      const end = dayjs(`${endDate.format("YYYY-MM-DD")} ${endTime.format("HH:mm:ss")}`);
+  
+      const diffInMinutes = end.diff(start, "minutes");
+      const hours = Math.floor(diffInMinutes / 60);
+      const minutes = diffInMinutes % 60;
+  
+      return `${hours} jam, ${minutes} menit`;
+    }
+    return null;
+  };
+  
+  const handleModalSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+  
+      const payload = {
+        ...values,
+        panel_id: id,
+        tanggal_masalah: values.tanggal_masalah
+          ? values.tanggal_masalah.format("YYYY-MM-DD")
+          : null,
+        jam_masalah: values.jam_masalah
+          ? values.jam_masalah.format("HH:mm:ss")
+          : null,
+        tanggal_penyelesaian: values.tanggal_penyelesaian
+          ? values.tanggal_penyelesaian.format("YYYY-MM-DD")
+          : null,
+        jam_penyelesaian: values.jam_penyelesaian
+          ? values.jam_penyelesaian.format("HH:mm:ss")
+          : null,
+      };
+  
+      if (modalType === "create") {
+        await axios.post(`http://localhost:8000/api/riwayat-panel`, payload, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        notification.success({ message: "Riwayat Panel berhasil ditambahkan" });
+      } else {
+        await axios.put(
+          `http://localhost:8000/api/riwayat-panel/${selectedData.id_riwayat_panel}`,
+          payload,
+          { headers: { Authorization: `Bearer ${authToken}` } }
+        );
+        notification.success({ message: "Riwayat Panel berhasil diperbarui" });
+      }
+  
+      fetchRiwayatPanel(id);
+      setShowModal(false);
+    } catch (error) {
+      // Tangani error dari Backend
+      if (error.response && error.response.status === 400) {
+          // Error validasi dari Backend
+          notification.warning({
+              message: error.response.data.message || "Terjadi kesalahan saat memvalidasi data.",
+              // description: error.response.data.message || "Terjadi kesalahan saat memvalidasi data.",
+          });
+      } else {
+          // Error lainnya
+          console.error("Error submitting form:", error);
+          notification.error({ message: "Gagal menyimpan data Riwayat APJ" });
+      }
+    }
+  };  
 
   const columns = [
     {
@@ -425,8 +439,11 @@ const DataRiwayatPanel = () => {
           <Form.Item name="jam_penyelesaian" label="Jam Penyelesaian">
             <TimePicker style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="durasi_penyelesaian" label="Durasi Penyelesaian (Jam)">
-            <Input disabled placeholder="Durasi otomatis berdasarkan waktu masalah dan penyelesaian" />
+          <Form.Item name="durasi_penyelesaian" label="Durasi Penyelesaian (Jam, Menit)">
+            <Input
+              disabled
+              placeholder="Durasi otomatis berdasarkan waktu masalah dan penyelesaian"
+            />
           </Form.Item>
           <Form.Item name="penyelesaian_masalah" label="Penyelesaian Masalah">
             <Input.TextArea placeholder="Masukkan Penyelesaian Masalah" />

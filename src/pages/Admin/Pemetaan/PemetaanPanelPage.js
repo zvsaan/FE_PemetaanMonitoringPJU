@@ -35,6 +35,14 @@ const PemetaanPanelPage = () => {
 
   const navigate = useNavigate(); // Navigasi untuk tombol kembali
 
+const statusColors = {
+  Pending: "#FF4500",
+  // Proses: "#FF4500",
+  Proses: "#FFD700",
+  Selesai: "#4CAF50",
+  // Default: "#808080",
+};
+
   useEffect(() => {
     setIsLoading(true);
 
@@ -63,7 +71,7 @@ const PemetaanPanelPage = () => {
         const headers = {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`,
         };
-        const panelResponse = await axios.get('http://localhost:8000/api/panels', { headers });
+        const panelResponse = await axios.get('http://localhost:8000/api/panels-with-status', { headers });
         setPanelData(panelResponse.data || []);
       } catch (error) {
         console.error('Error loading data:', error);
@@ -85,11 +93,12 @@ const PemetaanPanelPage = () => {
     };
   };
 
-  const getCustomMarkerIcon = () => {
+  const getCustomMarkerIcon = (status) => {
+    const color = statusColors[status] || statusColors.Selesai;
     const svgIcon = `
       <svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 24 36">
-        <path d="M12 0C7 0 3 4 3 9c0 6.5 9 18 9 18s9-11.5 9-18c0-5-4-9-9-9z" fill="#4CAF50" stroke="#333" stroke-width="1"/>
-        <circle cx="12" cy="9" r="5" fill="#FFD700" stroke="#333" stroke-width="1"/>
+        <path d="M12 0C7 0 3 4 3 9c0 6.5 9 18 9 18s9-11.5 9-18c0-5-4-9-9-9z" fill="${color}" stroke="#333" stroke-width="1"/>
+        <circle cx="12" cy="9" r="5" fill="#FFF" stroke="#333" stroke-width="1"/>
       </svg>
     `;
     return new L.DivIcon({
@@ -174,7 +183,7 @@ const PemetaanPanelPage = () => {
           <Marker
             key={panel.id_panel}
             position={[panel.longitude, panel.latitude]}
-            icon={getCustomMarkerIcon()}
+            icon={getCustomMarkerIcon(panel.status || "Default")}
           >
             <Popup>
               <div style={{ fontSize: '14px', lineHeight: '1.5' }}>
@@ -189,6 +198,24 @@ const PemetaanPanelPage = () => {
                 <b>Nama Jalan:</b> {panel.nama_jalan}
                 <br />
                 <b>Kecamatan:</b> {panel.kecamatan}
+                <br />
+                <b>Status:</b> {panel.status || "Tidak diketahui"}
+                <br />
+                <button
+                  onClick={() => navigate(`/app/admin/data-riwayat-panel/${panel.id_panel}`)}
+                  style={{
+                    marginTop: '10px',
+                    padding: '8px 16px',
+                    backgroundColor: '#007BFF',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                  }}
+                >
+                  Riwayat Panel
+                </button>
               </div>
             </Popup>
           </Marker>

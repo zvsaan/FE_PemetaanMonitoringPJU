@@ -9,6 +9,8 @@ import AdminImage from '../../assets/images/admin.png';
 import axios from 'axios'; // Import axios for API calls
 import AnalysisCard from 'parts/Admin/Analystic/AnalysisCard';
 import ProblemPercentageCard from 'parts/Admin/Analystic/ProblemPercentageCard';
+import ImportRiwayatCard from 'parts/Admin/Analystic/ImportRiwayatCard';
+import ExportRiwayatCard from 'parts/Admin/Analystic/ExportRiwayatCard';
 import CountUp from 'react-countup'; // Importing react-countup
 
 export default class DashboardPage extends Component {
@@ -100,32 +102,32 @@ export default class DashboardPage extends Component {
             </div>
 
             {/* Report Section */}
-<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-  <ReportCard
-    icon={<FontAwesomeIcon icon={faBolt} />}
-    title="Total APJ"
-    number={dashboardData.total_pju}
-    bgColor="bg-indigo-500"
-  />
-  <ReportCard
-    icon={<FontAwesomeIcon icon={faThLarge} />}
-    title="Total Panel"
-    number={dashboardData.total_panel}
-    bgColor="bg-teal-400"
-  />
-  <ReportCard
-    icon={<FontAwesomeIcon icon={faHistory} />}
-    title="Riwayat APJ"
-    number={dashboardData.total_riwayat_pju}
-    bgColor="bg-red-400"
-  />
-  <ReportCard
-    icon={<FontAwesomeIcon icon={faHistory} />}
-    title="Riwayat Panel"
-    number={dashboardData.total_riwayat_panel}
-    bgColor="bg-orange-400"
-  />
-</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <ReportCard
+                icon={<FontAwesomeIcon icon={faBolt} />}
+                title="Total APJ"
+                number={dashboardData.total_pju}
+                bgColor="bg-indigo-500"
+              />
+              <ReportCard
+                icon={<FontAwesomeIcon icon={faThLarge} />}
+                title="Total Panel"
+                number={dashboardData.total_panel}
+                bgColor="bg-teal-400"
+              />
+              <ReportCard
+                icon={<FontAwesomeIcon icon={faHistory} />}
+                title="Riwayat APJ"
+                number={dashboardData.total_riwayat_pju}
+                bgColor="bg-red-400"
+              />
+              <ReportCard
+                icon={<FontAwesomeIcon icon={faHistory} />}
+                title="Riwayat Panel"
+                number={dashboardData.total_riwayat_panel}
+                bgColor="bg-orange-400"
+              />
+            </div>
 
             {/* Analysis Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
@@ -139,6 +141,14 @@ export default class DashboardPage extends Component {
               <div className="bg-white rounded-lg shadow p-4 md:p-6">
                 <h2 className="text-xl font-bold text-gray-700 mb-4">Problem Percentage</h2>
                 <ProblemPercentageCard />
+              </div>
+              <div className="bg-white rounded-lg shadow p-4 md:p-6">
+                <h2 className="text-xl font-bold text-gray-700 mb-4">Import Riwayat</h2>
+                <ImportRiwayatCard />
+              </div>
+              <div className="bg-white rounded-lg shadow p-4 md:p-6">
+                <h2 className="text-xl font-bold text-gray-700 mb-4">Import Riwayat</h2>
+                <ExportRiwayatCard />
               </div>
             </div>
           </main>

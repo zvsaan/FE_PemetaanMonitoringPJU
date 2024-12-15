@@ -140,6 +140,7 @@ const DataRiwayatPJU = () => {
   const handleModalSubmit = async () => {
     try {
       const values = await form.validateFields();
+  
       const payload = {
         ...values,
         pju_id: id,
@@ -157,25 +158,37 @@ const DataRiwayatPJU = () => {
           : null,
       };
 
-      if (modalType === "create") {
-        await axios.post(`http://localhost:8000/api/riwayat-pju`, payload, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        });
-        notification.success({ message: "Riwayat APJ berhasil ditambahkan" });
-      } else {
-        await axios.put(
-          `http://localhost:8000/api/riwayat-pju/${selectedData.id_riwayat_pju}`,
-          payload,
-          { headers: { Authorization: `Bearer ${authToken}` } }
-        );
-        notification.success({ message: "Riwayat APJ berhasil diperbarui" });
-      }
+        if (modalType === "create") {
+            // Tambahkan data baru
+            await axios.post(`http://localhost:8000/api/riwayat-pju`, payload, {
+                headers: { Authorization: `Bearer ${authToken}` },
+            });
+            notification.success({ message: "Riwayat PJU berhasil ditambahkan" });
+        } else {
+            // Edit data yang sudah ada
+            await axios.put(
+                `http://localhost:8000/api/riwayat-pju/${selectedData.id_riwayat_pju}`,
+                payload,
+                { headers: { Authorization: `Bearer ${authToken}` } }
+            );
+            notification.success({ message: "Riwayat PJU berhasil diperbarui" });
+        }
 
-      fetchRiwayatPju(id);
-      setShowModal(false);
+        fetchRiwayatPju(id);
+        setShowModal(false);
     } catch (error) {
-      console.error("Error submitting form:", error);
-      notification.error({ message: "Gagal menyimpan data Riwayat APJ" });
+        // Tangani error dari Backend
+        if (error.response && error.response.status === 400) {
+            // Error validasi dari Backend
+            notification.warning({
+                message: error.response.data.message || "Terjadi kesalahan saat memvalidasi data.",
+                // description: error.response.data.message || "Terjadi kesalahan saat memvalidasi data.",
+            });
+        } else {
+            // Error lainnya
+            console.error("Error submitting form:", error);
+            notification.error({ message: "Gagal menyimpan data Riwayat APJ" });
+        }
     }
   };
 
@@ -210,21 +223,11 @@ const DataRiwayatPJU = () => {
     }
   };
 
-  const calculateDurationInHours = (startDate, startTime, endDate, endTime) => {
-    if (startDate && startTime && endDate && endTime) {
-      const start = dayjs(`${startDate.format("YYYY-MM-DD")} ${startTime.format("HH:mm:ss")}`);
-      const end = dayjs(`${endDate.format("YYYY-MM-DD")} ${endTime.format("HH:mm:ss")}`);
-      const duration = end.diff(start, "hours", true);
-      return duration.toFixed(2);
-    }
-    return null;
-  };
-
   const handleFormValuesChange = (_, allValues) => {
     const { tanggal_masalah, jam_masalah, tanggal_penyelesaian, jam_penyelesaian } = allValues;
   
     // Hitung durasi otomatis jika data lengkap
-    const duration = calculateDurationInHours(
+    const duration = calculateDurationInHoursAndMinutes(
       tanggal_masalah,
       jam_masalah,
       tanggal_penyelesaian,
@@ -236,7 +239,20 @@ const DataRiwayatPJU = () => {
     }
   };
   
-
+  const calculateDurationInHoursAndMinutes = (startDate, startTime, endDate, endTime) => {
+    if (startDate && startTime && endDate && endTime) {
+      const start = dayjs(`${startDate.format("YYYY-MM-DD")} ${startTime.format("HH:mm:ss")}`);
+      const end = dayjs(`${endDate.format("YYYY-MM-DD")} ${endTime.format("HH:mm:ss")}`);
+  
+      const diffInMinutes = end.diff(start, "minutes");
+      const hours = Math.floor(diffInMinutes / 60);
+      const minutes = diffInMinutes % 60;
+  
+      return `${hours} jam, ${minutes} menit`;
+    }
+    return null;
+  };
+  
   const columns = [
     {
       title: "No",
@@ -425,8 +441,11 @@ const DataRiwayatPJU = () => {
           <Form.Item name="jam_penyelesaian" label="Jam Penyelesaian">
             <TimePicker style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="durasi_penyelesaian" label="Durasi Penyelesaian (Jam)">
-            <Input disabled placeholder="Durasi otomatis berdasarkan waktu masalah dan penyelesaian" />
+          <Form.Item name="durasi_penyelesaian" label="Durasi Penyelesaian (Jam, Menit)">
+            <Input
+              disabled
+              placeholder="Durasi otomatis berdasarkan waktu masalah dan penyelesaian"
+            />
           </Form.Item>
           <Form.Item name="penyelesaian_masalah" label="Penyelesaian Masalah">
             <Input.TextArea placeholder="Masukkan Penyelesaian Masalah" />
