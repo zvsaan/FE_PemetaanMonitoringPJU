@@ -28,7 +28,7 @@ const BeritaTerkini = () => {
           </Fade>
           <Fade triggerOnce direction="up" delay={400}>
             <p className="text-lg mt-4">
-              PT Tri Tunggal Madiun Terang berkomitmen untuk menyediakan layanan Penerangan Jalan Umum (PJU) yang aman dan efisien di Kabupaten Madiun, sebagai bagian dari upaya kami dalam mendukung pengembangan infrastruktur yang berkelanjutan.
+            PT Tri Tunggal Madiun Terang terus berupaya memberikan layanan Alat Penerangan Jalan (APJ) yang aman dan efisien di Kabupaten Madiun. Kami berkomitmen untuk mendukung pengembangan infrastruktur berkelanjutan demi kemajuan bersama.
             </p>
           </Fade>
         </div>

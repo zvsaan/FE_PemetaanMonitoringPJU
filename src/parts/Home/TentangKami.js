@@ -57,6 +57,7 @@ const TentangKami = () => {
       <div className="relative z-10 my-6">
         <Fade triggerOnce delay={600}>
           <button
+            href="/tentangkami"
             className="bg-theme-purple text-white py-2 px-6 rounded-lg hover:bg-dark-theme-purple"
           >
             Selengkapnya

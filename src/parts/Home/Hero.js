@@ -7,24 +7,25 @@ const heroData = [
   {
     image: require("../../assets/images/hero/herolandingpage/hero1.jpeg"),
     title: "Selamat Datang di PT Tri Tunggal Madiun Terang",
-    description: "Mitra terpercaya Anda dalam penerangan jalan umum yang aman dan efisien.",
+    description: "Penyedia layanan penerangan jalan umum terpercaya di Kabupaten Madiun.",
   },
   {
     image: require("../../assets/images/hero/herolandingpage/hero2.jpg"),
-    title: "Inovasi untuk Penerangan yang Lebih Baik",
-    description: "Kami menciptakan solusi untuk penerangan jalan umum yang ramah lingkungan dan hemat energi.",
+    title: "Solusi Penerangan Jalan Umum Terpadu",
+    description: "Kami menghadirkan teknologi modern untuk efisiensi dan keberlanjutan dalam penerangan jalan.",
   },
   {
     image: require("../../assets/images/hero/herolandingpage/hero3.jpeg"),
-    title: "Jangkauan Global, Keahlian Lokal",
-    description: "Menghadirkan solusi penerangan jalan umum untuk berbagai daerah dengan pengalaman yang terpercaya.",
+    title: "Komitmen pada Pelayanan Berkualitas",
+    description: "Melayani masyarakat dengan pengelolaan penerangan jalan umum yang profesional dan responsif.",
   },
   {
     image: require("../../assets/images/hero/herolandingpage/hero4.jpeg"),
-    title: "Keberlanjutan Adalah Inti dari Visi Kami",
-    description: "Kami berkomitmen untuk membangun infrastruktur penerangan yang mendukung lingkungan dan berkelanjutan.",
+    title: "Dukung Infrastruktur Ramah Lingkungan",
+    description: "Kami berperan aktif dalam pembangunan penerangan jalan yang hemat energi dan berkelanjutan.",
   },
 ];
+
 
 const Hero = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -62,7 +63,7 @@ const Hero = () => {
           {/* Animasi Fade untuk tombol */}
           <Fade direction="up" delay={700} triggerOnce>
             <Button
-              href="/berita"
+              href="/tentangkami/layanan"
               type="link"
               className="inline-flex items-center mt-5 px-5 py-4 text-white text-lg bg-theme-purple rounded-lg shadow-2xl hover:bg-dark-theme-purple transition duration-200"
             >

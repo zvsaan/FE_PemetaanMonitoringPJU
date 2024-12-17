@@ -66,7 +66,9 @@ const DetailBerita = () => {
               </a>
             </li>
             <li>{`>`}</li>
-            <li className="text-gray-500">{berita.title}</li>
+            <li className="text-gray-500">
+              {berita.title.length > 12 ? `${berita.title.substring(0, 12)}...` : berita.title}
+            </li>
           </ul>
         </nav>
       </div>
