@@ -105,11 +105,9 @@ const Header = () => {
                 <li className='border-b py-2'><a href='/tentangkami' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Tentang Kami</a></li>
                 <li className='border-b py-2'><a href='/tentangkami/sekilas' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Sekilas Tentang Kami</a></li>
                 <li className='border-b py-2'><a href='/tentangkami/sejarah' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Sejarah Kami</a></li>
-                <li className='border-b py-2'><a href='/tentangkami/area-persebaran' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Area Persebaran APJ</a></li>
+                <li className='border-b py-2'><a href='/tentangkami/area-operasi' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Area Operasi Kami</a></li>
                 <li className='border-b py-2'><a href='/tentangkami/layanan' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Layanan Kami</a></li>
-                {/* <li className='border-b py-2'><a href='/tentangkami/visi-misi' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Visi dan Misi</a></li> */}
                 <li className='border-b py-2'><a href='/tentangkami/team' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>Team Kami</a></li>
-                <li className='border-b py-2'><a href='/tentangkami/konsorsium' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>PT Konsorsium Kami</a></li>
               </ul>
             </li>
             <li className='max-lg:border-b max-lg:border-white max-lg:py-3'>

@@ -47,7 +47,7 @@ function App() {
 
       <Route path="/tentangkami" element={<DetailTentangKamiPage />} />
       <Route path="/tentangkami/sekilas" element={<SekilasTentangKamiPage />} />
-      <Route path="/tentangkami/area-persebaran" element={<AreaOperasiKamiPage />} />
+      <Route path="/tentangkami/area-operasi" element={<AreaOperasiKamiPage />} />
       <Route path="/tentangkami/layanan" element={<LayananKamiPage />} />
       <Route path="/tentangkami/sejarah" element={<SejarahKamiPage />} />
       <Route path="/tentangkami/team" element={<TeamKamiPage />} />

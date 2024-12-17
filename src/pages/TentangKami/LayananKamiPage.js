@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import Footer from 'parts/Footer';
 import Header from 'parts/Header';
 import HeroLayananKami from 'parts/Hero/tentangkami/HeroLayananKami';
-// import HeroAreaOperasiKami from 'parts/Hero/tentangkami/HeroAreaOperasiKami';
+import LayananKami from 'parts/TentangKami/LayananKami';
 
 export default class LayananKamiPage extends Component {
   componentDidMount() {
@@ -16,7 +16,7 @@ export default class LayananKamiPage extends Component {
       <>
         <Header />
         <HeroLayananKami />
-        {/* <SekilasTentangKami /> */}
+        <LayananKami />
         <Footer />
       </>
     );

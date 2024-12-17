@@ -11,6 +11,22 @@ const SejarahKami = () => {
         Sejarah Kami
       </h1>
 
+      {/* Konsorsium Pembentukan PT TTMT */}
+      <div className="mb-16">
+        <h2 className="text-2xl font-semibold text-[#007bff]">Konsorsium Pembentukan PT Tri Tunggal Madiun Terang</h2>
+        <p className="mt-2 text-lg">
+          PT Tri Tunggal Madiun Terang (TTMT) dibentuk sebagai Badan Usaha Pelaksana (BUP) untuk proyek Kerja Sama Pemerintah dan Badan Usaha (KPBU) dalam penyediaan Alat Penerangan Jalan (APJ) di Kabupaten Madiun. Perusahaan ini merupakan hasil konsorsium dari tiga perusahaan nasional terkemuka:
+        </p>
+        <ul className="list-disc list-inside mt-4 text-lg">
+          <li><b>PT Focus Indo Lighting</b>: Perusahaan yang bergerak dalam produksi lampu LED nasional, menyediakan solusi pencahayaan yang efisien dan ramah lingkungan.</li>
+          <li><b>PT Evercoss</b>: Perusahaan elektronik yang dikenal sebagai produsen ponsel nasional, turut berpartisipasi dengan keahlian di bidang teknologi.</li>
+          <li><b>PT Perwira Multi Jaya</b>: Perusahaan yang bergerak di bidang infrastruktur, khususnya dalam penyediaan tiang PJU dan layanan terkait lainnya.</li>
+        </ul>
+        <p className="mt-4 text-lg">
+          Konsorsium ini bertujuan untuk melaksanakan proyek PJU di Kabupaten Madiun dengan jumlah 7.459 titik, dengan total nilai proyek sebesar Rp100 miliar. Proyek ini menjadi percontohan nasional pertama di Indonesia dalam bidang KPBU APJ.
+        </p>
+      </div>
+
       {/* Tahap 1 - Proses Pengadaan BUP KPBU APJ */}
       <div className="mb-16">
         <h2 className="text-2xl font-semibold text-[#007bff]">Tahap 1: Proses Pengadaan BUP KPBU APJ</h2>
@@ -26,7 +42,7 @@ const SejarahKami = () => {
       </div>
 
       {/* Tahap 2 - Proses Pendaftaran dan Pengambilan Dokumen RfP */}
-      <div className="mb-8">
+      <div className="mb-16">
         <h2 className="text-2xl font-semibold text-[#007bff]">Tahap 2: Proses Pendaftaran dan Pengambilan Dokumen RfP</h2>
         <p className="mt-2 text-lg">
           Tahap kedua dimulai dengan pengiriman undangan kepada peserta yang lulus prakualifikasi pada 12 Mei 2022. Setelah itu, peserta menyerahkan Surat Kerahasiaan antara 13 hingga 19 Mei 2022 dan mengikuti sesi penjelasan serta tinjauan lapangan dari 20 hingga 24 Mei 2022.
@@ -40,7 +56,7 @@ const SejarahKami = () => {
       </div>
 
       {/* Tahap 3 - Proses Perjanjian Kerjasama Proyek KPBU */}
-      <div className="mb-8">
+      <div className="mb-16">
         <h2 className="text-2xl font-semibold text-[#007bff]">Tahap 3: Proses Perjanjian Kerjasama Proyek KPBU</h2>
         <p className="mt-2 text-lg">
           Tahap ketiga dimulai dengan pengurusan perijinan pembentukan BUP KPBU APJ pada Agustus 2022, yang dilanjutkan dengan penandatanganan Perjanjian Kerjasama (PKS) pada 20 September 2022. Proyek memasuki tahap konstruksi dari Oktober 2022 hingga 18 Juli 2023.

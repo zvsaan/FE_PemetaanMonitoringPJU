@@ -96,11 +96,6 @@ const SidebarAdmin = ({ isOpen, toggleSidebar }) => {
                   <FontAwesomeIcon icon={faNewspaper} /> Berita Terkini
                 </Link>
               </MenuItem>
-
-              {/* <Link to="/app/admin/estimasi-biaya" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-600 transition">
-                <FontAwesomeIcon icon={faTachometerAlt} />
-                <span>Estimasi Biaya</span>
-              </Link> */}
             </nav>
           </div>
         </div>

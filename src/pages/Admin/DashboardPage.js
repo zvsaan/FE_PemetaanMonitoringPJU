@@ -1,7 +1,7 @@
 /* eslint-disable */
 import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLightbulb, faCheckCircle, faTimesCircle, faTools, faThLarge, faBolt, faBars, faHistory } from '@fortawesome/free-solid-svg-icons';
+import {faBolt, faThLarge,faHistory,faClock,faBars,faSyncAlt,faChartLine,} from "@fortawesome/free-solid-svg-icons";
 import 'react-calendar/dist/Calendar.css';
 import SidebarAdmin from 'parts/SidebarAdmin';
 import HeaderAdmin from 'parts/HeaderAdmin';
@@ -21,8 +21,14 @@ export default class DashboardPage extends Component {
       total_panel: 0,
       total_riwayat_pju: 0,
       total_riwayat_panel: 0,
+      riwayat_pending_pju: 0,
+      riwayat_pending_panel: 0,
+      riwayat_proses_pju: 0,
+      riwayat_proses_panel: 0,
+      avg_riwayat_pju: 0,
+      avg_riwayat_panel: 0,
     },
-  };
+  };  
 
   componentDidMount() {
     window.scrollTo(0, 0);
@@ -103,6 +109,7 @@ export default class DashboardPage extends Component {
 
             {/* Report Section */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Total Data */}
               <ReportCard
                 icon={<FontAwesomeIcon icon={faBolt} />}
                 title="Total APJ"
@@ -127,10 +134,58 @@ export default class DashboardPage extends Component {
                 number={dashboardData.total_riwayat_panel}
                 bgColor="bg-orange-400"
               />
-            </div>
 
+              {/* Riwayat by Status */}
+              <ReportCard
+                icon={<FontAwesomeIcon icon={faClock} />}
+                title="Riwayat Pending PJU"
+                number={dashboardData.riwayat_pending_pju}
+                bgColor="bg-yellow-500"
+              />
+              <ReportCard
+                icon={<FontAwesomeIcon icon={faClock} />}
+                title="Riwayat Pending Panel"
+                number={dashboardData.riwayat_pending_panel}
+                bgColor="bg-yellow-400"
+              />
+              <ReportCard
+                icon={<FontAwesomeIcon icon={faSyncAlt} />}
+                title="Riwayat Proses PJU"
+                number={dashboardData.riwayat_proses_pju}
+                bgColor="bg-blue-500"
+              />
+              <ReportCard
+                icon={<FontAwesomeIcon icon={faSyncAlt} />}
+                title="Riwayat Proses Panel"
+                number={dashboardData.riwayat_proses_panel}
+                bgColor="bg-blue-400"
+              />
+
+              {/* Rata-Rata Riwayat */}
+              <ReportCard
+                icon={<FontAwesomeIcon icon={faChartLine} />}
+                title="Rata-Rata Riwayat per PJU"
+                number={dashboardData.avg_riwayat_pju}
+                bgColor="bg-purple-500"
+              />
+              <ReportCard
+                icon={<FontAwesomeIcon icon={faChartLine} />}
+                title="Rata-Rata Riwayat per Panel"
+                number={dashboardData.avg_riwayat_panel}
+                bgColor="bg-indigo-400"
+              />
+            </div>
+            
             {/* Analysis Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+              <div className="bg-white rounded-lg shadow p-4 md:p-6">
+                <h2 className="text-xl font-bold text-gray-700 mb-4">Import Riwayat</h2>
+                <ImportRiwayatCard />
+              </div>
+              <div className="bg-white rounded-lg shadow p-4 md:p-6">
+                <h2 className="text-xl font-bold text-gray-700 mb-4">Import Riwayat</h2>
+                <ExportRiwayatCard />
+              </div>
               {/* Left Side: AnalysisCard */}
               <div className="bg-white rounded-lg shadow p-4 md:p-6">
                 <h2 className="text-xl font-bold text-gray-700 mb-4">Analysis</h2>
@@ -141,14 +196,6 @@ export default class DashboardPage extends Component {
               <div className="bg-white rounded-lg shadow p-4 md:p-6">
                 <h2 className="text-xl font-bold text-gray-700 mb-4">Problem Percentage</h2>
                 <ProblemPercentageCard />
-              </div>
-              <div className="bg-white rounded-lg shadow p-4 md:p-6">
-                <h2 className="text-xl font-bold text-gray-700 mb-4">Import Riwayat</h2>
-                <ImportRiwayatCard />
-              </div>
-              <div className="bg-white rounded-lg shadow p-4 md:p-6">
-                <h2 className="text-xl font-bold text-gray-700 mb-4">Import Riwayat</h2>
-                <ExportRiwayatCard />
               </div>
             </div>
           </main>
@@ -166,18 +213,31 @@ export default class DashboardPage extends Component {
   }
 }
 
-// Component untuk ReportCard dengan CountUp
-const ReportCard = ({ icon, title, number, bgColor }) => (
-  <div className="bg-white p-4 md:p-6 rounded-lg shadow flex flex-col items-center text-center">
-    <div
-      className={`${bgColor} text-white rounded-lg p-3 md:p-4 text-2xl md:text-3xl mb-2`}
-    >
-      {icon}
+const ReportCard = ({ icon, title, number, bgColor }) => {
+  // Format number only for avg_riwayat_pju and avg_riwayat_panel
+  const formattedNumber =
+    title === "Rata-Rata Riwayat per PJU" || title === "Rata-Rata Riwayat per Panel"
+      ? number.toFixed(2)
+      : number;
+
+  return (
+    <div className="bg-white p-4 md:p-6 rounded-lg shadow flex flex-col items-center text-center">
+      <div
+        className={`${bgColor} text-white rounded-lg p-3 md:p-4 text-2xl md:text-3xl mb-2`}
+      >
+        {icon}
+      </div>
+      <h4 className="text-sm font-semibold">{title}</h4>
+      <p className="text-lg md:text-2xl font-bold">
+        {/* Apply CountUp to animate the number */}
+        <CountUp
+          start={0}
+          end={parseFloat(formattedNumber)}
+          duration={2.5}
+          separator=","
+          decimals={title.includes("Rata-Rata") ? 2 : 0} // Set decimals conditionally
+        />
+      </p>
     </div>
-    <h4 className="text-sm font-semibold">{title}</h4>
-    <p className="text-lg md:text-2xl font-bold">
-      {/* Apply CountUp to animate the number */}
-      <CountUp start={0} end={number} duration={2.5} separator="," />
-    </p>
-  </div>
-)
+  );
+};

@@ -12,7 +12,7 @@ import FotoSejarahKami from 'assets/images/tentangKami/sejarah.png';
 import FotoSekilasTentangKami from 'assets/images/tentangKami/sekilas.png';
 import FotoAreaPersebaran from 'assets/images/tentangKami/AreaPersebaran.png';
 import FotoTeamKami from 'assets/images/tentangKami/team.jpeg';
-
+import FotoLayanan from 'assets/images/tentangKami/layanan.jpeg';
 
 import Visi from 'assets/images/tentangKami/visi.jpeg';
 import Misi from 'assets/images/tentangKami/misi.jpeg';
@@ -37,10 +37,7 @@ const DetailTentangKami = () => {
             <Fade bottom>
               <h2 className="text-3xl font-bold mb-4">Sekilas Tentang Kami</h2>
               <p className="text-lg text-gray-700 mb-6">
-                PT Tri Tunggal Madiun Terang (TTMT) didirikan pada 31 Agustus 2023 dengan tujuan memberikan penerangan
-                jalan umum kepada Pemerintah Kabupaten Madiun. Kami telah bekerjasama dengan Pemerintah Kabupaten Madiun
-                melalui perjanjian kerjasama untuk membangun dan
-                menyediakan 7459 titik luminernya yang tersebar di seluruh Kabupaten Madiun.
+              PT Tri Tunggal Madiun Terang (TTMT) didirikan pada 31 Agustus 2023 dengan tujuan menyediakan penerangan jalan umum yang modern dan ramah lingkungan. Dengan 7459 titik luminernya di seluruh Kabupaten Madiun, kami berkomitmen menghadirkan infrastruktur penerangan yang efisien, aman, dan berkelanjutan.
               </p>
               <a
                 href="/tentangkami/sekilas"
@@ -70,10 +67,7 @@ const DetailTentangKami = () => {
             <Fade bottom>
               <h2 className="text-3xl font-bold mb-4">Sejarah Kami</h2>
               <p className="text-lg mb-6">
-                PT Tri Tunggal Madiun Terang didirikan pada 31 Agustus 2023 dengan komitmen memberikan solusi Alat Penerangan Jalan
-                (APJ) kepada Pemerintah Kabupaten Madiun. Kami telah bekerja sama dengan Kabupaten Madiun
-                berdasarkan perjanjian kerjasama pada 20 September 2022, untuk menyediakan dan memasang 7459 titik
-                luminernya di seluruh Kabupaten Madiun.
+                Didirikan pada 31 Agustus 2023, PT TTMT memulai kerja sama strategis dengan Pemerintah Kabupaten Madiun sejak 2022. Perusahaan kami fokus pada penyediaan ribuan titik penerangan jalan umum yang tersebar di seluruh wilayah, mendukung pembangunan infrastruktur yang lebih baik.
               </p>
               <a
                 href="/tentangkami/sejarah"
@@ -106,12 +100,10 @@ const DetailTentangKami = () => {
             <Fade bottom>
               <h2 className="text-3xl font-bold mb-4 text-white">Area Persebaran APJ Kami</h2>
               <p className="text-lg text-white mb-6">
-                PT Tri Tunggal Madiun Terang memiliki jaringan distribusi APJ yang luas dan tersebar di seluruh Kabupaten
-                Madiun. Dengan dukungan infrastruktur yang kuat, kami memastikan luminernya dapat menjangkau berbagai
-                wilayah, baik di kota besar maupun di wilayah terpencil di seluruh Nusantara.
+              Jaringan penerangan PT TTMT mencakup seluruh wilayah Kabupaten Madiun. Dari kawasan perkotaan hingga pedesaan, kami memastikan setiap titik penerangan dapat diakses dengan infrastruktur yang handal dan teknologi mutakhir, mendukung kemajuan wilayah secara merata.
               </p>
               <a
-                href="/tentangkami/area-persebaran"
+                href="/tentangkami/area-operasi"
                 className="text-[#007bff] font-bold hover:text-blue-600"
               >
                 Selengkapnya
@@ -132,9 +124,7 @@ const DetailTentangKami = () => {
             <Fade bottom>
               <h2 className="text-3xl font-bold mb-4 text-white">Layanan Kami</h2>
               <p className="text-lg text-white mb-6">
-                PT Tri Tunggal Madiun Terang memiliki komitmen untuk menyediakan luminernya yang tersebar di seluruh
-                Kabupaten Madiun. Kami mendukung keberlanjutan dan efisiensi energi dalam pembangunan Alat Penerangan Jalan
-                (APJ) di berbagai wilayah.
+              Kami menawarkan berbagai layanan seperti pembangunan dan pemeliharaan penerangan jalan, modernisasi infrastruktur, serta dukungan berbasis teknologi digital. PT TTMT berkomitmen menyediakan solusi yang efisien dan berkelanjutan untuk kebutuhan penerangan jalan umum.
               </p>
               <a
                 href="/tentangkami/layanan"
@@ -147,8 +137,8 @@ const DetailTentangKami = () => {
           {/* Gambar di sebelah kiri (padding kiri mengikuti header) */}
           <div className="flex-shrink-0 lg:w-1/2 w-full">
             <img
-              src={FotoAreaPersebaran}
-              alt="Area Persebaran APJ"
+              src={FotoLayanan}
+              alt="Layanan Kami"
               className="w-full h-auto object-cover"
             />
           </div>
@@ -165,7 +155,7 @@ const DetailTentangKami = () => {
           <div className="flex-shrink-0 lg:w-1/2 w-full">
             <img
               src={FotoTeamKami}
-              alt="Area Persebaran APJ"
+              alt="Team Kami"
               className="w-full h-auto object-cover"
             />
           </div>
@@ -175,9 +165,7 @@ const DetailTentangKami = () => {
             <Fade bottom>
               <h2 className="text-3xl font-bold mb-4 text-white">Team Kami</h2>
               <p className="text-lg text-white mb-6">
-                PT Tri Tunggal Madiun Terang memiliki jaringan distribusi APJ yang luas dan tersebar di seluruh Kabupaten
-                Madiun. Dengan dukungan infrastruktur yang kuat, kami memastikan luminernya dapat menjangkau berbagai
-                wilayah, baik di kota besar maupun di wilayah terpencil di seluruh Nusantara.
+              Didukung oleh tenaga ahli dan profesional, tim PT TTMT selalu siap memberikan pelayanan terbaik. Dengan keahlian yang mendalam, kami memastikan setiap proyek terlaksana dengan kualitas dan efisiensi tinggi, sesuai visi kami untuk membangun infrastruktur unggul.
               </p>
               <a
                 href="/tentangkami/team"

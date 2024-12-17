@@ -16,14 +16,14 @@ import video6 from 'assets/images/media/video/video6.mp4';
 const dummyVideos = [
   {
     id: 1,
-    date: '12 Januari 2024',
-    title: 'Penerangan Jalan Desa Sumberdadi',
+    date: '20 September 2022',
+    title: 'Penandatanganan Perjanjian KPBU APJ',
     video: video1
   },
   {
     id: 2,
-    date: '15 Januari 2024',
-    title: 'Pemasangan PJU di Jalan Raya Madiun',
+    date: '14 Juni 2023',
+    title: 'Penghargaan Pembangunan Daerah',
     video: video2
   },
   {
@@ -35,7 +35,7 @@ const dummyVideos = [
   {
     id: 4,
     date: '25 Januari 2024',
-    title: 'Inovasi Penerangan Jalan',
+    title: 'Penandatanganan Financial Close Proyek',
     video: video4
   },
   {

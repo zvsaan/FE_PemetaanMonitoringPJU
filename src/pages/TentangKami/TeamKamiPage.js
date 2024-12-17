@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import Footer from 'parts/Footer';
 import Header from 'parts/Header';
 import HeroTeamKami from 'parts/Hero/tentangkami/HeroTeamKami';
-// import HeroTentangKami from 'parts/Hero/tentangkami/HeroTentangKami';
+import TeamKami from 'parts/TentangKami/TeamKami';
 
 export default class TeamKamiPage extends Component {
   componentDidMount() {
@@ -16,7 +16,7 @@ export default class TeamKamiPage extends Component {
       <>
         <Header />
         <HeroTeamKami />
-        {/* <TeamKami /> */}
+        <TeamKami />
         <Footer />
       </>
     );
