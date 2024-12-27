@@ -78,16 +78,20 @@ const DataBerita = () => {
   const handleEdit = (item) => {
     setModalType("edit");
     setSelectedData(item);
-
+  
+    // Konversi <br> menjadi \n untuk textarea
+    const contentWithNewlines = item.content.replace(/<br>/g, "\n");
+  
     // Set nilai awal form
     form.setFieldsValue({
       ...item,
+      content: contentWithNewlines, // Ganti <br> dengan \n
       published_date: moment(item.published_date),
     });
-
+  
     // Set preview image dari data yang dipilih
     setPreviewImage(item.image_url ? `http://localhost:8000${item.image_url}` : null);
-
+  
     // Tampilkan modal
     setShowModal(true);
   };
@@ -117,48 +121,66 @@ const DataBerita = () => {
   };
 
   const handleSubmit = async (values) => {
-      const formData = new FormData();
-
-      for (const key in values) {
-          if (key === "published_date") {
-              formData.append(key, values[key].format("YYYY-MM-DD"));
-          } else if (key === "image_url" && values.image_url?.file) {
-              // Hanya tambahkan `image_url` jika ada file baru
-              formData.append(key, values.image_url.file);
-          } else if (key !== "image_url") {
-              formData.append(key, values[key]);
-          }
+    const formData = new FormData();
+  
+    // Konversi \n menjadi <br> pada konten
+    const updatedContent = values.content.replace(/\n/g, "<br>");
+    
+    // Tambahkan semua nilai form ke FormData
+    for (const key in values) {
+      if (key === "published_date") {
+        formData.append(key, values[key].format("YYYY-MM-DD"));
+      } else if (key === "image_url" && values.image_url?.file) {
+        // Hanya tambahkan file baru jika ada
+        formData.append(key, values.image_url.file);
+      } else if (key === "content") {
+        // Tambahkan konten yang sudah dimodifikasi
+        formData.append(key, updatedContent);
+      } else if (key !== "image_url") {
+        formData.append(key, values[key]);
       }
-
-      try {
-          if (modalType === "create") {
-              await axios.post("http://localhost:8000/api/berita", formData, {
-                  headers: {
-                      Authorization: `Bearer ${authToken}`,
-                      "Content-Type": "multipart/form-data",
-                  },
-              });
-              notification.success({ message: "Berita berhasil ditambahkan" });
-          } else if (modalType === "edit") {
-              await axios.post(
-                  `http://localhost:8000/api/berita/${selectedData.id_berita}`,
-                  formData,
-                  {
-                      headers: {
-                          Authorization: `Bearer ${authToken}`,
-                          "Content-Type": "multipart/form-data",
-                      },
-                  }
-              );
-              notification.success({ message: "Berita berhasil diperbarui" });
+    }
+  
+    try {
+      if (modalType === "create") {
+        // Tambah data baru
+        await axios.post("http://localhost:8000/api/berita", formData, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        notification.success({ message: "Berita berhasil ditambahkan!" });
+      } else if (modalType === "edit") {
+        // Edit data yang sudah ada
+        await axios.post(
+          `http://localhost:8000/api/berita/${selectedData.id_berita}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "multipart/form-data",
+            },
           }
-          getBerita();
-          setShowModal(false);
-      } catch (error) {
-          console.error("Error submitting data:", error);
-          notification.error({ message: "Gagal menyimpan data berita" });
+        );
+        notification.success({ message: "Berita berhasil diperbarui!" });
       }
-  };
+      getBerita(); // Refresh data
+      setShowModal(false); // Tutup modal
+    } catch (error) {
+      console.error("Error submitting data:", error);
+  
+      // Tampilkan pesan error validasi
+      const errors = error.response?.data?.errors;
+      if (errors) {
+        Object.values(errors).forEach((errMsg) =>
+          notification.error({ message: `Error: ${errMsg[0]}` })
+        );
+      } else {
+        notification.error({ message: "Gagal menyimpan data berita!" });
+      }
+    }
+  }  
 
   const columns = [
     {
@@ -167,8 +189,17 @@ const DataBerita = () => {
       key: "no",
       render: (_, __, index) => index + 1,
     },
-    { title: "Judul", dataIndex: "title", key: "title" },
-    { title: "Konten", dataIndex: "content", key: "content" },
+    { title: "Judul", dataIndex: "title", key: "title",
+      render: (text) =>
+        text.length > 30 ? `${text.substring(0, 30)}...` : text,
+     },
+    {title: "Konten", dataIndex: "content", key: "content",
+      render: (text) => (
+        <div style={{ whiteSpace: "pre-line" }}>
+          {text.length > 50 ? `${text.substring(0, 50)}...` : text}
+        </div>
+      ),
+    },    
     { title: "Penulis", dataIndex: "author", key: "author" },
     { title: "Tanggal", dataIndex: "published_date", key: "published_date" },
     {
@@ -188,21 +219,18 @@ const DataBerita = () => {
     },
     { title: "Status", dataIndex: "status", key: "status" },
     {
-      title: "Aksi",
-      key: "aksi",
+      title: 'Aksi',
+      key: 'aksi',
       render: (_, record) => (
-        <div>
-          <Button
-            icon={<EditOutlined />}
-            type="link"
-            onClick={() => handleEdit(record)}
-          />
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)}/>
+          
           <Button
             icon={<DeleteOutlined />}
-            type="link"
             danger
             onClick={() => handleDelete(record)}
           />
+           
         </div>
       ),
     },
@@ -242,11 +270,11 @@ const DataBerita = () => {
           current: currentPage,
           pageSize: itemsPerPage,
           total: filteredData.length,
-          showSizeChanger: true,
           onChange: (page, pageSize) => {
             setCurrentPage(page);
             setItemsPerPage(pageSize);
           },
+          showSizeChanger: true,
         }}
       />
       <Modal

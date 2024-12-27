@@ -75,7 +75,7 @@ const DetailBerita = () => {
 
       {/* Detail Berita */}
       <div className="my-10 px-5 lg:px-52">
-        <h1 className="text-4xl font-semibold mb-4">{berita.title}</h1>
+        <h1 className="text-2xl font-semibold mb-4">{berita.title}</h1>
         <p className="text-sm text-gray-500 mb-4">{berita.published_date}</p>
 
         <div className="mb-6">
@@ -86,7 +86,14 @@ const DetailBerita = () => {
           />
         </div>
 
-        <div className="text-base text-gray-700 mb-4">{berita.content}</div>
+        {/* <div className="text-base text-gray-700 mb-4 leading-relaxed">{berita.content}</div> */}
+        <div className="text-base text-gray-700 mb-4 leading-relaxed">
+          <div
+            dangerouslySetInnerHTML={{
+              __html: berita.content,
+            }}
+          />
+        </div>
 
         <div className="text-sm text-gray-500">
           <p>Author: {berita.author}</p>

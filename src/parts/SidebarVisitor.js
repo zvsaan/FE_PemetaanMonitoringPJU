@@ -18,7 +18,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
-const SidebarAdmin = ({ isOpen, toggleSidebar }) => {
+const SidebarVisitor = ({ isOpen, toggleSidebar }) => {
   const [openMenu, setOpenMenu] = useState('');
 
   const toggleSubMenu = (menu) => {
@@ -29,7 +29,7 @@ const SidebarAdmin = ({ isOpen, toggleSidebar }) => {
     <div>
       <button
         onClick={() => toggleSubMenu(menuKey)}
-        className="flex items-center justify-between w-full p-3 rounded-lg hover:bg-blue-600 transition"
+        className="flex items-center justify-between w-full p-3 rounded-lg hover:bg-green-600 transition"
       >
         <div className="flex items-center space-x-3">
           <FontAwesomeIcon icon={icon} />
@@ -45,7 +45,7 @@ const SidebarAdmin = ({ isOpen, toggleSidebar }) => {
     <>
       {/* Sidebar */}
       <div
-  className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow-lg transform ${
+  className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-green-500 to-green-700 text-white shadow-lg transform ${
     isOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'
   } transition-all duration-500 ease-in-out z-50`}
 >
@@ -53,38 +53,29 @@ const SidebarAdmin = ({ isOpen, toggleSidebar }) => {
           <div className="flex flex-col items-center mb-8">
             <div className="text-2xl font-bold mb-6">SiGAP</div>
             <nav className="flex flex-col space-y-4 w-full">
-              <Link to="/app/admin/dashboard" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-600 transition">
+              <Link to="/v1/visitor/home" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition">
                 <FontAwesomeIcon icon={faTachometerAlt} />
                 <span>Dashboard</span>
               </Link>
 
               <MenuItem label="Kelola Data" icon={faTools} menuKey="manajemenData">
-                <Link to="/app/admin/data-panel" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                <Link to="/v1/visitor/paneldata" className="block p-2 rounded-lg hover:bg-green-500 transition">
                   <FontAwesomeIcon icon={faPlug} /> Data Panel
                 </Link>
-                <Link to="/app/admin/data-pju" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                <Link to="/v1/visitor/apjdata" className="block p-2 rounded-lg hover:bg-green-500 transition">
                   <FontAwesomeIcon icon={faLightbulb} /> Data APJ
                 </Link>
-                <Link to="/app/admin/data-konstruksi" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                <Link to="/v1/visitor/konstruksidata" className="block p-2 rounded-lg hover:bg-green-500 transition">
                   <FontAwesomeIcon icon={faLightbulb} /> Data Konstruksi
                 </Link>
               </MenuItem>
 
               <MenuItem label="Pemetaan" icon={faMapMarkerAlt} menuKey="pemetaanPJU">
-                <Link to="/app/admin/pemetaan-panel" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                <Link to="/v1/visitor/panelpemetaan" className="block p-2 rounded-lg hover:bg-green-500 transition">
                   <FontAwesomeIcon icon={faPlug} /> Pemetaan Panel
                 </Link>
-                <Link to="/app/admin/pemetaan-pju" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                <Link to="/v1/visitor/apjpemetaan" className="block p-2 rounded-lg hover:bg-green-500 transition">
                   <FontAwesomeIcon icon={faLightbulb} /> Pemetaan APJ
-                </Link>
-              </MenuItem>
-
-              <MenuItem label="Data Company" icon={faBuilding} menuKey="dataPerusahaan">
-                <Link to="/app/admin/data-team" className="block p-2 rounded-lg hover:bg-blue-500 transition">
-                  <FontAwesomeIcon icon={faUsers} /> Data Tim
-                </Link>
-                <Link to="/app/admin/data-berita" className="block p-2 rounded-lg hover:bg-blue-500 transition">
-                  <FontAwesomeIcon icon={faNewspaper} /> Berita Terkini
                 </Link>
               </MenuItem>
             </nav>
@@ -103,7 +94,7 @@ const SidebarAdmin = ({ isOpen, toggleSidebar }) => {
       {/* Floating Button */}
       <button
         onClick={toggleSidebar}
-        className="fixed bottom-4 right-4 bg-blue-600 text-white p-4 rounded-full shadow-lg z-50 hover:bg-blue-700 transition"
+        className="fixed bottom-4 right-4 bg-green-600 text-white p-4 rounded-full shadow-lg z-50 hover:bg-green-700 transition"
       >
         <FontAwesomeIcon icon={isOpen ? faTimes : faBars} />
       </button>
@@ -111,4 +102,4 @@ const SidebarAdmin = ({ isOpen, toggleSidebar }) => {
   );
 };
 
-export default SidebarAdmin;
+export default SidebarVisitor;

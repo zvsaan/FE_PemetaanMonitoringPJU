@@ -43,20 +43,24 @@ const ComponentBeritaTerkini = () => {
           // Render berita jika ada data
           beritaTerkini.map((item, index) => (
             <Zoom triggerOnce delay={600 + index * 200} key={item.id_berita}>
-              <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg relative aspect-[3/2]">
-                <img
-                  src={`http://localhost:8000${item.image_url}`}
-                  alt={item.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute bottom-0 left-0 w-full p-6">
-                  <h3 className="text-xl font-semibold mb-2 text-left text-white">{item.title}</h3>
-                  <a href={`/media/berita/${item.slug}`} className="text-blue-400 hover:text-blue-500">
-                    Selengkapnya
-                  </a>
-                </div>
+            <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg relative aspect-[3/2]">
+              <img
+                src={`http://localhost:8000${item.image_url}`}
+                alt={item.title}
+                className="w-full h-full object-cover"
+              />
+              {/* Overlay untuk efek gelap */}
+              <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+              <div className="absolute bottom-0 left-0 w-full p-6">
+                <h3 className="text-lg font-semibold mb-2 text-left text-white">
+                  {item.title.length > 40 ? `${item.title.substring(0, 40)}...` : item.title}
+                </h3>
+                <a href={`/media/berita/${item.slug}`} className="text-blue-400 hover:text-blue-500 text-sm">
+                  Selengkapnya
+                </a>
               </div>
-            </Zoom>
+            </div>
+          </Zoom>          
           ))
         ) : (
           // Pesan jika tidak ada data

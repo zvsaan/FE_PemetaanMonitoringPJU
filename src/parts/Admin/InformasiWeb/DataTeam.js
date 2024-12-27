@@ -6,7 +6,7 @@ import axios from "axios";
 
 const DataTeam = () => {
   const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState(data);
+  const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -35,6 +35,7 @@ const DataTeam = () => {
       setFilteredData(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
+      notify("error", "Gagal memuat data!");
     }
   };
 
@@ -47,9 +48,9 @@ const DataTeam = () => {
         },
       });
       getTeam();
-      notify("success", "Berhasil menambahkan data!");
+      notify("success", "Data berhasil ditambahkan!");
     } catch (error) {
-      console.error("Error creating data:", error);
+      handleValidationError(error);
     }
   };
 
@@ -62,9 +63,9 @@ const DataTeam = () => {
         },
       });
       getTeam();
-      notify("success", "Berhasil mengupdate data!");
+      notify("success", "Data berhasil diperbarui!");
     } catch (error) {
-      console.error("Error updating data:", error);
+      handleValidationError(error);
     }
   };
 
@@ -76,9 +77,21 @@ const DataTeam = () => {
         },
       });
       getTeam();
-      notify("success", "Berhasil menghapus data!");
+      notify("success", "Data berhasil dihapus!");
     } catch (error) {
       console.error("Error deleting data:", error);
+      notify("error", "Gagal menghapus data!");
+    }
+  };
+
+  const handleValidationError = (error) => {
+    const errors = error.response?.data?.errors;
+    if (errors) {
+      Object.values(errors).forEach((errMsg) =>
+        notify("error", `Error: ${errMsg[0]}`)
+      );
+    } else {
+      notify("error", "Gagal memproses data!");
     }
   };
 
@@ -101,7 +114,7 @@ const DataTeam = () => {
       const values = await form.validateFields();
       const formData = new FormData();
       for (const key in values) {
-        formData.append(key, values[key]);
+        formData.append(key, key === "description" ? values[key].replace(/\n/g, "<br>") : values[key]);
       }
       if (photo) {
         formData.append("photo_url", photo);
@@ -123,18 +136,35 @@ const DataTeam = () => {
     { title: "No", dataIndex: "id_team", render: (_, __, index) => (currentPage - 1) * itemsPerPage + index + 1 },
     { title: "Nama", dataIndex: "name" },
     { title: "Posisi", dataIndex: "position" },
-    { title: "Deskripsi", dataIndex: "description" },
+    {
+      title: "Deskripsi",
+      dataIndex: "description",
+      render: (text) => (
+        <div
+          dangerouslySetInnerHTML={{
+            __html: text,
+          }}
+        />
+      ),
+    },
     {
       title: "Foto",
       dataIndex: "photo_url",
       render: (text) => text && <img src={`http://localhost:8000${text}`} alt="Foto" style={{ width: 50, height: 50 }} />,
     },
     {
-      title: "Aksi",
-      render: (record) => (
-        <div style={{ display: "flex", gap: "10px" }}>
-          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-          <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(record)} />
+      title: 'Aksi',
+      key: 'aksi',
+      render: (_, record) => (
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)}/>
+   
+          <Button
+            icon={<DeleteOutlined />}
+            danger
+            onClick={() => handleDelete(record)}
+          />
+    
         </div>
       ),
     },
@@ -183,8 +213,18 @@ const DataTeam = () => {
       </div>
       <Table
         columns={columns}
-        dataSource={filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)}
-        pagination={false}
+        dataSource={filteredData}
+        pagination={{
+          current: currentPage,
+          pageSize: itemsPerPage,
+          total: filteredData.length,
+          onChange: (page, pageSize) => {
+            setCurrentPage(page);
+            setItemsPerPage(pageSize);
+          },
+          showSizeChanger: true,
+          // showQuickJumper: true,
+        }}
         rowKey="id_team"
       />
       <Modal

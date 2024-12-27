@@ -453,8 +453,8 @@ const DataRiwayatPJU = () => {
           <Form.Item name="pencegahan" label="Pencegahan">
             <Input.TextArea placeholder="Masukkan Pencegahan" />
           </Form.Item>
-          <Form.Item name="nomor_rujukan" label="Nomor Rujukan">
-            <Input placeholder="Masukkan Nomor Rujukan" />
+          <Form.Item name="nomor_rujukan" label="Dasar Acuan">
+            <Input placeholder="Masukkan Nomor Dasar Acuan" />
           </Form.Item>
           <Form.Item name="status" label="Status" rules={[{ required: true, message: "Status wajib diisi" }]}>
             <Select placeholder="Pilih Status">

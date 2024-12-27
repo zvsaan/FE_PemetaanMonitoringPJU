@@ -14,10 +14,24 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:8000/api/login', { username, password });
-      const { token } = response.data;
+      const { token, user } = response.data; // Expecting user data to include the role
 
       localStorage.setItem('authToken', token);
-      navigate('/app/admin/dashboard');
+
+      // Navigate based on role
+      switch (user.role) {
+        case 'superadmin':
+          navigate('/app/superadmin/dashboard');
+          break;
+        case 'admin':
+          navigate('/app/admin/dashboard');
+          break;
+        case 'visitor':
+          navigate('/v1/visitor/home');
+          break;
+        default:
+          setError('Invalid role. Please contact support.');
+      }
     } catch (error) {
       setError(error.response?.data?.message || 'Login gagal');
     }
@@ -33,9 +47,9 @@ const LoginPage = () => {
         {/* Logo */}
         <div className="text-center">
           <h2 className="text-4xl font-extrabold text-blue-700">PT TTMT</h2>
-          <p className="text-sm text-gray-600 mt-2">Please login to your admin account</p>
+          <p className="text-sm text-gray-600 mt-2">Please login to your account</p>
         </div>
-        
+
         <form className="space-y-6" onSubmit={handleLogin}>
           {/* Error Message */}
           {error && <p className="text-red-500 text-sm">{error}</p>}

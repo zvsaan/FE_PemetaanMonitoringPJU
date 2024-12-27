@@ -7,15 +7,10 @@ import NotFound from 'assets/images/404image.png';
 
 // eslint-disable-next-line react/prefer-stateless-function
 export default class NotFoundPage extends Component {
-  handleRedirect = () => {
-    const authToken = localStorage.getItem('authToken');
-
-    if (authToken) {
-      window.location.href = '/app/admin/dashboard';
-    } else {
-      window.location.href = '/';
-    }
-  };
+  // handleRedirect = () => {
+  //     window.location.href = '/';
+  //   }
+  // };
 
   render() {
     return (
@@ -27,17 +22,17 @@ export default class NotFoundPage extends Component {
             className="w-1/2 max-w-xs object-contain hover:animate-brutal-move"
           />
         </div>
-        <h1 className="text-white text-2xl text-center mt-5">
+        <h1 className="text-white text-2xl text-center mt-5 px-5">
           Halaman ini tidak ada atau tidak dapat ditemukan
         </h1>
-        <div className="flex justify-center">
+        {/* <div className="flex justify-center">
           <Button
-            onClick={this.handleRedirect}
+            href='/'
             className="flex w-30 h-10 px-5 mt-5 bg-gray-600 text-white items-center rounded transform transition duration-500 hover:bg-gray-900"
           >
             Kembali
           </Button>
-        </div>
+        </div> */}
       </div>
     );
   }

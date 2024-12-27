@@ -4,8 +4,9 @@ import { Navigate, Outlet } from 'react-router-dom';
 import axios from 'axios';
 import LoadingScreen from './LoadingScreen';
 
-const PrivateRoute = () => {
+const PrivateRoute = ({ allowedRoles }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   const authToken = localStorage.getItem('authToken');
 
   useEffect(() => {
@@ -21,8 +22,12 @@ const PrivateRoute = () => {
           }
         );
 
-        setIsAuthenticated(response.data.success);
-        // console.log("Data", response.data.user);
+        if (response.data.success) {
+          setIsAuthenticated(true);
+          setUserRole(response.data.user.role);
+        } else {
+          setIsAuthenticated(false);
+        }
       } catch (error) {
         setIsAuthenticated(false);
       }
@@ -39,7 +44,26 @@ const PrivateRoute = () => {
     return <LoadingScreen />;
   }
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/" />;
+  if (!isAuthenticated) {
+    return <Navigate to="/" />;
+  }
+
+  // Jika role pengguna tidak ada di daftar role yang diizinkan
+  if (!allowedRoles.includes(userRole)) {
+    // Redirect ke halaman sesuai role pengguna
+    switch (userRole) {
+      case 'visitor':
+        return <Navigate to="/v1/visitor/home" />;
+      case 'admin':
+        return <Navigate to="/app/admin/dashboard" />;
+      case 'superadmin':
+        return <Navigate to="/app/superadmin/dashboard" />;
+      default:
+        return <Navigate to="/" />;
+    }
+  }
+
+  return <Outlet />;
 };
 
 export default PrivateRoute;

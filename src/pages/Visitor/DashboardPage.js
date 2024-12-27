@@ -3,14 +3,12 @@ import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faBolt, faThLarge,faHistory,faClock,faBars,faSyncAlt,faChartLine,} from "@fortawesome/free-solid-svg-icons";
 import 'react-calendar/dist/Calendar.css';
-import SidebarAdmin from 'parts/SidebarAdmin';
-import HeaderAdmin from 'parts/HeaderAdmin';
+import SidebarVisitor from 'parts/SidebarVisitor';
+import HeaderVisitor from 'parts/HeaderVisitor';
 import AdminImage from '../../assets/images/admin.png';
-import axios from 'axios'; // Import axios for API calls
-import AnalysisCard from 'parts/Admin/Analystic/AnalysisCard';
-import ProblemPercentageCard from 'parts/Admin/Analystic/ProblemPercentageCard';
-import ImportRiwayatCard from 'parts/Admin/Analystic/ImportRiwayatCard';
-import ExportRiwayatCard from 'parts/Admin/Analystic/ExportRiwayatCard';
+import axios from 'axios';
+import AnalysisCard from 'parts/Visitor/Analystic/AnalysisCard';
+import ProblemPercentageCard from 'parts/Visitor/Analystic/ProblemPercentageCard';
 import CountUp from 'react-countup'; // Importing react-countup
 
 export default class DashboardPage extends Component {
@@ -21,12 +19,6 @@ export default class DashboardPage extends Component {
       total_panel: 0,
       total_riwayat_pju: 0,
       total_riwayat_panel: 0,
-      riwayat_pending_pju: 0,
-      riwayat_pending_panel: 0,
-      riwayat_proses_pju: 0,
-      riwayat_proses_panel: 0,
-      avg_riwayat_pju: 0,
-      avg_riwayat_panel: 0,
     },
   };  
 
@@ -44,7 +36,7 @@ export default class DashboardPage extends Component {
     const authToken = localStorage.getItem('authToken'); // Pastikan auth token tersedia
     if (authToken) {
       axios
-        .get('http://localhost:8000/api/dashboard-data', {
+        .get('http://localhost:8000/api/visitor/dashboard-data', {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -70,7 +62,7 @@ export default class DashboardPage extends Component {
     return (
       <div className="flex">
         {/* Sidebar */}
-        <SidebarAdmin isOpen={isOpen} toggleSidebar={this.toggleSidebar} />
+        <SidebarVisitor isOpen={isOpen} toggleSidebar={this.toggleSidebar} />
 
         {/* Overlay (for Mobile) */}
         {isOpen && (
@@ -85,25 +77,23 @@ export default class DashboardPage extends Component {
           className={`flex-1 min-h-screen transition-all duration-300 ${isOpen ? 'md:ml-64' : 'ml-0'}`}
         >
           {/* Header */}
-          <HeaderAdmin />
+          <HeaderVisitor />
 
           {/* Main Dashboard Content */}
           <main className="p-4 sm:p-6 w-full">
-            <h1 className="text-3xl font-bold text-blue-600">Admin Dashboard</h1>
-            <p>Selamat datang di panel admin!</p>
+            <h1 className="text-3xl font-bold text-green-600">Visitor Dashboard</h1>
+            <p>Selamat datang visitor!</p>
 
             {/* Welcome Card */}
-            <div className="bg-purple-600 text-white rounded-xl p-6 flex items-center relative mt-6 mb-6">
+            <div className="bg-green-600 text-white rounded-xl p-6 flex items-center relative mt-6 mb-6">
               <img
                 src={AdminImage}
-                alt="Admin"
+                alt="Visitor"
                 className="w-16 h-16 md:w-32 md:h-auto absolute left-4 md:left-0 transform -translate-y-1/4"
               />
               <div className="ml-24 md:ml-36">
-                <h2 className="text-xl md:text-2xl font-bold">
-                  Welcome, Admin TTMT
-                </h2>
-                <p>Have a nice day at work</p>
+                <h2 className="text-xl md:text-2xl font-bold">Welcome, Visitor</h2>
+                <p>Stay updated with the latest report information</p>
               </div>
             </div>
 
@@ -134,69 +124,6 @@ export default class DashboardPage extends Component {
                 number={dashboardData.total_riwayat_panel}
                 bgColor="bg-orange-400"
               />
-
-              {/* Riwayat by Status */}
-              <ReportCard
-                icon={<FontAwesomeIcon icon={faClock} />}
-                title="Riwayat Pending APJ"
-                number={dashboardData.riwayat_pending_pju}
-                bgColor="bg-yellow-500"
-              />
-              <ReportCard
-                icon={<FontAwesomeIcon icon={faClock} />}
-                title="Riwayat Pending Panel"
-                number={dashboardData.riwayat_pending_panel}
-                bgColor="bg-yellow-400"
-              />
-              <ReportCard
-                icon={<FontAwesomeIcon icon={faSyncAlt} />}
-                title="Riwayat Proses APJ"
-                number={dashboardData.riwayat_proses_pju}
-                bgColor="bg-blue-500"
-              />
-              <ReportCard
-                icon={<FontAwesomeIcon icon={faSyncAlt} />}
-                title="Riwayat Proses Panel"
-                number={dashboardData.riwayat_proses_panel}
-                bgColor="bg-blue-400"
-              />
-
-              {/* Rata-Rata Riwayat */}
-              {/* <ReportCard
-                icon={<FontAwesomeIcon icon={faChartLine} />}
-                title="Rata-Rata Riwayat per APJ"
-                number={dashboardData.avg_riwayat_pju}
-                bgColor="bg-purple-500"
-              />
-              <ReportCard
-                icon={<FontAwesomeIcon icon={faChartLine} />}
-                title="Rata-Rata Riwayat per Panel"
-                number={dashboardData.avg_riwayat_panel}
-                bgColor="bg-indigo-400"
-              /> */}
-            </div>
-            
-            {/* Analysis Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-              <div className="bg-white rounded-lg shadow p-4 md:p-6">
-                <h2 className="text-xl font-bold text-gray-700 mb-4">Import Riwayat</h2>
-                <ImportRiwayatCard />
-              </div>
-              <div className="bg-white rounded-lg shadow p-4 md:p-6">
-                <h2 className="text-xl font-bold text-gray-700 mb-4">Import Riwayat</h2>
-                <ExportRiwayatCard />
-              </div>
-              {/* Left Side: AnalysisCard */}
-              <div className="bg-white rounded-lg shadow p-4 md:p-6">
-                <h2 className="text-xl font-bold text-gray-700 mb-4">Analysis</h2>
-                <AnalysisCard />
-              </div>
-
-              {/* Right Side: ProblemPercentageCard */}
-              <div className="bg-white rounded-lg shadow p-4 md:p-6">
-                <h2 className="text-xl font-bold text-gray-700 mb-4">Problem Percentage</h2>
-                <ProblemPercentageCard />
-              </div>
             </div>
           </main>
         </div>
@@ -204,7 +131,7 @@ export default class DashboardPage extends Component {
         {/* Floating Button */}
         <button
           onClick={this.toggleSidebar}
-          className="fixed bottom-4 right-4 bg-blue-600 text-white p-4 rounded-full shadow-lg z-50 hover:bg-blue-700 transition md:hidden"
+          className="fixed bottom-4 right-4 bg-green-600 text-white p-4 rounded-full shadow-lg z-50 hover:bg-green-700 transition md:hidden"
         >
           <FontAwesomeIcon icon={faBars} />
         </button>
