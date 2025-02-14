@@ -407,10 +407,45 @@ const DataPJU = () => {
               <Form.Item name="status_jalan" label="Status Jalan" rules={[{ required: true, message: 'Status Jalan wajib diisi' }]}>
                 <Input placeholder="Masukkan Status Jalan" />
               </Form.Item>
-              <Form.Item name="longitude" label="Longitude" rules={[{ required: true, message: 'Longitude wajib diisi' }]}>
+              <Form.Item
+                name="longitude"
+                label="Longitude"
+                rules={[
+                  { required: true, message: 'Longitude wajib diisi' },
+                  {
+                    validator: (_, value) => {
+                      if (value === undefined || value === null || value === '') {
+                        return Promise.reject(new Error('Longitude wajib diisi'));
+                      }
+                      if (value < -180 || value > 180) {
+                        return Promise.reject(new Error('Longitude harus antara -180 dan 180'));
+                      }
+                      return Promise.resolve();
+                    },
+                  },
+                ]}
+              >
                 <Input type="number" placeholder="Masukkan Longitude" />
               </Form.Item>
-              <Form.Item name="latitude" label="Latitude" rules={[{ required: true, message: 'Latitude wajib diisi' }]}>
+
+              <Form.Item
+                name="latitude"
+                label="Latitude"
+                rules={[
+                  { required: true, message: 'Latitude wajib diisi' },
+                  {
+                    validator: (_, value) => {
+                      if (value === undefined || value === null || value === '') {
+                        return Promise.reject(new Error('Latitude wajib diisi'));
+                      }
+                      if (value < -90 || value > 90) {
+                        return Promise.reject(new Error('Latitude harus antara -90 dan 90'));
+                      }
+                      return Promise.resolve();
+                    },
+                  },
+                ]}
+              >
                 <Input type="number" placeholder="Masukkan Latitude" />
               </Form.Item>
           </Form>

@@ -48,6 +48,8 @@ import UserManagementPage from "pages/SuperAdmin/UserManagementPage";
 import DataTeamPage from "pages/Admin/InformasiWeb/DataTeamPage";
 import DataBeritaPage from "pages/Admin/InformasiWeb/DataBeritaPage";
 
+import DataPengaduanPage from "pages/Admin/Pengaduan/DataPengaduanPage";
+
 import Coba from "pages/Coba";
 
 import PrivateRoute from "PrivateRoute";
@@ -115,6 +117,7 @@ function App() {
           <Route path="/app/admin/data-riwayat-panel/:id" element={<DataRiwayatPanelPage />} />
           <Route path="/app/admin/data-team" element={<DataTeamPage />} />
           <Route path="/app/admin/data-berita" element={<DataBeritaPage />} />
+          <Route path="/app/admin/pengaduan" element={<DataPengaduanPage />} />
         </Route>
 
         {/* Rute Super Admin */}

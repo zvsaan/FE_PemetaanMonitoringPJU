@@ -334,21 +334,42 @@ const DataPanel = () => {
             label="Longitude"
             rules={[
               { required: true, message: 'Longitude wajib diisi' },
-              // { type: 'number', min: -180, max: 180, message: 'Longitude harus antara -180 dan 180' },
+              { type: 'number', message: 'Longitude harus berupa angka' },
+              { validator: (_, value) => 
+                  value >= -180 && value <= 180 
+                  ? Promise.resolve() 
+                  : Promise.reject(new Error('Longitude harus antara -180 dan 180')),
+              },
             ]}
           >
-            <InputNumber placeholder="Masukkan Longitude" style={{ width: '100%' }} />
+            <InputNumber
+              placeholder="Masukkan Longitude"
+              style={{ width: '100%' }}
+              min={-180}
+              max={180}
+            />
           </Form.Item>
-          <Form.Item
-            name="latitude"
-            label="Latitude"
-            rules={[
-              { required: true, message: 'Latitude wajib diisi' },
-              // { type: 'number', min: -90, max: 90, message: 'Latitude harus antara -90 dan 90' },
-            ]}
-          >
-            <InputNumber placeholder="Masukkan Latitude" style={{ width: '100%' }} />
-          </Form.Item>
+
+        <Form.Item
+          name="latitude"
+          label="Latitude"
+          rules={[
+            { required: true, message: 'Latitude wajib diisi' },
+            { type: 'number', message: 'Latitude harus berupa angka' },
+            { validator: (_, value) => 
+                value >= -90 && value <= 90 
+                ? Promise.resolve() 
+                : Promise.reject(new Error('Latitude harus antara -90 dan 90')),
+            },
+          ]}
+        >
+          <InputNumber
+            placeholder="Masukkan Latitude"
+            style={{ width: '100%' }}
+            min={-90}
+            max={90}
+          />
+        </Form.Item>
         <Form.Item name="abd_no" label="ABD No">
           <Input placeholder="Masukkan ABD No (Opsional)" />
         </Form.Item>

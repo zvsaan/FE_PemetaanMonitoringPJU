@@ -94,7 +94,8 @@ const statusColors = {
   };
 
   const getCustomMarkerIcon = (status) => {
-    const color = statusColors[status] || statusColors.Selesai;
+    // const color = statusColors[status] || statusColors.Selesai;
+    const color = statusColors[status] || "#808080"; // Warna default (abu-abu)
     const svgIcon = `
       <svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 24 36">
         <path d="M12 0C7 0 3 4 3 9c0 6.5 9 18 9 18s9-11.5 9-18c0-5-4-9-9-9z" fill="${color}" stroke="#333" stroke-width="1"/>
@@ -179,10 +180,12 @@ const statusColors = {
             }}
           />
         ))}
-        {panelData.map((panel) => (
+        {/* {panelData.map((panel) => ( */}
+        {panelData.filter(panel => panel.latitude && panel.longitude).map((panel) => (
           <Marker
             key={panel.id_panel}
-            position={[panel.longitude, panel.latitude]}
+            // position={[panel.longitude, panel.latitude]}
+            position={[panel.latitude, panel.longitude]}
             icon={getCustomMarkerIcon(panel.status || "Default")}
           >
             <Popup>
@@ -191,7 +194,7 @@ const statusColors = {
                   PANEL DETAIL
                 </strong>
                 <br />
-                <b>ID Panel:</b> {panel.id_panel}
+                {/* <b>ID Panel:</b> {panel.id_panel} */}
                 <br />
                 <b>No APP:</b> {panel.no_app}
                 <br />

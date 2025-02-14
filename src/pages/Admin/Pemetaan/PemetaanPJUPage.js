@@ -97,8 +97,8 @@ const PemetaanPJUPage = () => {
           setPjuData(data);
   
           if (data.length > 0) {
-            const { longitude, latitude } = data[0];
-            setMapCenter([longitude, latitude]);
+            const { latitude, longitude } = data[0];
+            setMapCenter([latitude, longitude]);
             // position={[pju.longitude, pju.latitude]}
             setMapZoom(14);
           }
@@ -223,12 +223,14 @@ const PemetaanPJUPage = () => {
             }}
           />
         )}
-        {pjuData.map((pju) => (
+        {/* {pjuData.map((pju) => ( */}
+          {pjuData.filter(pju => pju.latitude && pju.longitude).map((pju) => (
           <Marker
             key={pju.id_pju}
             // position={[pju.latitude, pju.longitude]}
-            position={[pju.longitude, pju.latitude]}
-            icon={getCustomMarkerIcon(pju.status)} // Use status to determine icon color
+            // position={[pju.longitude, pju.latitude]}
+            position={[pju.latitude, pju.longitude]}
+            icon={getCustomMarkerIcon(pju.status)}
           >
             <Popup>
               <div style={{ fontSize: '14px', lineHeight: '1.5' }}>
@@ -236,7 +238,7 @@ const PemetaanPJUPage = () => {
                   PJU DETAIL
                 </strong>
                 <br />
-                <b>No APJ:</b> {pju.pju_id}
+                {/* <b>No APJ:</b> {pju.id_pju} */}
                 <br />
                 <b>No Tiang:</b> {pju.no_tiang_baru}
                 <br />
