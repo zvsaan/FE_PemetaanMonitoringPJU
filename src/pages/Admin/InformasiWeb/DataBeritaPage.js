@@ -1,7 +1,8 @@
 /* eslint-disable */
 import React, { Component } from 'react';
 
-import SidebarAdmin from 'parts/SidebarAdmin';
+// import SidebarAdmin from 'parts/SidebarAdmin';
+import SidebarSuperAdmin from 'parts/SidebarSuperAdmin';
 import HeaderAdmin from 'parts/HeaderAdmin';
 import DataBerita from 'parts/Admin/InformasiWeb/DataBerita';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -26,7 +27,7 @@ export default class DataBeritaPage extends Component {
     return (
       <div className="flex overflow-hidden relative">
         {/* Sidebar */}
-        <SidebarAdmin isOpen={isOpen} toggleSidebar={this.toggleSidebar} />
+        <SidebarSuperAdmin isOpen={isOpen} toggleSidebar={this.toggleSidebar} />
 
         {/* Overlay untuk Mobile */}
         {isOpen && (

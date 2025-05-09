@@ -115,8 +115,6 @@ function App() {
           <Route path="/app/admin/pemetaan-panel" element={<PemetaanPanelPage />} />
           <Route path="/app/admin/data-riwayat-pju/:id" element={<DataRiwayatPJUPage />} />
           <Route path="/app/admin/data-riwayat-panel/:id" element={<DataRiwayatPanelPage />} />
-          <Route path="/app/admin/data-team" element={<DataTeamPage />} />
-          <Route path="/app/admin/data-berita" element={<DataBeritaPage />} />
           <Route path="/app/admin/pengaduan" element={<DataPengaduanPage />} />
         </Route>
 
@@ -124,6 +122,8 @@ function App() {
         <Route element={<PrivateRoute allowedRoles={["superadmin"]} />}>
           <Route path="/app/superadmin/dashboard" element={<DashboardPageSuperAdmin />} />
           <Route path="/app/superadmin/data-users" element={<UserManagementPage />} />
+          <Route path="/app/superadmin/data-team" element={<DataTeamPage />} />
+          <Route path="/app/superadmin/data-berita" element={<DataBeritaPage />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

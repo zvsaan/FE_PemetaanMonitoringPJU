@@ -7,6 +7,25 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [language, setLanguage] = useState('ID');
+  const [navbarItems, setNavbarItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch navbar items from API
+  useEffect(() => {
+    const fetchNavbarItems = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/navbar');
+        const data = await response.json();
+        setNavbarItems(data);
+      } catch (error) {
+        console.error('Error fetching navbar items:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNavbarItems();
+  }, []);
 
   // Function to handle scroll event
   const handleScroll = () => {
@@ -34,32 +53,39 @@ const Header = () => {
     setLanguage(lang);
   };
 
-  // Language-specific texts
-  const texts = {
-    ID: {
-      home: 'Beranda',
-      about: 'Tentang Kami',
-      media: 'Media',
-      contact: 'Kontak',
-      aboutUs: 'Tentang Kami',
-      overview: 'Sekilas Tentang Kami',
-      history: 'Sejarah Kami',
-      operations: 'Area Operasi Kami',
-      services: 'Layanan Kami',
-      team: 'Team Kami',
-    },
-    EN: {
-      home: 'Home',
-      about: 'About Us',
-      media: 'Media',
-      contact: 'Contact',
-      aboutUs: 'About Us',
-      overview: 'Our Overview',
-      history: 'Our History',
-      operations: 'Our Operations',
-      services: 'Our Services',
-      team: 'Our Team',
-    },
+  // Function to render navbar items recursively with original styling
+  const renderNavbarItems = (items) => {
+    return items.map((item) => {
+      if (item.type === 'dropdown' && item.children.length > 0) {
+        return (
+          <li key={item.id} className='group max-lg:border-b max-lg:border-white max-lg:py-3 relative'>
+            <a className='text-white hover:text-blue-400 text-[15px] font-bold lg:hover:fill-[#007bff] block cursor-pointer'>
+              {item.title}
+              <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" className="ml-1 inline-block" viewBox="0 0 24 24">
+                <path d="M12 16a1 1 0 0 1-.71-.29l-6-6a1 1 0 0 1 1.42-1.42l5.29 5.3 5.29-5.29a1 1 0 0 1 1.41 1.41l-6 6a1 1 0 0 1-.7.29z" fill="white" />
+              </svg>
+            </a>
+            <ul className='absolute shadow-lg bg-white space-y-3 lg:top-5 max-lg:top-8 -left-6 min-w-[250px] z-50 max-h-0 overflow-hidden group-hover:opacity-100 group-hover:max-h-[700px] px-6 group-hover:pb-4 group-hover:pt-6 transition-all duration-500'>
+              {item.children.map((child) => (
+                <li key={child.id} className='border-b py-2'>
+                  <a href={child.url} className='text-black hover:text-[#007bff] text-[15px] font-bold block'>
+                    {child.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </li>
+        );
+      } else {
+        return (
+          <li key={item.id} className='max-lg:border-b max-lg:border-white max-lg:py-3'>
+            <a href={item.url} className='text-white hover:text-blue-400 text-[15px] font-bold block'>
+              {item.title}
+            </a>
+          </li>
+        );
+      }
+    });
   };
 
   return (
@@ -130,33 +156,13 @@ const Header = () => {
             <FaTimes className="w-4 h-4 text-black" />
           </button>
 
-          <ul className='lg:flex lg:gap-x-10 max-lg:space-y-3 max-lg:fixed max-lg:bg-black max-lg:w-1/2 max-lg:min-w-[300px] max-lg:top-0 max-lg:left-0 max-lg:p-6 max-lg:h-full max-lg:shadow-md max-lg:overflow-auto z-50'>
-            <li className='max-lg:border-b max-lg:border-white max-lg:py-3'>
-              <a href='/' className='text-white hover:text-blue-400 text-[15px] font-bold block'>{texts[language].home}</a>
-            </li>
-            <li className='group max-lg:border-b max-lg:border-white max-lg:py-3 relative'>
-              <a className='text-white hover:text-blue-400 text-[15px] font-bold lg:hover:fill-[#007bff] block'>
-                {texts[language].about}
-                <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" className="ml-1 inline-block" viewBox="0 0 24 24">
-                  <path d="M12 16a1 1 0 0 1-.71-.29l-6-6a1 1 0 0 1 1.42-1.42l5.29 5.3 5.29-5.29a1 1 0 0 1 1.41 1.41l-6 6a1 1 0 0 1-.7.29z" fill="white" />
-                </svg>
-              </a>
-              <ul className='absolute shadow-lg bg-white space-y-3 lg:top-5 max-lg:top-8 -left-6 min-w-[250px] z-50 max-h-0 overflow-hidden group-hover:opacity-100 group-hover:max-h-[700px] px-6 group-hover:pb-4 group-hover:pt-6 transition-all duration-500'>
-                <li className='border-b py-2'><a href='/tentangkami' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>{texts[language].aboutUs}</a></li>
-                <li className='border-b py-2'><a href='/tentangkami/sekilas' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>{texts[language].overview}</a></li>
-                <li className='border-b py-2'><a href='/tentangkami/sejarah' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>{texts[language].history}</a></li>
-                <li className='border-b py-2'><a href='/tentangkami/area-operasi' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>{texts[language].operations}</a></li>
-                <li className='border-b py-2'><a href='/tentangkami/layanan' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>{texts[language].services}</a></li>
-                <li className='border-b py-2'><a href='/tentangkami/team' className='text-black hover:text-[#007bff] text-[15px] font-bold block'>{texts[language].team}</a></li>
-              </ul>
-            </li>
-            <li className='max-lg:border-b max-lg:border-white max-lg:py-3'>
-              <a href='/media' className='text-white hover:text-blue-400 text-[15px] font-bold block'>{texts[language].media}</a>
-            </li>
-            <li className='max-lg:border-b max-lg:border-white max-lg:py-3'>
-              <a href='/contact' className='text-white hover:text-blue-400 text-[15px] font-bold block'>{texts[language].contact}</a>
-            </li>
-          </ul>
+          {loading ? (
+            <div className="text-white">Loading...</div>
+          ) : (
+            <ul className='lg:flex lg:gap-x-10 max-lg:space-y-3 max-lg:fixed max-lg:bg-black max-lg:w-1/2 max-lg:min-w-[300px] max-lg:top-0 max-lg:left-0 max-lg:p-6 max-lg:h-full max-lg:shadow-md max-lg:overflow-auto z-50'>
+              {renderNavbarItems(navbarItems)}
+            </ul>
+          )}
         </div>
       </div>
     </header>

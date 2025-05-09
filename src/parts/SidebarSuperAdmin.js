@@ -3,13 +3,18 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTachometerAlt,
-  faLightbulb,
+  // faLightbulb,
   faPlug,
-  faTools,
+  // faTools,
   faAngleDown,
   faAngleUp,
   faTimes,
   faBars,
+  faBuilding,
+  faUsers,
+  faNewspaper,
+  faBarsStaggered,
+  // faHistory,
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
@@ -61,6 +66,24 @@ const SidebarSuperAdmin = ({ isOpen, toggleSidebar }) => {
                   <FontAwesomeIcon icon={faPlug} />
                   <span>Data Users</span>
                 </Link>
+
+                <MenuItem label="Menu Data" icon={faBarsStaggered} menuKey="dataManagement">
+                <Link to="/app/superadmin/data-team" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                  <FontAwesomeIcon icon={faUsers} /> Navbar
+                </Link>
+                <Link to="/app/superadmin/data-berita" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                  <FontAwesomeIcon icon={faNewspaper} /> Navbar
+                </Link>
+                </MenuItem>
+
+                <MenuItem label="Data Company" icon={faBuilding} menuKey="dataPerusahaan">
+                <Link to="/app/superadmin/data-team" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                  <FontAwesomeIcon icon={faUsers} /> Data Tim
+                </Link>
+                <Link to="/app/superadmin/data-berita" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                  <FontAwesomeIcon icon={faNewspaper} /> Berita Terkini
+                </Link>
+              </MenuItem>
             </nav>
           </div>
         </div>

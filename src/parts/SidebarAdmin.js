@@ -89,14 +89,14 @@ const SidebarAdmin = ({ isOpen, toggleSidebar }) => {
                 </Link>
               </MenuItem>
 
-              <MenuItem label="Data Company" icon={faBuilding} menuKey="dataPerusahaan">
+              {/* <MenuItem label="Data Company" icon={faBuilding} menuKey="dataPerusahaan">
                 <Link to="/app/admin/data-team" className="block p-2 rounded-lg hover:bg-blue-500 transition">
                   <FontAwesomeIcon icon={faUsers} /> Data Tim
                 </Link>
                 <Link to="/app/admin/data-berita" className="block p-2 rounded-lg hover:bg-blue-500 transition">
                   <FontAwesomeIcon icon={faNewspaper} /> Berita Terkini
                 </Link>
-              </MenuItem>
+              </MenuItem> */}
             </nav>
           </div>
         </div>
