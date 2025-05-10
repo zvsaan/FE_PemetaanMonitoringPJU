@@ -45,8 +45,10 @@ import DataRiwayatPanelPageVisitor from "pages/Visitor/InformasiPJU/DataRiwayatP
 import DashboardPageSuperAdmin from "pages/SuperAdmin/DashboardPage";
 import UserManagementPage from "pages/SuperAdmin/UserManagementPage";
 
-import DataTeamPage from "pages/Admin/InformasiWeb/DataTeamPage";
-import DataBeritaPage from "pages/Admin/InformasiWeb/DataBeritaPage";
+import DataTeamPage from "pages/SuperAdmin/InformasiWeb/DataTeamPage";
+import DataBeritaPage from "pages/SuperAdmin/InformasiWeb/DataBeritaPage";
+import DataNavbarPage from "pages/SuperAdmin/InformasiWeb/DataNavbarPage";
+import DataHeroPage from "pages/SuperAdmin/InformasiWeb/DataHeroPage";
 
 import DataPengaduanPage from "pages/Admin/Pengaduan/DataPengaduanPage";
 
@@ -124,6 +126,8 @@ function App() {
           <Route path="/app/superadmin/data-users" element={<UserManagementPage />} />
           <Route path="/app/superadmin/data-team" element={<DataTeamPage />} />
           <Route path="/app/superadmin/data-berita" element={<DataBeritaPage />} />
+          <Route path="/app/superadmin/data-navbar" element={<DataNavbarPage />} />
+          <Route path="/app/superadmin/data-hero" element={<DataHeroPage />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTachometerAlt,
-  // faLightbulb,
+  faImage,
   faPlug,
   // faTools,
   faAngleDown,
@@ -67,23 +67,20 @@ const SidebarSuperAdmin = ({ isOpen, toggleSidebar }) => {
                   <span>Data Users</span>
                 </Link>
 
-                <MenuItem label="Menu Data" icon={faBarsStaggered} menuKey="dataManagement">
-                <Link to="/app/superadmin/data-team" className="block p-2 rounded-lg hover:bg-blue-500 transition">
-                  <FontAwesomeIcon icon={faUsers} /> Navbar
-                </Link>
-                <Link to="/app/superadmin/data-berita" className="block p-2 rounded-lg hover:bg-blue-500 transition">
-                  <FontAwesomeIcon icon={faNewspaper} /> Navbar
-                </Link>
+                <MenuItem label="Data Company" icon={faBarsStaggered} menuKey="dataManagement">
+                  <Link to="/app/superadmin/data-navbar" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                    <FontAwesomeIcon icon={faBars} /> Navbar
+                  </Link>
+                  <Link to="/app/superadmin/data-hero" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                    <FontAwesomeIcon icon={faImage} /> Hero
+                  </Link>
+                  <Link to="/app/superadmin/data-team" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                    <FontAwesomeIcon icon={faUsers} /> Team
+                  </Link>
+                  <Link to="/app/superadmin/data-berita" className="block p-2 rounded-lg hover:bg-blue-500 transition">
+                    <FontAwesomeIcon icon={faNewspaper} /> Berita
+                  </Link>
                 </MenuItem>
-
-                <MenuItem label="Data Company" icon={faBuilding} menuKey="dataPerusahaan">
-                <Link to="/app/superadmin/data-team" className="block p-2 rounded-lg hover:bg-blue-500 transition">
-                  <FontAwesomeIcon icon={faUsers} /> Data Tim
-                </Link>
-                <Link to="/app/superadmin/data-berita" className="block p-2 rounded-lg hover:bg-blue-500 transition">
-                  <FontAwesomeIcon icon={faNewspaper} /> Berita Terkini
-                </Link>
-              </MenuItem>
             </nav>
           </div>
         </div>

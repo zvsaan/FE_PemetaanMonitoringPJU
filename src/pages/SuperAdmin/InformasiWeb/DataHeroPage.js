@@ -4,11 +4,11 @@ import React, { Component } from "react";
 // import SidebarAdmin from 'parts/SidebarAdmin';
 import SidebarSuperAdmin from "parts/SidebarSuperAdmin";
 import HeaderAdmin from "parts/HeaderAdmin";
-import DataBerita from "parts/SuperAdmin/InformasiWeb/DataBerita";
+import DataHero from "parts/SuperAdmin/InformasiWeb/DataHero";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 
-export default class DataBeritaPage extends Component {
+export default class DataHeroPage extends Component {
   state = {
     isOpen: true,
   };
@@ -48,9 +48,9 @@ export default class DataBeritaPage extends Component {
 
           {/* Main Content */}
           <main className="p-6">
-            <h1 className="text-3xl font-bold text-blue-700">Data Berita</h1>
+            <h1 className="text-3xl font-bold text-blue-700">Data Hero Slides</h1>
             <div className="overflow-x-auto">
-              <DataBerita />
+              <DataHero />
             </div>
           </main>
         </div>
