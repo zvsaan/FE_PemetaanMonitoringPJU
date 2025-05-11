@@ -142,33 +142,34 @@ const DataKWH = () => {
       const values = await form.validateFields();
       const formData = new FormData();
   
-      // Append all fields including panel_id
-      formData.append('panel_id', values.panel_id);
-      formData.append('kwh_number', values.kwh_number);
-      if (values.notes) formData.append('notes', values.notes);
-      
       // Handle image upload
       if (values.image && values.image[0]?.originFileObj) {
         formData.append('image', values.image[0].originFileObj);
       }
   
-      // Tambahkan _method untuk Laravel jika menggunakan PUT
+      // Append other fields
+      formData.append('panel_id', values.panel_id);
+      formData.append('kwh_number', values.kwh_number);
+      if (values.notes) formData.append('notes', values.notes);
+  
       if (currentReading) {
+        // Untuk UPDATE, tambahkan _method=PUT
         formData.append('_method', 'PUT');
+        await axios.post(`http://localhost:8000/api/kwh-readings/${currentReading.id_reading}`, formData, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      } else {
+        // Untuk CREATE
+        await axios.post('http://localhost:8000/api/kwh-readings', formData, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
       }
-  
-      const url = currentReading 
-        ? `http://localhost:8000/api/kwh-readings/${currentReading.id_reading}`
-        : "http://localhost:8000/api/kwh-readings";
-  
-      const method = currentReading ? 'post' : 'post'; 
-  
-      await axios.post(url, formData, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
   
       notification.success({ 
         message: `Catatan KWH berhasil ${currentReading ? 'diperbarui' : 'ditambahkan'}` 
@@ -305,7 +306,7 @@ const DataKWH = () => {
         </Card>
       ) : (
         <>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
             <Input.Search
               placeholder="Cari nomor KWH atau panel..."
               allowClear
