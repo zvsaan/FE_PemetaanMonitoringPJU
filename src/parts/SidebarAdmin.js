@@ -63,9 +63,9 @@ const SidebarAdmin = ({ isOpen, toggleSidebar }) => {
                 <FontAwesomeIcon icon={faComments} />
                 <span>Pengaduan</span>
               </Link>
-              <Link to="/app/admin/pengaduan" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-600 transition">
+              <Link to="/app/admin/catat-kwh" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-600 transition">
                 <FontAwesomeIcon icon={faComments} />
-                <span>Data KWH</span>
+                <span>Catat KWH</span>
               </Link>
 
               <MenuItem label="Pemetaan" icon={faMapMarkerAlt} menuKey="pemetaanPJU">

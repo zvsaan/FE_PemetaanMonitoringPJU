@@ -51,6 +51,7 @@ import DataNavbarPage from "pages/SuperAdmin/InformasiWeb/DataNavbarPage";
 import DataHeroPage from "pages/SuperAdmin/InformasiWeb/DataHeroPage";
 
 import DataPengaduanPage from "pages/Admin/Pengaduan/DataPengaduanPage";
+import DataCatatKWHPage from "pages/Admin/CatatKWH/DataCatatKWHPage";
 
 import Coba from "pages/Coba";
 
@@ -118,6 +119,7 @@ function App() {
           <Route path="/app/admin/data-riwayat-pju/:id" element={<DataRiwayatPJUPage />} />
           <Route path="/app/admin/data-riwayat-panel/:id" element={<DataRiwayatPanelPage />} />
           <Route path="/app/admin/pengaduan" element={<DataPengaduanPage />} />
+          <Route path="/app/admin/catat-kwh" element={<DataCatatKWHPage />} />
         </Route>
 
         {/* Rute Super Admin */}

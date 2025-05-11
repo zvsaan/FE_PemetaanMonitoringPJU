@@ -8,6 +8,7 @@ const Hero = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slides, setSlides] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [transitioning, setTransitioning] = useState(false);
 
   useEffect(() => {
     const fetchSlides = async () => {
@@ -27,8 +28,12 @@ const Hero = () => {
   useEffect(() => {
     if (slides.length > 0) {
       const interval = setInterval(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
-      }, 10000);
+        setTransitioning(true);
+        setTimeout(() => {
+          setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
+          setTransitioning(false);
+        }, 500); // Waktu transisi
+      }, 10000); // Interval slide
 
       return () => clearInterval(interval);
     }
@@ -39,21 +44,32 @@ const Hero = () => {
   }
 
   if (slides.length === 0) {
-    return <div className="h-screen bg-gray-200 flex items-center justify-center">
-      <p>Tidak ada hero slide yang tersedia</p>
-    </div>;
+    return (
+      <div className="h-screen bg-gray-200 flex items-center justify-center">
+        <p>Tidak ada hero slide yang tersedia</p>
+      </div>
+    );
   }
 
   const { image_path, title, description } = slides[currentIndex];
 
   return (
     <section
-      className="hero relative bg-cover bg-center h-screen"
-      style={{ 
-        backgroundImage: `url(http://localhost:8000/storage/${image_path})` 
+      className="hero relative bg-cover bg-center h-screen overflow-hidden"
+      style={{
+        backgroundImage: `url(http://localhost:8000/storage/${image_path})`,
       }}
     >
+      {/* Overlay untuk transisi */}
+      <div
+        className={`absolute inset-0 bg-black z-20 transition-opacity duration-500 ${
+          transitioning ? "opacity-50" : "opacity-0 pointer-events-none"
+        }`}
+      ></div>
+      
+      {/* Background overlay tetap */}
       <div className="absolute inset-0 bg-black opacity-50"></div>
+      
       <div className="relative z-10 flex items-center justify-start h-full text-white mt-5 lg:px-28 px-5">
         <div className="max-w-lg">
           <Fade direction="up" delay={300} triggerOnce>
