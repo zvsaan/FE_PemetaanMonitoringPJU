@@ -1,232 +1,321 @@
 /* eslint-disable */
-import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Input,
-  Button,
-  Modal,
-  Upload,
-  Form,
-  notification,
-  Image,
-  message,
-  Select,
-  Card,
-  Space,
-  Descriptions
-} from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
-  UploadOutlined,
-  SearchOutlined
-} from "@ant-design/icons";
-import axios from "axios";
-
-const { Option } = Select;
+import React, { useEffect, useState } from 'react';
+import { Table, Button, Image, Modal, Form, Input, Select, notification, Descriptions, Card, Upload } from 'antd';
+import { EditOutlined, ExportOutlined, DeleteOutlined, PlusOutlined, SearchOutlined, UploadOutlined } from '@ant-design/icons';
+import axios from 'axios';
 
 const DataKWH = () => {
-  const [readings, setReadings] = useState([]);
-  const [panels, setPanels] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [currentReading, setCurrentReading] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [allData, setAllData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedPanel, setSelectedPanel] = useState(null);
-  const [panelReadings, setPanelReadings] = useState([]);
-  const [showPanelReadings, setShowPanelReadings] = useState(false);
+  const [selectedPanel, setSelectedPanel] = useState('');
+  const [panelList, setPanelList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [showModal, setShowModal] = useState(false);
+  const [currentReading, setCurrentReading] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [selectedYear, setSelectedYear] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
   const [form] = Form.useForm();
 
-  const authToken = localStorage.getItem("authToken");
+  const authToken = localStorage.getItem('authToken');
 
   useEffect(() => {
-    fetchPanels();
-    fetchReadings();
+    getKwhReadings();
+    getPanels();
   }, []);
 
-  const fetchPanels = async () => {
+  const getKwhReadings = async () => {
+    setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:8000/api/panels", {
+      const response = await axios.get('http://localhost:8000/api/kwh-readings', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      setPanels(response.data);
+      setAllData(response.data);
+      setFilteredData(response.data);
     } catch (error) {
-      console.error("Error fetching panels:", error);
-      notification.error({ message: "Gagal memuat data panel" });
+      console.error('Error fetching data:', error);
+      notification.error({ message: 'Gagal memuat data KWH' });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const fetchReadings = async () => {
+  const getPanels = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/kwh-readings", {
+      const response = await axios.get('http://localhost:8000/api/panels', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
-      setReadings(response.data);
-      setLoading(false);
+      setPanelList(response.data.map(panel => ({ 
+        value: panel.id_panel, 
+        label: `${panel.no_app} - ${panel.nama_jalan}` 
+      })));
     } catch (error) {
-      console.error("Error fetching readings:", error);
-      notification.error({ message: "Gagal memuat data KWH" });
-      setLoading(false);
+      console.error('Error fetching panel list:', error);
+      notification.error({ message: 'Gagal memuat data panel' });
     }
   };
 
-  const fetchPanelReadings = async (panelId) => {
-    try {
-      const response = await axios.get(`http://localhost:8000/api/panels/${panelId}/kwh-readings`, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
-      setPanelReadings(response.data);
-      setSelectedPanel(panels.find(p => p.id_panel === panelId));
-      setShowPanelReadings(true);
-    } catch (error) {
-      console.error("Error fetching panel readings:", error);
-      notification.error({ message: "Gagal memuat data KWH panel" });
-    }
+  const getAvailableYears = () => {
+    const years = new Set();
+    allData.forEach(item => {
+      if (item.created_at) {
+        years.add(new Date(item.created_at).getFullYear());
+      }
+    });
+    return Array.from(years).sort((a, b) => b - a).map(year => ({
+      value: year,
+      label: year.toString()
+    }));
   };
+  
+  const getAvailableMonths = () => {
+    const months = [
+      { value: '1', label: 'Januari' },
+      { value: '2', label: 'Februari' },
+      { value: '3', label: 'Maret' },
+      { value: '4', label: 'April' },
+      { value: '5', label: 'Mei' },
+      { value: '6', label: 'Juni' },
+      { value: '7', label: 'Juli' },
+      { value: '8', label: 'Agustus' },
+      { value: '9', label: 'September' },
+      { value: '10', label: 'Oktober' },
+      { value: '11', label: 'November' },
+      { value: '12', label: 'Desember' }
+    ];
+    return months;
+  };
+
+  const filterData = () => {
+    let tempData = allData;
+  
+    if (selectedPanel) {
+      tempData = tempData.filter(item => item.panel_id == selectedPanel);
+    }
+  
+    if (searchTerm) {
+      tempData = tempData.filter(item =>
+        item.kwh_number && String(item.kwh_number).toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+  
+    if (selectedYear) {
+      tempData = tempData.filter(item => {
+        if (!item.created_at) return false;
+        return new Date(item.created_at).getFullYear() == selectedYear;
+      });
+    }
+  
+    if (selectedMonth) {
+      tempData = tempData.filter(item => {
+        if (!item.created_at) return false;
+        return (new Date(item.created_at).getMonth() + 1) == selectedMonth;
+      });
+    }
+  
+    setFilteredData(tempData);
+  };
+
+  useEffect(() => {
+    filterData();
+  }, [searchTerm, selectedPanel, selectedYear, selectedMonth]);
 
   const handleSearch = (value) => {
     setSearchTerm(value);
-    if (!value) {
-      fetchReadings();
-      return;
+  };
+
+  const handlePanelChange = (value) => {
+    setSelectedPanel(value || '');
+  };
+
+  const handleYearChange = (value) => {
+    setSelectedYear(value || '');
+  };
+  
+  const handleMonthChange = (value) => {
+    setSelectedMonth(value || '');
+  };
+
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handleModalSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      const formData = new FormData();
+      
+      // Tambahkan semua field ke FormData
+      Object.keys(values).forEach(key => {
+        if (key === 'image' && values[key] && values[key][0]) {
+          formData.append('image', values[key][0].originFileObj);
+        } else if (values[key] !== undefined) {
+          formData.append(key, values[key]);
+        }
+      });
+  
+      let response;
+      if (currentReading) {
+        // Gunakan POST dengan _method PUT
+        formData.append('_method', 'PUT'); // <-- Ini solusi utamanya
+        response = await axios.post(
+          `http://localhost:8000/api/kwh-readings/${currentReading.id_reading}`,
+          formData,
+          {
+            headers: { 
+              Authorization: `Bearer ${authToken}`,
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+        );
+        notification.success({ message: 'Data KWH berhasil diperbarui' });
+      } else {
+        response = await axios.post(
+          'http://localhost:8000/api/kwh-readings', 
+          formData,
+          {
+            headers: { 
+              Authorization: `Bearer ${authToken}`,
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+        );
+        notification.success({ message: 'Data KWH berhasil ditambahkan' });
+      }
+  
+      getKwhReadings();
+      setShowModal(false);
+      form.resetFields();
+    } catch (error) {
+      console.error('Error details:', error.response?.data || error.message);
+      notification.error({ 
+        message: 'Gagal menyimpan data KWH',
+        description: error.response?.data?.message || error.message 
+      });
     }
-    
-    const filtered = readings.filter(reading => 
-      reading.kwh_number.toLowerCase().includes(value.toLowerCase()) ||
-      reading.panel?.no_app.toLowerCase().includes(value.toLowerCase())
-    );
-    setReadings(filtered);
   };
 
-  const handleCreate = () => {
-    setCurrentReading(null);
-    form.resetFields();
-    setModalVisible(true);
-  };
-
-  const handleEdit = (reading) => {
-    setCurrentReading(reading);
-    form.setFieldsValue({
-      panel_id: reading.panel_id,
-      kwh_number: reading.kwh_number,
-      notes: reading.notes,
-      image: undefined
-    });
-    setModalVisible(true);
-  };
-
-  const handleDelete = (id) => {
+  const handleDelete = (record) => {
     Modal.confirm({
-      title: "Hapus Catatan KWH",
-      content: "Apakah Anda yakin ingin menghapus catatan ini?",
+      title: 'Hapus Data KWH',
+      content: `Apakah Anda yakin ingin menghapus data KWH ini?`,
+      okText: 'Ya',
+      cancelText: 'Batal',
       onOk: async () => {
         try {
-          await axios.delete(`http://localhost:8000/api/kwh-readings/${id}`, {
+          await axios.delete(`http://localhost:8000/api/kwh-readings/${record.id_reading}`, {
             headers: { Authorization: `Bearer ${authToken}` },
           });
-          notification.success({ message: "Catatan KWH berhasil dihapus" });
-          fetchReadings();
+          notification.success({ message: 'Data KWH berhasil dihapus' });
+          getKwhReadings();
         } catch (error) {
-          console.error("Error deleting reading:", error);
-          notification.error({ message: "Gagal menghapus catatan KWH" });
+          console.error('Error deleting data:', error);
+          notification.error({ message: 'Gagal menghapus data KWH' });
         }
       },
     });
   };
 
-  const handleSubmit = async () => {
-    setSubmitting(true);
-    try {
-      const values = await form.validateFields();
-      const formData = new FormData();
-  
-      // Handle image upload
-      if (values.image && values.image[0]?.originFileObj) {
-        formData.append('image', values.image[0].originFileObj);
-      }
-  
-      // Append other fields
-      formData.append('panel_id', values.panel_id);
-      formData.append('kwh_number', values.kwh_number);
-      if (values.notes) formData.append('notes', values.notes);
-  
-      if (currentReading) {
-        // Untuk UPDATE, tambahkan _method=PUT
-        formData.append('_method', 'PUT');
-        await axios.post(`http://localhost:8000/api/kwh-readings/${currentReading.id_reading}`, formData, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-      } else {
-        // Untuk CREATE
-        await axios.post('http://localhost:8000/api/kwh-readings', formData, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-      }
-  
-      notification.success({ 
-        message: `Catatan KWH berhasil ${currentReading ? 'diperbarui' : 'ditambahkan'}` 
-      });
-      
-      setModalVisible(false);
-      fetchReadings();
-      form.resetFields();
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      if (error.response?.data?.errors) {
-        Object.entries(error.response.data.errors).forEach(([field, errors]) => {
-          notification.error({ 
-            message: `${field}: ${errors.join(', ')}` 
-          });
-        });
-      } else {
-        notification.error({ 
-          message: error.response?.data?.message || "Gagal menyimpan catatan KWH" 
-        });
-      }
-    } finally {
-      setSubmitting(false);
+  const handleExport = async () => {
+  setIsExporting(true);
+  try {
+    const params = new URLSearchParams();
+    if (selectedYear) params.append('year', selectedYear);
+    if (selectedMonth) params.append('month', selectedMonth);
+
+    const response = await axios.get(`http://localhost:8000/api/export/kwh?${params.toString()}`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+      responseType: 'blob',
+    });
+
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    
+    // Buat nama file berdasarkan filter
+    let fileName = 'data_kwh';
+    if (selectedYear) fileName += `_${selectedYear}`;
+    if (selectedMonth) {
+      const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                         'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      fileName += `_${monthNames[selectedMonth - 1]}`;
     }
+    fileName += '.xlsx';
+    
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    notification.success({ message: 'Data berhasil diekspor!' });
+  } catch (error) {
+    notification.error({ message: 'Gagal mengekspor data!' });
+  } finally {
+    setIsExporting(false);
+  }
+};
+
+const beforeUpload = (file) => {
+  const isImage = file.type.startsWith('image/');
+  if (!isImage) {
+    notification.error({ message: 'Hanya boleh upload gambar!' });
+    return Upload.LIST_IGNORE; // Mengabaikan file yang bukan gambar
+  }
+  
+  const isLt2M = file.size / 1024 / 1024 < 2; // Batas 2MB
+  if (!isLt2M) {
+    notification.error({ message: 'Ukuran gambar harus kurang dari 2MB!' });
+    return Upload.LIST_IGNORE;
+  }
+  
+  return true;
+};
+
+  const handleCreate = () => {
+    setCurrentReading(null);
+    form.resetFields();
+    setShowModal(true);
   };
 
-  const beforeUpload = (file) => {
-    const isImage = file.type.startsWith('image/');
-    if (!isImage) {
-      message.error('Hanya file gambar yang diperbolehkan!');
-      return Upload.LIST_IGNORE;
-    }
-
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error('Ukuran gambar tidak boleh lebih dari 2MB!');
-      return Upload.LIST_IGNORE;
-    }
-
-    return false;
+  const handleEdit = (record) => {
+    setCurrentReading(record);
+    form.setFieldsValue({
+      ...record,
+      panel_id: record.panel_id,
+      kwh_number: record.kwh_number,
+      notes: record.notes
+    });
+    setShowModal(true);
   };
 
   const columns = [
-    {
-      title: "No",
-      key: "no",
-      render: (_, __, index) => index + 1,
+    { 
+      title: 'No', 
+      dataIndex: 'id_reading', 
+      render: (_, __, index) => (currentPage - 1) * itemsPerPage + index + 1 
     },
-    {
-      title: "No Panel",
-      dataIndex: ["panel", "no_app"],
-      key: "panel",
+    { 
+      title: 'Panel', 
+      dataIndex: 'panel', 
+      render: (panel) => panel ? `${panel.no_app} - ${panel.nama_jalan}` : '-' 
     },
-    {
-      title: "Nomor KWH",
-      dataIndex: "kwh_number",
-      key: "kwh_number",
+    { 
+      title: 'Nomor KWH', 
+      dataIndex: 'kwh_number' 
+    },
+    { 
+      title: 'Catatan', 
+      dataIndex: 'notes' 
+    },
+    { 
+      title: 'Tanggal Dibuat', 
+      dataIndex: 'created_at', 
+      render: (date) => new Date(date).toLocaleDateString() 
     },
     {
       title: "Pencatat",
@@ -234,189 +323,203 @@ const DataKWH = () => {
       key: "user",
     },
     {
-      title: "Tanggal",
-      dataIndex: "created_at",
-      key: "date",
-      render: (date) => new Date(date).toLocaleString(),
-    },
-    {
-      title: "Gambar",
-      dataIndex: "image_path",
-      key: "image",
-      render: (image) => image ? (
-        <Image
-          src={`http://localhost:8000/storage/${image}`}
-          width={100}
-          preview={{
-            src: `http://localhost:8000/storage/${image}`,
-          }}
-        />
-      ) : null,
-    },
-    {
-      title: "Aksi",
-      key: "actions",
-      render: (_, record) => (
-        <Space>
-          <Button
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
+      title: 'Gambar',
+      dataIndex: 'image_path',
+      render: (image_path) => (
+        image_path ? (
+          <Image
+            width={50}
+            src={`http://localhost:8000/storage/${image_path}`}
+            preview={{
+              src: `http://localhost:8000/storage/${image_path}`,
+            }}
           />
+        ) : '-'
+      ),
+    },
+    {
+      title: 'Aksi',
+      key: 'aksi',
+      render: (_, record) => (
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)}>
+            Edit
+          </Button>
           <Button
             icon={<DeleteOutlined />}
             danger
-            onClick={() => handleDelete(record.id_reading)}
-          />
-          <Button
-            type="link"
-            onClick={() => fetchPanelReadings(record.panel_id)}
+            onClick={() => handleDelete(record)}
           >
-            Lihat Panel
+            Hapus
           </Button>
-        </Space>
+        </div>
       ),
     },
   ];
 
   return (
     <div className="container">
-      {showPanelReadings ? (
-        <Card
-          title={`Data KWH Panel ${selectedPanel?.no_app}`}
-          extra={
-            <Button onClick={() => setShowPanelReadings(false)}>
-              Kembali ke Semua Data
-            </Button>
-          }
-        >
-          <Descriptions bordered column={2}>
-            <Descriptions.Item label="No APP">{selectedPanel?.no_app}</Descriptions.Item>
-            <Descriptions.Item label="Lokasi">{selectedPanel?.nama_jalan}</Descriptions.Item>
-            <Descriptions.Item label="Desa/Kel">{selectedPanel?.desa_kel}</Descriptions.Item>
-            <Descriptions.Item label="Kecamatan">{selectedPanel?.kecamatan}</Descriptions.Item>
-          </Descriptions>
-
-          <Table
-            columns={columns.filter(col => col.key !== 'panel')}
-            dataSource={panelReadings}
-            rowKey="id_reading"
-            loading={loading}
-            style={{ marginTop: 20 }}
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '10px',
+          marginBottom: '16px',
+        }}
+      >
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
+          <Input.Search
+            placeholder="Cari berdasarkan Nomor KWH"
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            allowClear
+            style={{ width: '200px', flexShrink: 0 }}
           />
-        </Card>
-      ) : (
-        <>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
-            <Input.Search
-              placeholder="Cari nomor KWH atau panel..."
-              allowClear
-              enterButton={<SearchOutlined />}
-              onSearch={handleSearch}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ width: 400 }}
-              value={searchTerm}
-            />
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleCreate}
-            >
-              Tambah Catatan KWH
-            </Button>
-          </div>
-
-          <Table
-            columns={columns}
-            dataSource={readings}
-            rowKey="id_reading"
-            loading={loading}
-            pagination={{ pageSize: 10 }}
+          <Select
+            placeholder="Filter Panel"
+            value={selectedPanel}
+            onChange={handlePanelChange}
+            options={[{ value: '', label: 'Semua Panel' }, ...panelList]}
+            allowClear
+            style={{ width: '200px', flexShrink: 0 }}
+            showSearch
+            optionFilterProp="label"
+            filterOption={(input, option) =>
+              option.label.toLowerCase().includes(input.toLowerCase())
+            }
           />
-        </>
-      )}
+          <Select
+            placeholder="Pilih Tahun"
+            value={selectedYear}
+            onChange={handleYearChange}
+            options={[{ value: '', label: 'Semua Tahun' }, ...getAvailableYears()]}
+            allowClear
+            style={{ width: '150px', flexShrink: 0 }}
+          />
+          <Select
+            placeholder="Pilih Bulan"
+            value={selectedMonth}
+            onChange={handleMonthChange}
+            options={[{ value: '', label: 'Semua Bulan' }, ...getAvailableMonths()]}
+            allowClear
+            style={{ width: '150px', flexShrink: 0 }}
+          />
+        </div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <Button type="default" icon={<ExportOutlined />} loading={isExporting} onClick={handleExport}>
+            {isExporting ? 'Sedang Mengekspor...' : 'Export'}
+          </Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
+            Tambah Data
+          </Button>
+        </div>
+      </div>
+
+      <Table
+        columns={columns}
+        loading={isLoading}
+        dataSource={paginatedData.map((item, index) => ({ ...item, key: index }))}
+        pagination={{
+          current: currentPage,
+          pageSize: itemsPerPage,
+          total: filteredData.length,
+          onChange: (page, pageSize) => {
+            setCurrentPage(page);
+            setItemsPerPage(pageSize);
+          },
+        }}
+        scroll={{ x: 'max-content' }}
+      />
 
       <Modal
         title={currentReading ? "Edit Catatan KWH" : "Tambah Catatan KWH"}
-        open={modalVisible}
+        visible={showModal}
         onCancel={() => {
-          setModalVisible(false);
+          setShowModal(false);
           form.resetFields();
         }}
-        onOk={handleSubmit}
+        onOk={() => form.submit()}
         width={700}
         okText="Simpan"
         cancelText="Batal"
-        confirmLoading={submitting}
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout="vertical" onFinish={handleModalSubmit}>
           <Form.Item
             name="panel_id"
             label="Panel"
-            rules={[{ required: true, message: "Panel harus dipilih" }]}
+            rules={[{ required: true, message: 'Panel wajib dipilih' }]}
           >
             <Select
-              showSearch
               placeholder="Pilih Panel"
-              optionFilterProp="children"
-              disabled={!!currentReading}
+              options={panelList}
+              showSearch
+              optionFilterProp="label"
               filterOption={(input, option) =>
-                option.children.toLowerCase().includes(input.toLowerCase())
+                option.label.toLowerCase().includes(input.toLowerCase())
               }
-            >
-              {panels.map(panel => (
-                <Option key={panel.id_panel} value={panel.id_panel}>
-                  {panel.no_app} - {panel.nama_jalan}
-                </Option>
-              ))}
-            </Select>
+              disabled={!!currentReading}
+            />
           </Form.Item>
 
           <Form.Item
             name="kwh_number"
             label="Nomor KWH"
-            rules={[{ required: true, message: "Nomor KWH harus diisi" }]}
+            rules={[{ required: true, message: 'Nomor KWH wajib diisi' }]}
           >
-            <Input type="number" />
+            <Input type="number" placeholder="Masukkan Nomor KWH" />
           </Form.Item>
 
           <Form.Item
             name="notes"
             label="Catatan"
           >
-            <Input.TextArea rows={4} />
+            <Input.TextArea placeholder="Masukkan Catatan (Opsional)" />
           </Form.Item>
 
           <Form.Item
-            name="image"
-            label="Gambar KWH Meter"
-            valuePropName="fileList"
-            getValueFromEvent={(e) => {
-              if (Array.isArray(e)) {
-                return e;
-              }
-              return e && e.fileList;
-            }}
-            rules={[
-              {
-                required: !currentReading,
-                message: "Gambar KWH meter harus diupload",
-              },
-            ]}
-          >
-            <Upload
-              listType="picture-card"
-              beforeUpload={beforeUpload}
-              maxCount={1}
-              accept="image/*"
-            >
-              {form.getFieldValue('image')?.length ? null : (
-                <div>
-                  <UploadOutlined />
-                  <div style={{ marginTop: 8 }}>Upload</div>
-                </div>
-              )}
-            </Upload>
-          </Form.Item>
+  name="image"
+  label="Gambar KWH Meter"
+  valuePropName="fileList"
+  getValueFromEvent={(e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
+  }}
+  rules={[
+    {
+      required: !currentReading,
+      message: 'Gambar KWH meter harus diupload',
+    },
+    {
+      validator: (_, fileList) => {
+        if (fileList && fileList[0]) {
+          const file = fileList[0];
+          if (file.size / 1024 / 1024 > 2) {
+            return Promise.reject(new Error('Ukuran gambar maksimal 2MB!'));
+          }
+        }
+        return Promise.resolve();
+      },
+    },
+  ]}
+>
+  <Upload
+    listType="picture-card"
+    beforeUpload={beforeUpload}
+    maxCount={1}
+    accept="image/*"
+  >
+    {form.getFieldValue('image')?.length ? null : (
+      <div>
+        <UploadOutlined />
+        <div style={{ marginTop: 8 }}>Upload</div>
+      </div>
+    )}
+  </Upload>
+</Form.Item>
 
           {currentReading?.image_path && (
             <Form.Item label="Gambar Saat Ini">
