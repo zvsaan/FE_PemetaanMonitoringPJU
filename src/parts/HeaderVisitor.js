@@ -1,9 +1,9 @@
 /* eslint-disable */
-import React, { useState } from 'react';
+import { faSearch, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell, faBars, faSearch, faUserCircle } from '@fortawesome/free-solid-svg-icons';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const HeaderVisitor = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -16,7 +16,7 @@ const HeaderVisitor = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:8000/api/logout', {}, {
+      await axios.post('https://be-sigap.tifpsdku.com/api/logout', {}, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`
         }

@@ -1,24 +1,23 @@
 /* eslint-disable */
-import React, { useEffect, useState } from "react";
 import {
-  Table,
-  Input,
-  Button,
-  Modal,
-  Pagination,
-  Form,
-  Select,
-  Switch,
-  notification,
-} from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
-  EyeOutlined,
-  EyeInvisibleOutlined,
+    DeleteOutlined,
+    EditOutlined,
+    EyeInvisibleOutlined,
+    EyeOutlined,
+    PlusOutlined,
 } from "@ant-design/icons";
+import {
+    Button,
+    Form,
+    Input,
+    Modal,
+    Select,
+    Switch,
+    Table,
+    notification
+} from "antd";
 import axios from "axios";
+import { useEffect, useState } from "react";
 
 const DataNavbar = () => {
   const [data, setData] = useState([]);
@@ -45,7 +44,7 @@ const DataNavbar = () => {
 
   const getNavbarItems = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/superadmin/navbar", {
+      const response = await axios.get("https://be-sigap.tifpsdku.com/api/superadmin/navbar", {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setData(response.data);
@@ -57,7 +56,7 @@ const DataNavbar = () => {
 
   const fetchParentItems = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/superadmin/navbar", {
+      const response = await axios.get("https://be-sigap.tifpsdku.com/api/superadmin/navbar", {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       // Filter hanya item yang bisa menjadi parent (type dropdown atau link)
@@ -99,7 +98,7 @@ const DataNavbar = () => {
   const handleTogglePublish = async (id, currentStatus) => {
     try {
       await axios.put(
-        `http://localhost:8000/api/superadmin/navbar/${id}/toggle-publish`,
+        `https://be-sigap.tifpsdku.com/api/superadmin/navbar/${id}/toggle-publish`,
         {},
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
@@ -122,7 +121,7 @@ const DataNavbar = () => {
       onOk: async () => {
         try {
           await axios.delete(
-            `http://localhost:8000/api/superadmin/navbar/${item.id}`,
+            `https://be-sigap.tifpsdku.com/api/superadmin/navbar/${item.id}`,
             { headers: { Authorization: `Bearer ${authToken}` } }
           );
           getNavbarItems();
@@ -139,14 +138,14 @@ const DataNavbar = () => {
     try {
       if (modalType === "create") {
         await axios.post(
-          "http://localhost:8000/api/superadmin/navbar",
+          "https://be-sigap.tifpsdku.com/api/superadmin/navbar",
           values,
           { headers: { Authorization: `Bearer ${authToken}` } }
         );
         notification.success({ message: "Menu berhasil ditambahkan!" });
       } else if (modalType === "edit") {
         await axios.put(
-          `http://localhost:8000/api/superadmin/navbar/${selectedData.id}`,
+          `https://be-sigap.tifpsdku.com/api/superadmin/navbar/${selectedData.id}`,
           values,
           { headers: { Authorization: `Bearer ${authToken}` } }
         );

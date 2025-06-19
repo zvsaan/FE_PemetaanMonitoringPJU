@@ -1,8 +1,8 @@
 /* eslint-disable */
-import React, { useState } from "react";
-import { Button, Upload, notification } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import { Button, Upload, notification } from "antd";
 import axios from "axios";
+import { useState } from "react";
 
 const ImportRiwayatPJU = () => {
   const [file, setFile] = useState(null);
@@ -19,7 +19,7 @@ const ImportRiwayatPJU = () => {
 
     setIsUploading(true);
     try {
-      const response = await axios.post("http://localhost:8000/api/import/riwayat-pju", formData, {
+      const response = await axios.post("https://be-sigap.tifpsdku.com/api/import/riwayat-pju", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,

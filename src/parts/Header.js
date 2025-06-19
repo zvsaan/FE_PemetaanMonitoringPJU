@@ -1,7 +1,7 @@
 /* eslint-disable */
-import React, { useState, useEffect } from 'react';
-import { FaBars, FaTimes, FaSignInAlt, FaFacebook, FaLinkedin, FaYoutube } from 'react-icons/fa';
 import logo from 'assets/images/logo/logo.png';
+import { useEffect, useState } from 'react';
+import { FaBars, FaLinkedin, FaSignInAlt, FaTimes, FaYoutube } from 'react-icons/fa';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,7 +14,7 @@ const Header = () => {
   useEffect(() => {
     const fetchNavbarItems = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/navbar');
+        const response = await fetch('https://be-sigap.tifpsdku.com/api/navbar');
         const data = await response.json();
         setNavbarItems(data);
       } catch (error) {

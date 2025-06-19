@@ -1,28 +1,28 @@
 /* eslint-disable */
-import React, { useState, useEffect } from "react";
 import {
-  Table,
-  Input,
-  Button,
-  Modal,
-  Upload,
-  Form,
-  notification,
-  Image,
-  message,
-  Select,
-  Card,
-  Space,
-  Descriptions
-} from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
-  UploadOutlined,
-  SearchOutlined
+    DeleteOutlined,
+    EditOutlined,
+    PlusOutlined,
+    SearchOutlined,
+    UploadOutlined
 } from "@ant-design/icons";
+import {
+    Button,
+    Card,
+    Descriptions,
+    Form,
+    Image,
+    Input,
+    message,
+    Modal,
+    notification,
+    Select,
+    Space,
+    Table,
+    Upload
+} from "antd";
 import axios from "axios";
+import { useEffect, useState } from "react";
 
 const { Option } = Select;
 
@@ -48,7 +48,7 @@ const DataKWH = () => {
 
   const fetchPanels = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/panels", {
+      const response = await axios.get("https://be-sigap.tifpsdku.com/api/panels", {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setPanels(response.data);
@@ -60,7 +60,7 @@ const DataKWH = () => {
 
   const fetchReadings = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/kwh-readings", {
+      const response = await axios.get("https://be-sigap.tifpsdku.com/api/kwh-readings", {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setReadings(response.data);
@@ -74,7 +74,7 @@ const DataKWH = () => {
 
   const fetchPanelReadings = async (panelId) => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/panels/${panelId}/kwh-readings`, {
+      const response = await axios.get(`https://be-sigap.tifpsdku.com/api/panels/${panelId}/kwh-readings`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setPanelReadings(response.data);
@@ -123,7 +123,7 @@ const DataKWH = () => {
       content: "Apakah Anda yakin ingin menghapus catatan ini?",
       onOk: async () => {
         try {
-          await axios.delete(`http://localhost:8000/api/kwh-readings/${id}`, {
+          await axios.delete(`https://be-sigap.tifpsdku.com/api/kwh-readings/${id}`, {
             headers: { Authorization: `Bearer ${authToken}` },
           });
           notification.success({ message: "Catatan KWH berhasil dihapus" });
@@ -158,8 +158,8 @@ const DataKWH = () => {
       }
   
       const url = currentReading 
-        ? `http://localhost:8000/api/kwh-readings/${currentReading.id_reading}`
-        : "http://localhost:8000/api/kwh-readings";
+        ? `https://be-sigap.tifpsdku.com/api/kwh-readings/${currentReading.id_reading}`
+        : "https://be-sigap.tifpsdku.com/api/kwh-readings";
   
       const method = currentReading ? 'post' : 'post'; 
   
@@ -244,10 +244,10 @@ const DataKWH = () => {
       key: "image",
       render: (image) => image ? (
         <Image
-          src={`http://localhost:8000/storage/${image}`}
+          src={`https://be-sigap.tifpsdku.com/storage/${image}`}
           width={100}
           preview={{
-            src: `http://localhost:8000/storage/${image}`,
+            src: `https://be-sigap.tifpsdku.com/storage/${image}`,
           }}
         />
       ) : null,
@@ -420,10 +420,10 @@ const DataKWH = () => {
           {currentReading?.image_path && (
             <Form.Item label="Gambar Saat Ini">
               <Image
-                src={`http://localhost:8000/storage/${currentReading.image_path}`}
+                src={`https://be-sigap.tifpsdku.com/storage/${currentReading.image_path}`}
                 width={200}
                 preview={{
-                  src: `http://localhost:8000/storage/${currentReading.image_path}`,
+                  src: `https://be-sigap.tifpsdku.com/storage/${currentReading.image_path}`,
                 }}
               />
             </Form.Item>

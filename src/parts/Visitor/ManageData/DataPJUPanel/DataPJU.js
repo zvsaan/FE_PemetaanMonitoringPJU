@@ -1,9 +1,8 @@
 /* eslint-disable */
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Table, Button, Modal, Form, Input, Select, notification, Descriptions, Spin } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined, ExportOutlined } from '@ant-design/icons';
+import { Button, Input, Select, Table, notification } from 'antd';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const DataPJU = () => {
   const navigate = useNavigate();
@@ -29,7 +28,7 @@ const DataPJU = () => {
   const getPjus = async () => {
     setIsLoading(true); // Mulai loading
     try {
-      const response = await axios.get('http://localhost:8000/api/visitor/pjus', {
+      const response = await axios.get('https://be-sigap.tifpsdku.com/api/visitor/pjus', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setAllData(response.data);
@@ -45,7 +44,7 @@ const DataPJU = () => {
   // Fetch daftar kecamatan
   const getKecamatanList = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/visitor/kecamatan-list', {
+      const response = await axios.get('https://be-sigap.tifpsdku.com/api/visitor/kecamatan-list', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setKecamatanList(response.data.map(item => ({ value: item.kecamatan, label: item.kecamatan })));

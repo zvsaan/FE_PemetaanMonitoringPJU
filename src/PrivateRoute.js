@@ -1,7 +1,7 @@
 /* eslint-disable */
-import React, { useEffect, useState } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
 import LoadingScreen from './LoadingScreen';
 
 const PrivateRoute = ({ allowedRoles }) => {
@@ -13,7 +13,7 @@ const PrivateRoute = ({ allowedRoles }) => {
     const validateToken = async () => {
       try {
         const response = await axios.post(
-          'http://localhost:8000/api/validate-token',
+          'https://be-sigap.tifpsdku.com/api/validate-token',
           {},
           {
             headers: {

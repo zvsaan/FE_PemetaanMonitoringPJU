@@ -1,21 +1,15 @@
 /* eslint-disable */
-import React, { useEffect, useState } from "react";
 import {
-  Table,
-  Button,
-  Tag,
-  notification,
-  Modal,
-  Form,
-  Input,
-  DatePicker,
-  TimePicker,
-  Select,
+    Form,
+    Modal,
+    Table,
+    Tag,
+    notification
 } from "antd";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import { EditOutlined, DeleteOutlined, PlusOutlined, ExportOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 const DataRiwayatPanel = () => {
   const { id } = useParams();
@@ -43,7 +37,7 @@ const DataRiwayatPanel = () => {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/visitor/riwayat-panel/${panelId}`,
+        `https://be-sigap.tifpsdku.com/api/visitor/riwayat-panel/${panelId}`,
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }

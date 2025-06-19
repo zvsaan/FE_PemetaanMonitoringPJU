@@ -1,26 +1,25 @@
 /* eslint-disable */
-import React, { useState, useEffect } from "react";
 import {
-  Table,
-  Input,
-  Button,
-  Modal,
-  Upload,
-  Form,
-  Switch,
-  notification,
-  Image,
-  message
-} from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
-  UploadOutlined,
-  EyeOutlined,
-  EyeInvisibleOutlined
+    DeleteOutlined,
+    EditOutlined,
+    EyeInvisibleOutlined,
+    EyeOutlined,
+    PlusOutlined
 } from "@ant-design/icons";
+import {
+    Button,
+    Form,
+    Image,
+    Input,
+    Modal,
+    Switch,
+    Table,
+    Upload,
+    message,
+    notification
+} from "antd";
 import axios from "axios";
+import { useEffect, useState } from "react";
 
 const DataHero = () => {
   const [slides, setSlides] = useState([]);
@@ -39,7 +38,7 @@ const DataHero = () => {
 
   const fetchSlides = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/admin/hero-slides", {
+      const response = await axios.get("https://be-sigap.tifpsdku.com/api/admin/hero-slides", {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setSlides(response.data);
@@ -97,7 +96,7 @@ const DataHero = () => {
       content: "Apakah Anda yakin ingin menghapus slide ini?",
       onOk: async () => {
         try {
-          await axios.delete(`http://localhost:8000/api/admin/hero-slides/${id}`, {
+          await axios.delete(`https://be-sigap.tifpsdku.com/api/admin/hero-slides/${id}`, {
             headers: { Authorization: `Bearer ${authToken}` },
           });
           notification.success({ message: "Slide berhasil dihapus" });
@@ -113,7 +112,7 @@ const DataHero = () => {
   const handleToggleActive = async (id, currentStatus) => {
     try {
       await axios.put(
-        `http://localhost:8000/api/admin/hero-slides/${id}/toggle-active`,
+        `https://be-sigap.tifpsdku.com/api/admin/hero-slides/${id}/toggle-active`,
         {},
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
@@ -146,8 +145,8 @@ const DataHero = () => {
       formData.append('is_active', values.is_active ? '1' : '0');
 
       const url = currentSlide 
-        ? `http://localhost:8000/api/admin/hero-slides/${currentSlide.id}`
-        : "http://localhost:8000/api/admin/hero-slides";
+        ? `https://be-sigap.tifpsdku.com/api/admin/hero-slides/${currentSlide.id}`
+        : "https://be-sigap.tifpsdku.com/api/admin/hero-slides";
 
       const method = currentSlide ? 'put' : 'post';
 
@@ -216,10 +215,10 @@ const DataHero = () => {
       key: "image",
       render: (image) => (
         <Image
-          src={`http://localhost:8000/storage/${image}`}
+          src={`https://be-sigap.tifpsdku.com/storage/${image}`}
           width={100}
           preview={{
-            src: `http://localhost:8000/storage/${image}`,
+            src: `https://be-sigap.tifpsdku.com/storage/${image}`,
           }}
         />
       ),
@@ -361,10 +360,10 @@ const DataHero = () => {
           {currentSlide?.image_path && (
             <Form.Item label="Gambar Saat Ini">
               <Image
-                src={`http://localhost:8000/storage/${currentSlide.image_path}`}
+                src={`https://be-sigap.tifpsdku.com/storage/${currentSlide.image_path}`}
                 width={200}
                 preview={{
-                  src: `http://localhost:8000/storage/${currentSlide.image_path}`,
+                  src: `https://be-sigap.tifpsdku.com/storage/${currentSlide.image_path}`,
                 }}
               />
             </Form.Item>

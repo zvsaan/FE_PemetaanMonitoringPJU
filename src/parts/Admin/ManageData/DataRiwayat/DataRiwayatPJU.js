@@ -1,21 +1,21 @@
 /* eslint-disable */
-import React, { useEffect, useState } from "react";
+import { DeleteOutlined, EditOutlined, ExportOutlined, PlusOutlined } from "@ant-design/icons";
 import {
-  Table,
-  Button,
-  Tag,
-  notification,
-  Modal,
-  Form,
-  Input,
-  DatePicker,
-  TimePicker,
-  Select,
+    Button,
+    DatePicker,
+    Form,
+    Input,
+    Modal,
+    Select,
+    Table,
+    Tag,
+    TimePicker,
+    notification,
 } from "antd";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import { EditOutlined, DeleteOutlined, PlusOutlined, ExportOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 const DataRiwayatPJU = () => {
   const { id } = useParams();
@@ -43,7 +43,7 @@ const DataRiwayatPJU = () => {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/riwayat-pju/${pjuId}`,
+        `https://be-sigap.tifpsdku.com/api/riwayat-pju/${pjuId}`,
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }
@@ -97,7 +97,7 @@ const DataRiwayatPJU = () => {
       onOk: async () => {
         try {
           await axios.delete(
-            `http://localhost:8000/api/riwayat-pju/${idRiwayat}`,
+            `https://be-sigap.tifpsdku.com/api/riwayat-pju/${idRiwayat}`,
             {
               headers: { Authorization: `Bearer ${authToken}` },
             }
@@ -160,14 +160,14 @@ const DataRiwayatPJU = () => {
 
         if (modalType === "create") {
             // Tambahkan data baru
-            await axios.post(`http://localhost:8000/api/riwayat-pju`, payload, {
+            await axios.post(`https://be-sigap.tifpsdku.com/api/riwayat-pju`, payload, {
                 headers: { Authorization: `Bearer ${authToken}` },
             });
             notification.success({ message: "Riwayat PJU berhasil ditambahkan" });
         } else {
             // Edit data yang sudah ada
             await axios.put(
-                `http://localhost:8000/api/riwayat-pju/${selectedData.id_riwayat_pju}`,
+                `https://be-sigap.tifpsdku.com/api/riwayat-pju/${selectedData.id_riwayat_pju}`,
                 payload,
                 { headers: { Authorization: `Bearer ${authToken}` } }
             );
@@ -195,7 +195,7 @@ const DataRiwayatPJU = () => {
   const handleExport = async () => {
     setIsExporting(true);
     try {
-        const response = await axios.get(`http://localhost:8000/api/export-riwayat-pju/riwayat/${id}`, {
+        const response = await axios.get(`https://be-sigap.tifpsdku.com/api/export-riwayat-pju/riwayat/${id}`, {
             headers: { Authorization: `Bearer ${authToken}` },
             responseType: 'blob',
         });

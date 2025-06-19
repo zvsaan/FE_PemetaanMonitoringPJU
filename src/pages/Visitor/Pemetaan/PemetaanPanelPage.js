@@ -1,10 +1,10 @@
 /* eslint-disable */
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from 'react-leaflet';
-import L from 'leaflet';
 import axios from 'axios';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useEffect, useState } from 'react';
+import { GeoJSON, MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import { useNavigate } from 'react-router-dom';
 
 // Warna kecamatan
 const kecamatanColors = {
@@ -71,7 +71,7 @@ const statusColors = {
         const headers = {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`,
         };
-        const panelResponse = await axios.get('http://localhost:8000/api/visitor/panels-with-status', { headers });
+        const panelResponse = await axios.get('https://be-sigap.tifpsdku.com/api/visitor/panels-with-status', { headers });
         setPanelData(panelResponse.data || []);
       } catch (error) {
         console.error('Error loading data:', error);

@@ -1,9 +1,9 @@
 /* eslint-disable */
-import React, { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Table, Button, Modal, Form, Input, InputNumber, notification } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined, ExportOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, ExportOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Form, Input, InputNumber, Modal, notification, Table } from 'antd';
 import axios from 'axios';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const debounce = (func, delay) => {
   let timer;
@@ -43,7 +43,7 @@ const DataPanel = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/panels', {
+      const response = await axios.get('https://be-sigap.tifpsdku.com/api/panels', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setData(response.data);
@@ -89,12 +89,12 @@ const DataPanel = () => {
     try {
       const values = await form.validateFields();
       if (modalType === 'create') {
-        await axios.post('http://localhost:8000/api/panels', values, {
+        await axios.post('https://be-sigap.tifpsdku.com/api/panels', values, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         notification.success({ message: 'Data Panel berhasil ditambahkan' });
       } else if (modalType === 'edit') {
-        await axios.post(`http://localhost:8000/api/panels/${selectedData.id_panel}`, values, {
+        await axios.post(`https://be-sigap.tifpsdku.com/api/panels/${selectedData.id_panel}`, values, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         notification.success({ message: 'Data Panel berhasil diperbarui' });
@@ -117,7 +117,7 @@ const DataPanel = () => {
       cancelText: 'Batal',
       onOk: async () => {
         try {
-          await axios.delete(`http://localhost:8000/api/panels/${record.id_panel}`, {
+          await axios.delete(`https://be-sigap.tifpsdku.com/api/panels/${record.id_panel}`, {
             headers: { Authorization: `Bearer ${authToken}` },
           });
           notification.success({ message: 'Data Panel berhasil dihapus' });
@@ -134,7 +134,7 @@ const DataPanel = () => {
     setIsExporting(true);
     notification.info({ message: 'Sedang mengekspor data...', description: 'Harap tunggu beberapa saat.' });
     try {
-      const response = await axios.get('http://localhost:8000/api/export/panel', {
+      const response = await axios.get('https://be-sigap.tifpsdku.com/api/export/panel', {
         headers: { Authorization: `Bearer ${authToken}` },
         responseType: 'blob',
       });

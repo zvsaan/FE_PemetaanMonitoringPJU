@@ -1,15 +1,13 @@
 /* eslint-disable */
-import React, { Component } from 'react';
+import { faBars, faBolt, faHistory, faThLarge } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faBolt, faThLarge,faHistory,faClock,faBars,faSyncAlt,faChartLine,} from "@fortawesome/free-solid-svg-icons";
-import 'react-calendar/dist/Calendar.css';
-import SidebarVisitor from 'parts/SidebarVisitor';
-import HeaderVisitor from 'parts/HeaderVisitor';
-import AdminImage from '../../assets/images/admin.png';
 import axios from 'axios';
-import AnalysisCard from 'parts/Visitor/Analystic/AnalysisCard';
-import ProblemPercentageCard from 'parts/Visitor/Analystic/ProblemPercentageCard';
+import HeaderVisitor from 'parts/HeaderVisitor';
+import SidebarVisitor from 'parts/SidebarVisitor';
+import { Component } from 'react';
+import 'react-calendar/dist/Calendar.css';
 import CountUp from 'react-countup'; // Importing react-countup
+import AdminImage from '../../assets/images/admin.png';
 
 export default class DashboardPage extends Component {
   state = {
@@ -36,7 +34,7 @@ export default class DashboardPage extends Component {
     const authToken = localStorage.getItem('authToken'); // Pastikan auth token tersedia
     if (authToken) {
       axios
-        .get('http://localhost:8000/api/visitor/dashboard-data', {
+        .get('https://be-sigap.tifpsdku.com/api/visitor/dashboard-data', {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },

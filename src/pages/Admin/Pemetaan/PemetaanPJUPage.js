@@ -1,10 +1,10 @@
 /* eslint-disable */
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, GeoJSON, useMap } from 'react-leaflet';
-import L from 'leaflet';
 import axios from 'axios';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useEffect, useState } from 'react';
+import { GeoJSON, MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
+import { useNavigate } from 'react-router-dom';
 
 // Warna kecamatan
 const kecamatanColors = {
@@ -58,7 +58,7 @@ const PemetaanPJUPage = () => {
     };
   
     axios
-      .get('http://localhost:8000/api/kecamatan-list', { headers })
+      .get('https://be-sigap.tifpsdku.com/api/kecamatan-list', { headers })
       .then((response) => setKecamatanList(response.data || []))
       .catch((error) => {
         console.error('Error fetching kecamatan list:', error);
@@ -91,7 +91,7 @@ const PemetaanPJUPage = () => {
   
       // Fetch PJU data
       axios
-        .get(`http://localhost:8000/api/pjus-with-status?kecamatan=${selectedKecamatan}`, { headers })
+        .get(`https://be-sigap.tifpsdku.com/api/pjus-with-status?kecamatan=${selectedKecamatan}`, { headers })
         .then((response) => {
           const data = response.data.data || [];
           setPjuData(data);

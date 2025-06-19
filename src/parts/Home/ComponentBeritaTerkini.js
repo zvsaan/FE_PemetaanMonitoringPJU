@@ -1,7 +1,7 @@
 /* eslint-disable */
-import React, { useState, useEffect } from 'react';
-import { Zoom } from 'react-awesome-reveal';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { Zoom } from 'react-awesome-reveal';
 
 const ComponentBeritaTerkini = () => {
   const [beritaTerkini, setBeritaTerkini] = useState([]);
@@ -10,7 +10,7 @@ const ComponentBeritaTerkini = () => {
   useEffect(() => {
     // Fetch the latest 3 news articles when the component mounts
     axios
-      .get('http://localhost:8000/api/userberitaterbaru')
+      .get('https://be-sigap.tifpsdku.com/api/userberitaterbaru')
       .then((response) => {
         setBeritaTerkini(response.data); // Set the fetched berita to the state
         setLoading(false); // Set loading to false setelah data berhasil diambil
@@ -45,7 +45,7 @@ const ComponentBeritaTerkini = () => {
             <Zoom triggerOnce delay={600 + index * 200} key={item.id_berita}>
             <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg relative aspect-[3/2]">
               <img
-                src={`http://localhost:8000${item.image_url}`}
+                src={`https://be-sigap.tifpsdku.com${item.image_url}`}
                 alt={item.title}
                 className="w-full h-full object-cover"
               />

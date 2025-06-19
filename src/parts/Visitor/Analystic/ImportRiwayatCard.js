@@ -1,8 +1,8 @@
 /* eslint-disable */
-import React, { useState } from "react";
-import { Button, Modal, Upload, notification, Card, Row, Col } from "antd";
-import { InboxOutlined, FileTextOutlined } from "@ant-design/icons";
+import { FileTextOutlined, InboxOutlined } from "@ant-design/icons";
+import { Button, Card, Col, Modal, Row, Upload, notification } from "antd";
 import axios from "axios";
+import { useState } from "react";
 
 const ImportRiwayatCard = () => {
   const [visible, setVisible] = useState(false);
@@ -63,8 +63,8 @@ const ImportRiwayatCard = () => {
       // Gunakan URL API yang sesuai berdasarkan importType
       const uploadUrl =
         importType === "Riwayat APJ"
-          ? "http://localhost:8000/api/import/riwayat-pju"
-          : "http://localhost:8000/api/import/riwayat-panel"; // Pastikan URL backend benar
+          ? "https://be-sigap.tifpsdku.com/api/import/riwayat-pju"
+          : "https://be-sigap.tifpsdku.com/api/import/riwayat-panel"; // Pastikan URL backend benar
   
       const response = await axios.post(uploadUrl, formData, {
         headers: {

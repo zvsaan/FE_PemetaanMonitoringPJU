@@ -1,9 +1,9 @@
 /* eslint-disable */
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Table, Button, Modal, Form, Input, Select, notification, Descriptions, Spin } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined, ExportOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, ExportOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Modal, Select, Table, notification } from 'antd';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const DataPJU = () => {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ const DataPJU = () => {
   const getPjus = async () => {
     setIsLoading(true); // Mulai loading
     try {
-      const response = await axios.get('http://localhost:8000/api/pjus', {
+      const response = await axios.get('https://be-sigap.tifpsdku.com/api/pjus', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setAllData(response.data);
@@ -51,7 +51,7 @@ const DataPJU = () => {
   // Fetch daftar kecamatan
   const getKecamatanList = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/kecamatan-list', {
+      const response = await axios.get('https://be-sigap.tifpsdku.com/api/kecamatan-list', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setKecamatanList(response.data.map(item => ({ value: item.kecamatan, label: item.kecamatan })));
@@ -63,7 +63,7 @@ const DataPJU = () => {
 
   const getPanels = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/dropdownpanels', {
+      const response = await axios.get('https://be-sigap.tifpsdku.com/api/dropdownpanels', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       // console.log('API Response:', response.data);
@@ -140,12 +140,12 @@ const DataPJU = () => {
     try {
       const values = await form.validateFields();
       if (modalType === 'create') {
-        await axios.post('http://localhost:8000/api/pjus', values, {
+        await axios.post('https://be-sigap.tifpsdku.com/api/pjus', values, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         notification.success({ message: 'Data PJU berhasil ditambahkan' });
       } else if (modalType === 'edit') {
-        await axios.post(`http://localhost:8000/api/pjus/${selectedData.id_pju}`, values, {
+        await axios.post(`https://be-sigap.tifpsdku.com/api/pjus/${selectedData.id_pju}`, values, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         notification.success({ message: 'Data PJU berhasil diperbarui' });
@@ -182,7 +182,7 @@ const DataPJU = () => {
       cancelText: 'Batal',
       onOk: async () => {
         try {
-          await axios.delete(`http://localhost:8000/api/pjus/${record.id_pju}`, {
+          await axios.delete(`https://be-sigap.tifpsdku.com/api/pjus/${record.id_pju}`, {
             headers: { Authorization: `Bearer ${authToken}` },
           });
           notification.success({ message: 'Data PJU berhasil dihapus' });
@@ -198,7 +198,7 @@ const DataPJU = () => {
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/export/pju', {
+      const response = await axios.get('https://be-sigap.tifpsdku.com/api/export/pju', {
         headers: { Authorization: `Bearer ${authToken}` },
         responseType: 'blob',
       });

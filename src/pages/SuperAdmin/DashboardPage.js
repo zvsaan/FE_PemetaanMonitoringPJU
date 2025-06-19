@@ -1,10 +1,10 @@
 /* eslint-disable */
-import React, { Component } from 'react';
+import { faUserAlt, faUsers, faUserShield, faUserTie } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserShield, faUsers, faUserTie, faUserAlt } from '@fortawesome/free-solid-svg-icons';
-import SidebarSuperAdmin from 'parts/SidebarSuperAdmin';
-import HeaderSuperAdmin from 'parts/HeaderSuperAdmin';
 import axios from 'axios'; // Import axios for API calls
+import HeaderSuperAdmin from 'parts/HeaderSuperAdmin';
+import SidebarSuperAdmin from 'parts/SidebarSuperAdmin';
+import { Component } from 'react';
 import CountUp from 'react-countup'; // Importing react-countup
 
 export default class DashboardPageSuperAdmin extends Component {
@@ -32,7 +32,7 @@ export default class DashboardPageSuperAdmin extends Component {
     const authToken = localStorage.getItem('authToken'); // Pastikan auth token tersedia
     if (authToken) {
       axios
-        .get('http://localhost:8000/api/superadmin/dashboard-data', {
+        .get('https://be-sigap.tifpsdku.com/api/superadmin/dashboard-data', {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },

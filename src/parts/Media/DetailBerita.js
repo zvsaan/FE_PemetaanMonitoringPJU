@@ -1,6 +1,6 @@
 /* eslint-disable */
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 const DetailBerita = () => {
@@ -9,7 +9,7 @@ const DetailBerita = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/api/userberita/${slug}`)
+      .get(`https://be-sigap.tifpsdku.com/api/userberita/${slug}`)
       .then((response) => {
         setBerita(response.data);
       })
@@ -80,7 +80,7 @@ const DetailBerita = () => {
 
         <div className="mb-6">
           <img
-            src={`http://localhost:8000${berita.image_url}`}
+            src={`https://be-sigap.tifpsdku.com${berita.image_url}`}
             alt={berita.title}
             className="w-full h-auto rounded-lg shadow-lg"
           />

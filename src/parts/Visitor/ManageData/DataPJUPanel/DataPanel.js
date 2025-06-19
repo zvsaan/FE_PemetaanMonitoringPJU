@@ -1,7 +1,7 @@
 /* eslint-disable */
-import React, { useEffect, useState, useMemo } from 'react';
+import { Button, Input, notification, Table } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Modal, Form, Input, InputNumber, notification } from 'antd';
 // import { EditOutlined, DeleteOutlined, PlusOutlined, ExportOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
@@ -37,7 +37,7 @@ const DataPanel = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/visitor/panels', {
+      const response = await axios.get('https://be-sigap.tifpsdku.com/api/visitor/panels', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setData(response.data);

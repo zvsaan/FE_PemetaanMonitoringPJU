@@ -1,23 +1,22 @@
 /* eslint-disable */
-import React, { useEffect, useState, useRef } from "react";
-import axios from "axios";
+import { CameraOutlined, DeleteOutlined, DownloadOutlined, EditOutlined, UploadOutlined } from "@ant-design/icons";
 import {
-  Table,
-  Button,
-  Modal,
-  Form,
-  Input,
-  message,
-  Space,
-  notification,
-  Upload,
-  Select,
+    Button,
+    Form,
+    Input,
+    message,
+    Modal,
+    notification,
+    Select,
+    Space,
+    Table,
+    Upload,
 } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined, UploadOutlined, CameraOutlined } from "@ant-design/icons";
-import $ from "jquery";
+import axios from "axios";
+import dayjs from "dayjs";
+import React, { useEffect, useRef, useState } from "react";
 import "select2";
 import "select2/dist/css/select2.min.css";
-import dayjs from "dayjs";
 
 const DataPengaduan = () => {
   const [form] = Form.useForm();
@@ -30,8 +29,10 @@ const DataPengaduan = () => {
   const [optionsPanel, setOptionsPanel] = useState([]);
   const [optionsPju, setOptionsPju] = useState([]);
   const [selectedPanelId, setSelectedPanelId] = useState(null);
-  const [selectedPjuId, setSelectedPjuId] = useState("");
+  const [selectedPjuId, setSelectedPjuId] = useState(null);
+  const [kondisiMasalah, setKondisiMasalah] = useState("");
   const [lokasi, setLokasi] = useState("");
+  const [usedPJUIdsPending, setUsedPJUIdsPending] = useState([]);
   const [modalMode, setModalMode] = useState("add");
   const [cameraStream, setCameraStream] = useState(null);
   const [capturedImage, setCapturedImage] = useState(null);
@@ -40,6 +41,9 @@ const DataPengaduan = () => {
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [allPju, setAllPju] = useState([]);
   const [selectedKondisi, setSelectedKondisi] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(dayjs().year());
+  const [selectedMonth, setSelectedMonth] = useState(dayjs().month() + 1); // 1-12
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const itemsPerPage = 5;
   const authToken = localStorage.getItem("authToken");
@@ -52,8 +56,12 @@ const DataPengaduan = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:8000/api/pengaduan", {
+      const response = await axios.get("https://be-sigap.tifpsdku.com/api/pengaduan", {
         headers: { Authorization: `Bearer ${authToken}` },
+        params: {
+          year: selectedYear,
+          month: selectedMonth,
+        },
       });
       setPengaduan(response.data);
     } catch (error) {
@@ -71,7 +79,7 @@ const DataPengaduan = () => {
   useEffect(() => {
     const fetchOptionsPanel = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/panels", {
+        const response = await axios.get("https://be-sigap.tifpsdku.com/api/panels", {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         setOptionsPanel(response.data);
@@ -83,33 +91,151 @@ const DataPengaduan = () => {
     fetchOptionsPanel();
   }, []);
 
+  useEffect(() => {
+    if (pengaduan.length > 0) {
+      const usedIds = [];
+
+      pengaduan.forEach((aduan) => {
+        if (aduan.status === "pending" && aduan.detail_pengaduans?.length > 0) {
+          aduan.detail_pengaduans.forEach((detail) => {
+            if (detail.pju_id) {
+              usedIds.push(detail.pju_id);
+            }
+          });
+        }
+      });
+
+      setUsedPJUIdsPending(usedIds);
+    }
+  }, [pengaduan]);
+
+  const filteredPJU = kondisiMasalah === "tiang"
+    ? allPju.filter(pju => !usedPJUIdsPending.includes(pju.id))
+    : allPju;
+
+  const showImportModal = () => setIsImportModalOpen(true);
+  const handleImportModalCancel = () => setIsImportModalOpen(false);
+
+  const handleDownloadTemplate = async () => {
+    try {
+      const response = await fetch("https://be-sigap.tifpsdku.com/api/export-template", {
+        method: "GET",
+        headers: {
+          Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Gagal mengunduh template.");
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "template_pengaduan.xlsx");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("Download template error:", error);
+      notification.error({ message: "Gagal mengunduh template." });
+    }
+  };
+
+  const handleImportPengaduan = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post("https://be-sigap.tifpsdku.com/api/import-pengaduan", formData, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      notification.success({ message: "Import pengaduan berhasil." });
+      getPengaduan();
+      setIsImportModalOpen(false);
+    } catch (error) {
+      console.error("Import error:", error);
+      notification.error({
+        message: "Gagal mengimpor data.",
+        description: error.response?.data?.message || "Terjadi kesalahan saat mengimpor.",
+      });
+    }
+  };
+
+
+  const handleDownloadExcel = async () => {
+    if (!selectedMonth || !selectedYear) {
+      alert("Pilih bulan dan tahun terlebih dahulu.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://be-sigap.tifpsdku.com/api/pengaduan/export_excel?month=${selectedMonth}&year=${selectedYear}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || "Gagal mengunduh file.");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      const fileName = `pengaduan_${selectedYear}-${selectedMonth
+        .toString()
+        .padStart(2, "0")}.xlsx`;
+
+      link.href = url;
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      alert("Gagal mengekspor data: " + error.message);
+      console.error("Export error:", error);
+    }
+  };
+
   const handlePanelChange = async (value) => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/panel/${value}/validate`,
+        `https://be-sigap.tifpsdku.com/api/panel/${value}/validate`,
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }
       );
-  
+
       const { valid } = response.data;
-  
+
       if (valid === false) {
         message.error("Panel ini sudah digunakan di pengaduan aktif.");
         return;
       }
-  
+
       setSelectedPanelId(value);
     } catch (error) {
       console.error("Error saat validasi panel:", error);
       message.error("Gagal memvalidasi panel.");
     }
-  };  
+  };
 
   useEffect(() => {
     const fetchAllPju = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/pjus", {
+        const response = await axios.get("https://be-sigap.tifpsdku.com/api/pjus", {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         setAllPju(response.data);
@@ -126,7 +252,7 @@ const DataPengaduan = () => {
       const fetchLokasi = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8000/api/panel/location/${selectedPanelId}`,
+            `https://be-sigap.tifpsdku.com/api/panel/location/${selectedPanelId}`,
             {
               headers: { Authorization: `Bearer ${authToken}` },
             }
@@ -263,7 +389,7 @@ const DataPengaduan = () => {
 
       if (isEditMode && selectedPengaduan) {
         await axios.post(
-          `http://localhost:8000/api/pengaduan/${selectedPengaduan.id_pengaduan}?_method=PUT`,
+          `https://be-sigap.tifpsdku.com/api/pengaduan/${selectedPengaduan.id_pengaduan}?_method=PUT`,
           formData,
           {
             headers: {
@@ -274,7 +400,7 @@ const DataPengaduan = () => {
         );
         notification.success({ message: "Data pengaduan berhasil diperbarui" });
       } else {
-        await axios.post("http://localhost:8000/api/pengaduan", formData, {
+        await axios.post("https://be-sigap.tifpsdku.com/api/pengaduan", formData, {
           headers: {
             Authorization: `Bearer ${authToken}`,
             "Content-Type": "multipart/form-data",
@@ -315,7 +441,7 @@ const DataPengaduan = () => {
       onOk: async () => {
         try {
           await axios.delete(
-            `http://localhost:8000/api/pengaduan/${record.id_pengaduan}`,
+            `https://be-sigap.tifpsdku.com/api/pengaduan/${record.id_pengaduan}`,
             {
               headers: { Authorization: `Bearer ${authToken}` },
             }
@@ -345,7 +471,7 @@ const DataPengaduan = () => {
     if (!lokasi && record.panel_id) {
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/panel/location/${record.panel_id}`,
+          `https://be-sigap.tifpsdku.com/api/panel/location/${record.panel_id}`,
           { headers: { Authorization: `Bearer ${authToken}` } }
         );
         const { nama_jalan, desa_kel, kecamatan } = response.data;
@@ -362,10 +488,11 @@ const DataPengaduan = () => {
           uid: '-1',
           name: record.foto_pengaduan,
           status: 'done',
-          url: `http://localhost:8000/storage/foto_pengaduan/${record.foto_pengaduan}`,
+          url: `https://be-sigap.tifpsdku.com/storage/foto_pengaduan/${record.foto_pengaduan}`,
         },
       ];
     }
+
 
     // Set form fields setelah data tersedia
     setTimeout(() => {
@@ -426,7 +553,7 @@ const DataPengaduan = () => {
       render: (foto_pengaduan) =>
         foto_pengaduan ? (
           <img
-            src={`http://localhost:8000/storage/${foto_pengaduan}`}
+            src={`https://be-sigap.tifpsdku.com/storage/${foto_pengaduan}`}
             alt="Foto Pengaduan"
             style={{ height: "50px" }}
           />
@@ -443,7 +570,7 @@ const DataPengaduan = () => {
       render: (foto_penanganan) =>
         foto_penanganan ? (
           <img
-            src={`http://localhost:8000/storage/${foto_penanganan}`}
+            src={`https://be-sigap.tifpsdku.com/storage/${foto_penanganan}`}
             alt="Foto Penanganan"
             style={{ height: "50px" }}
           />
@@ -477,9 +604,85 @@ const DataPengaduan = () => {
 
   return (
     <>
-      <Button type="primary" onClick={handleAdd} style={{ marginBottom: 16 }}>
+      <Space style={{ marginBottom: 16 }}>
+        <Select
+          value={selectedYear}
+          onChange={(value) => setSelectedYear(value)}
+          style={{ width: 120 }}
+          placeholder="Pilih Tahun"
+        >
+          {Array.from({ length: 10 }, (_, i) => {
+            const year = dayjs().year() - i;
+            return <Select.Option key={year} value={year}>{year}</Select.Option>;
+          })}
+        </Select>
+
+        <Select
+          value={selectedMonth}
+          onChange={(value) => setSelectedMonth(value)}
+          style={{ width: 150 }}
+          placeholder="Pilih Bulan"
+        >
+          {dayjs.months().map((monthName, index) => (
+            <Select.Option key={index + 1} value={index + 1}>
+              {monthName}
+            </Select.Option>
+          ))}
+        </Select>
+
+        <Button type="primary" onClick={getPengaduan}>
+          Filter
+        </Button>
+      </Space>
+
+      <Button type="primary" onClick={handleAdd} style={{ marginLeft: 8 }}>
         Tambah Pengaduan
       </Button>
+
+      <Button
+        icon={<DownloadOutlined />}
+        type="default"
+        onClick={handleDownloadExcel}
+        style={{ marginLeft: 8 }}
+      >
+        Export ke Excel
+      </Button>
+
+      <Button
+        type="default"
+        icon={<UploadOutlined />}
+        onClick={showImportModal}
+        style={{ marginLeft: 8 }}
+      >
+        Download / Import
+      </Button>
+
+      <Modal
+        title="Download Template atau Import Data"
+        open={isImportModalOpen}
+        onCancel={handleImportModalCancel}
+        footer={null}
+      >
+        <Space direction="vertical" style={{ width: "100%" }}>
+          <Button icon={<DownloadOutlined />} onClick={handleDownloadTemplate} block>
+            Download Template Excel
+          </Button>
+
+          <Upload
+            showUploadList={false}
+            beforeUpload={(file) => {
+              handleImportPengaduan(file);
+              return false;
+            }}
+            accept=".xlsx,.xls"
+          >
+            <Button icon={<UploadOutlined />} block>
+              Import Data Pengaduan
+            </Button>
+          </Upload>
+        </Space>
+      </Modal>
+
       <Table
         columns={columns}
         dataSource={pengaduan}
@@ -509,14 +712,20 @@ const DataPengaduan = () => {
               </Form.Item>
 
               <Form.Item name="kondisi_masalah" label="Kondisi Masalah">
+                {/* Pilih Kondisi Masalah */}
                 <Select
                   placeholder="Pilih Kondisi Masalah"
-                  showSearch
-                  onChange={(value) => setSelectedKondisi(value)} // <- Tambahkan ini
+                  value={kondisiMasalah}
+                  onChange={(value) => {
+                    setKondisiMasalah(value);
+                    setSelectedPanelId(null);
+                    setSelectedPjuId(null);
+                  }}
+                  style={{ width: 300, marginBottom: 16 }}
                 >
                   <Select.Option value="Tiang">Tiang</Select.Option>
-                  <Select.Option value="Panel">Panel</Select.Option>
                   <Select.Option value="1 Line">1 Line</Select.Option>
+                  <Select.Option value="Panel">Panel</Select.Option>
                 </Select>
               </Form.Item>
 
@@ -531,12 +740,12 @@ const DataPengaduan = () => {
                 </Select>
               </Form.Item>
 
-              {selectedKondisi === "Tiang" && (
+              {kondisiMasalah === "Tiang" && (
                 <Form.Item label="PJU" name="pju_id">
                   <Select
                     mode="multiple"
                     placeholder="Pilih Tiang PJU"
-                    options={optionsPju.map((pju) => ({
+                    options={filteredPJU.map((pju) => ({
                       value: pju.id_pju,
                       label: pju.kode_tiang,
                     }))}

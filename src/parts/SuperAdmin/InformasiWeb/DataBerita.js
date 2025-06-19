@@ -1,25 +1,24 @@
 /* eslint-disable */
-import React, { useEffect, useState } from "react";
 import {
-  Table,
-  Input,
-  Button,
-  Modal,
-  Pagination,
-  Upload,
-  Form,
-  Select,
-  DatePicker,
-  notification,
-} from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
-  UploadOutlined,
+    DeleteOutlined,
+    EditOutlined,
+    PlusOutlined,
+    UploadOutlined,
 } from "@ant-design/icons";
+import {
+    Button,
+    DatePicker,
+    Form,
+    Input,
+    Modal,
+    notification,
+    Select,
+    Table,
+    Upload
+} from "antd";
 import axios from "axios";
 import moment from "moment";
+import { useEffect, useState } from "react";
 
 const DataBerita = () => {
   const [data, setData] = useState([]);
@@ -45,7 +44,7 @@ const DataBerita = () => {
 
   const getBerita = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/berita", {
+      const response = await axios.get("https://be-sigap.tifpsdku.com/api/berita", {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setData(response.data);
@@ -90,7 +89,7 @@ const DataBerita = () => {
     });
   
     // Set preview image dari data yang dipilih
-    setPreviewImage(item.image_url ? `http://localhost:8000${item.image_url}` : null);
+    setPreviewImage(item.image_url ? `https://be-sigap.tifpsdku.com${item.image_url}` : null);
   
     // Tampilkan modal
     setShowModal(true);
@@ -105,7 +104,7 @@ const DataBerita = () => {
       onOk: async () => {
         try {
           await axios.delete(
-            `http://localhost:8000/api/berita/${item.id_berita}`,
+            `https://be-sigap.tifpsdku.com/api/berita/${item.id_berita}`,
             {
               headers: { Authorization: `Bearer ${authToken}` },
             }
@@ -144,7 +143,7 @@ const DataBerita = () => {
     try {
       if (modalType === "create") {
         // Tambah data baru
-        await axios.post("http://localhost:8000/api/berita", formData, {
+        await axios.post("https://be-sigap.tifpsdku.com/api/berita", formData, {
           headers: {
             Authorization: `Bearer ${authToken}`,
             "Content-Type": "multipart/form-data",
@@ -154,7 +153,7 @@ const DataBerita = () => {
       } else if (modalType === "edit") {
         // Edit data yang sudah ada
         await axios.post(
-          `http://localhost:8000/api/berita/${selectedData.id_berita}`,
+          `https://be-sigap.tifpsdku.com/api/berita/${selectedData.id_berita}`,
           formData,
           {
             headers: {
@@ -209,7 +208,7 @@ const DataBerita = () => {
       render: (url) =>
         url ? (
           <img
-            src={`http://localhost:8000${url}`}
+            src={`https://be-sigap.tifpsdku.com${url}`}
             alt="berita"
             style={{ width: 50 }}
           />

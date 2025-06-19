@@ -1,7 +1,7 @@
 /* eslint-disable */
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -13,7 +13,7 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/login', { username, password });
+      const response = await axios.post('https://be-sigap.tifpsdku.com/api/login', { username, password });
       const { token, user } = response.data; // Expecting user data to include the role
 
       localStorage.setItem('authToken', token);

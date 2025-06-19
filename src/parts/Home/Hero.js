@@ -1,8 +1,8 @@
 /* eslint-disable */
-import React, { useState, useEffect } from "react";
-import Button from "elements/Button";
-import { Fade } from "react-awesome-reveal";
 import axios from "axios";
+import Button from "elements/Button";
+import { useEffect, useState } from "react";
+import { Fade } from "react-awesome-reveal";
 
 const Hero = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -13,7 +13,7 @@ const Hero = () => {
   useEffect(() => {
     const fetchSlides = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/hero-slides");
+        const response = await axios.get("https://be-sigap.tifpsdku.com/api/hero-slides");
         setSlides(response.data);
         setLoading(false);
       } catch (error) {
@@ -57,7 +57,7 @@ const Hero = () => {
     <section
       className="hero relative bg-cover bg-center h-screen overflow-hidden"
       style={{
-        backgroundImage: `url(http://localhost:8000/storage/${image_path})`,
+        backgroundImage: `url(https://be-sigap.tifpsdku.com/storage/${image_path})`,
       }}
     >
       {/* Overlay untuk transisi */}

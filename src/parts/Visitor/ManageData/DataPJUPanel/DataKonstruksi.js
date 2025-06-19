@@ -1,6 +1,6 @@
 /* eslint-disable */
-import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Form, Select, Input, DatePicker, notification, Upload } from 'antd';
+import { Input, notification, Table } from 'antd';
+import { useEffect, useState } from 'react';
 // import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 // import moment from 'moment';
@@ -29,7 +29,7 @@ const DataKonstruksi = () => {
   const getDataKonstruksi = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/api/visitor/konstruksi', {
+      const response = await axios.get('https://be-sigap.tifpsdku.com/api/visitor/konstruksi', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setAllData(response.data);
@@ -43,7 +43,7 @@ const DataKonstruksi = () => {
 
   const fetchPjuOptions = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/visitor/pjus', {
+      const response = await axios.get('https://be-sigap.tifpsdku.com/api/visitor/pjus', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       const usedPjuIds = allData.map((item) => item.no_tiang_baru);

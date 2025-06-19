@@ -1,8 +1,8 @@
 /* eslint-disable */
-import React, { useState } from "react";
-import { Button, Modal, Card, Row, Col, notification, Spin } from "antd";
-import { FileTextOutlined, ExportOutlined, LoadingOutlined } from "@ant-design/icons";
+import { ExportOutlined, FileTextOutlined, LoadingOutlined } from "@ant-design/icons";
+import { Button, Card, Col, Modal, notification, Row, Spin } from "antd";
 import axios from "axios";
+import { useState } from "react";
 
 const ExportRiwayatCard = () => {
   const [visible, setVisible] = useState(false);
@@ -35,15 +35,15 @@ const ExportRiwayatCard = () => {
     if (exportType === "APJ") {
       switch (exportOption) {
         case "all":
-          exportUrl = "http://localhost:8000/api/export-riwayat-pju/all";
+          exportUrl = "https://be-sigap.tifpsdku.com/api/export-riwayat-pju/all";
           fileName = "Data Semua Riwayat APJ.xlsx";
           break;
         case "riwayat":
-          exportUrl = "http://localhost:8000/api/export-riwayat-pju/riwayat";
+          exportUrl = "https://be-sigap.tifpsdku.com/api/export-riwayat-pju/riwayat";
           fileName = "Data Semua Riwayat APJ Berdasarkan Data Riwayat.xlsx";
           break;
         case "pengaduan":
-          exportUrl = "http://localhost:8000/api/export-riwayat-pju/pengaduan";
+          exportUrl = "https://be-sigap.tifpsdku.com/api/export-riwayat-pju/pengaduan";
           fileName = "Data Semua Riwayat APJ Berdasarkan Data Pengaduan.xlsx";
           break;
         default:
@@ -52,15 +52,15 @@ const ExportRiwayatCard = () => {
     } else if (exportType === "Panel") {
       switch (exportOption) {
         case "all":
-          exportUrl = "http://localhost:8000/api/export-riwayat-panel/all";
+          exportUrl = "https://be-sigap.tifpsdku.com/api/export-riwayat-panel/all";
           fileName = "Data Semua Riwayat Panel.xlsx";
           break;
         case "riwayat":
-          exportUrl = "http://localhost:8000/api/export-riwayat-panel/riwayat";
+          exportUrl = "https://be-sigap.tifpsdku.com/api/export-riwayat-panel/riwayat";
           fileName = "Data Semua Riwayat Panel Berdasarkan Data Riwayat.xlsx";
           break;
         case "pengaduan":
-          exportUrl = "http://localhost:8000/api/export-riwayat-panel/pengaduan";
+          exportUrl = "https://be-sigap.tifpsdku.com/api/export-riwayat-panel/pengaduan";
           fileName = "Data Semua Riwayat Panel Berdasarkan Data Pengaduan.xlsx";
           break;
         default:

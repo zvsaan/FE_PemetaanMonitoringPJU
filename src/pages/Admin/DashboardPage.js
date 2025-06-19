@@ -1,17 +1,17 @@
 /* eslint-disable */
-import React, { Component } from 'react';
+import { faBars, faBolt, faClock, faHistory, faSyncAlt, faThLarge } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faBolt, faThLarge,faHistory,faClock,faBars,faSyncAlt,faChartLine,} from "@fortawesome/free-solid-svg-icons";
-import 'react-calendar/dist/Calendar.css';
-import SidebarAdmin from 'parts/SidebarAdmin';
-import HeaderAdmin from 'parts/HeaderAdmin';
-import AdminImage from '../../assets/images/admin.png';
 import axios from 'axios'; // Import axios for API calls
 import AnalysisCard from 'parts/Admin/Analystic/AnalysisCard';
-import ProblemPercentageCard from 'parts/Admin/Analystic/ProblemPercentageCard';
-import ImportRiwayatCard from 'parts/Admin/Analystic/ImportRiwayatCard';
 import ExportRiwayatCard from 'parts/Admin/Analystic/ExportRiwayatCard';
+import ImportRiwayatCard from 'parts/Admin/Analystic/ImportRiwayatCard';
+import ProblemPercentageCard from 'parts/Admin/Analystic/ProblemPercentageCard';
+import HeaderAdmin from 'parts/HeaderAdmin';
+import SidebarAdmin from 'parts/SidebarAdmin';
+import { Component } from 'react';
+import 'react-calendar/dist/Calendar.css';
 import CountUp from 'react-countup'; // Importing react-countup
+import AdminImage from '../../assets/images/admin.png';
 
 export default class DashboardPage extends Component {
   state = {
@@ -44,7 +44,7 @@ export default class DashboardPage extends Component {
     const authToken = localStorage.getItem('authToken'); // Pastikan auth token tersedia
     if (authToken) {
       axios
-        .get('http://localhost:8000/api/dashboard-data', {
+        .get('https://be-sigap.tifpsdku.com/api/dashboard-data', {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },

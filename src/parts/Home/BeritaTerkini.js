@@ -1,7 +1,7 @@
 /* eslint-disable */
-import React, { useState, useEffect } from 'react';
-import { Zoom, Fade } from 'react-awesome-reveal';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { Fade } from 'react-awesome-reveal';
 import ComponentBeritaTerkini from './ComponentBeritaTerkini';
 
 const BeritaTerkini = () => {
@@ -9,7 +9,7 @@ const BeritaTerkini = () => {
   
   useEffect(() => {
     // Fetch the latest 3 news articles when the component mounts
-    axios.get('http://localhost:8000/api/userberitaterbaru')
+    axios.get('https://be-sigap.tifpsdku.com/api/userberitaterbaru')
       .then(response => {
         setBeritaTerkini(response.data); // Set the fetched berita to the state
       })
