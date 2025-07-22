@@ -38,7 +38,7 @@ const DataHero = () => {
 
   const fetchSlides = async () => {
     try {
-      const response = await axios.get("https://be-sigap.tifpsdku.com/api/admin/hero-slides", {
+      const response = await axios.get("http://localhost:8000/api/admin/hero-slides", {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setSlides(response.data);
@@ -96,7 +96,7 @@ const DataHero = () => {
       content: "Apakah Anda yakin ingin menghapus slide ini?",
       onOk: async () => {
         try {
-          await axios.delete(`https://be-sigap.tifpsdku.com/api/admin/hero-slides/${id}`, {
+          await axios.delete(`http://localhost:8000/api/admin/hero-slides/${id}`, {
             headers: { Authorization: `Bearer ${authToken}` },
           });
           notification.success({ message: "Slide berhasil dihapus" });
@@ -112,7 +112,7 @@ const DataHero = () => {
   const handleToggleActive = async (id, currentStatus) => {
     try {
       await axios.put(
-        `https://be-sigap.tifpsdku.com/api/admin/hero-slides/${id}/toggle-active`,
+        `http://localhost:8000/api/admin/hero-slides/${id}/toggle-active`,
         {},
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
@@ -145,8 +145,8 @@ const DataHero = () => {
       formData.append('is_active', values.is_active ? '1' : '0');
 
       const url = currentSlide 
-        ? `https://be-sigap.tifpsdku.com/api/admin/hero-slides/${currentSlide.id}`
-        : "https://be-sigap.tifpsdku.com/api/admin/hero-slides";
+        ? `http://localhost:8000/api/admin/hero-slides/${currentSlide.id}`
+        : "http://localhost:8000/api/admin/hero-slides";
 
       const method = currentSlide ? 'put' : 'post';
 
@@ -215,10 +215,10 @@ const DataHero = () => {
       key: "image",
       render: (image) => (
         <Image
-          src={`https://be-sigap.tifpsdku.com/storage/${image}`}
+          src={`http://localhost:8000/storage/${image}`}
           width={100}
           preview={{
-            src: `https://be-sigap.tifpsdku.com/storage/${image}`,
+            src: `http://localhost:8000/storage/${image}`,
           }}
         />
       ),
@@ -360,10 +360,10 @@ const DataHero = () => {
           {currentSlide?.image_path && (
             <Form.Item label="Gambar Saat Ini">
               <Image
-                src={`https://be-sigap.tifpsdku.com/storage/${currentSlide.image_path}`}
+                src={`http://localhost:8000/storage/${currentSlide.image_path}`}
                 width={200}
                 preview={{
-                  src: `https://be-sigap.tifpsdku.com/storage/${currentSlide.image_path}`,
+                  src: `http://localhost:8000/storage/${currentSlide.image_path}`,
                 }}
               />
             </Form.Item>

@@ -34,7 +34,7 @@ const DataKonstruksi = () => {
   const getDataKonstruksi = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get('https://be-sigap.tifpsdku.com/api/konstruksi', {
+      const response = await axios.get('http://localhost:8000/api/konstruksi', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setAllData(response.data);
@@ -48,7 +48,7 @@ const DataKonstruksi = () => {
 
   const fetchPjuOptions = async () => {
     try {
-      const response = await axios.get('https://be-sigap.tifpsdku.com/api/pjus', {
+      const response = await axios.get('http://localhost:8000/api/pjus', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       const usedPjuIds = allData.map((item) => item.no_tiang_baru);
@@ -86,12 +86,12 @@ const DataKonstruksi = () => {
       };
 
       if (isEditing) {
-        await axios.put(`https://be-sigap.tifpsdku.com/api/konstruksi/${selectedData.id_konstruksi}`, formattedData, {
+        await axios.put(`http://localhost:8000/api/konstruksi/${selectedData.id_konstruksi}`, formattedData, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         notification.success({ message: 'Data konstruksi berhasil diperbarui' });
       } else {
-        await axios.post('https://be-sigap.tifpsdku.com/api/konstruksi', formattedData, {
+        await axios.post('http://localhost:8000/api/konstruksi', formattedData, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         notification.success({ message: 'Data konstruksi berhasil ditambahkan' });
@@ -117,7 +117,7 @@ const DataKonstruksi = () => {
       cancelText: 'Batal',
       onOk: async () => {
         try {
-          await axios.delete(`https://be-sigap.tifpsdku.com/api/konstruksi/${record.id_konstruksi}`, {
+          await axios.delete(`http://localhost:8000/api/konstruksi/${record.id_konstruksi}`, {
             headers: { Authorization: `Bearer ${authToken}` },
           });
           notification.success({ message: 'Data konstruksi berhasil dihapus' });
@@ -132,7 +132,7 @@ const DataKonstruksi = () => {
   const handleExport = async () => {
     notification.info({ message: 'Mengunduh data...', description: 'Harap tunggu beberapa saat.' });
     try {
-      const response = await axios.get('https://be-sigap.tifpsdku.com/api/export/konstruksi', {
+      const response = await axios.get('http://localhost:8000/api/export/konstruksi', {
         headers: { Authorization: `Bearer ${authToken}` },
         responseType: 'blob',
       });
@@ -155,7 +155,7 @@ const DataKonstruksi = () => {
     formData.append('file', file);
 
     try {
-      await axios.post('https://be-sigap.tifpsdku.com/api/import/konstruksi', formData, {
+      await axios.post('http://localhost:8000/api/import/konstruksi', formData, {
         headers: { Authorization: `Bearer ${authToken}`, 'Content-Type': 'multipart/form-data' },
       });
       notification.success({ message: 'Data berhasil diimpor' });

@@ -37,7 +37,7 @@ const DataRiwayatPJU = () => {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `https://be-sigap.tifpsdku.com/api/visitor/riwayat-pju/${pjuId}`,
+        `http://localhost:8000/api/visitor/riwayat-pju/${pjuId}`,
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }

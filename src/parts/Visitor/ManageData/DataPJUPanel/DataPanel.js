@@ -37,7 +37,7 @@ const DataPanel = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.get('https://be-sigap.tifpsdku.com/api/visitor/panels', {
+      const response = await axios.get('http://localhost:8000/api/visitor/panels', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setData(response.data);

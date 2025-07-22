@@ -35,15 +35,15 @@ const ExportRiwayatCard = () => {
     if (exportType === "APJ") {
       switch (exportOption) {
         case "all":
-          exportUrl = "https://be-sigap.tifpsdku.com/api/export-riwayat-pju/all";
+          exportUrl = "http://localhost:8000/api/export-riwayat-pju/all";
           fileName = "Data Semua Riwayat APJ.xlsx";
           break;
         case "riwayat":
-          exportUrl = "https://be-sigap.tifpsdku.com/api/export-riwayat-pju/riwayat";
+          exportUrl = "http://localhost:8000/api/export-riwayat-pju/riwayat";
           fileName = "Data Semua Riwayat APJ Berdasarkan Data Riwayat.xlsx";
           break;
         case "pengaduan":
-          exportUrl = "https://be-sigap.tifpsdku.com/api/export-riwayat-pju/pengaduan";
+          exportUrl = "http://localhost:8000/api/export-riwayat-pju/pengaduan";
           fileName = "Data Semua Riwayat APJ Berdasarkan Data Pengaduan.xlsx";
           break;
         default:
@@ -52,15 +52,15 @@ const ExportRiwayatCard = () => {
     } else if (exportType === "Panel") {
       switch (exportOption) {
         case "all":
-          exportUrl = "https://be-sigap.tifpsdku.com/api/export-riwayat-panel/all";
+          exportUrl = "http://localhost:8000/api/export-riwayat-panel/all";
           fileName = "Data Semua Riwayat Panel.xlsx";
           break;
         case "riwayat":
-          exportUrl = "https://be-sigap.tifpsdku.com/api/export-riwayat-panel/riwayat";
+          exportUrl = "http://localhost:8000/api/export-riwayat-panel/riwayat";
           fileName = "Data Semua Riwayat Panel Berdasarkan Data Riwayat.xlsx";
           break;
         case "pengaduan":
-          exportUrl = "https://be-sigap.tifpsdku.com/api/export-riwayat-panel/pengaduan";
+          exportUrl = "http://localhost:8000/api/export-riwayat-panel/pengaduan";
           fileName = "Data Semua Riwayat Panel Berdasarkan Data Pengaduan.xlsx";
           break;
         default:

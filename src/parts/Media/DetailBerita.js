@@ -9,7 +9,7 @@ const DetailBerita = () => {
 
   useEffect(() => {
     axios
-      .get(`https://be-sigap.tifpsdku.com/api/userberita/${slug}`)
+      .get(`http://localhost:8000/api/userberita/${slug}`)
       .then((response) => {
         setBerita(response.data);
       })
@@ -80,7 +80,7 @@ const DetailBerita = () => {
 
         <div className="mb-6">
           <img
-            src={`https://be-sigap.tifpsdku.com${berita.image_url}`}
+            src={`http://localhost:8000${berita.image_url}`}
             alt={berita.title}
             className="w-full h-auto rounded-lg shadow-lg"
           />

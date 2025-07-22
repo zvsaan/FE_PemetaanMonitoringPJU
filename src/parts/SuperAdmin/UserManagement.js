@@ -39,7 +39,7 @@ const UserManagement = () => {
 
   const getUsers = async () => {
     try {
-      const response = await axios.get("https://be-sigap.tifpsdku.com/api/users", {
+      const response = await axios.get("http://localhost:8000/api/users", {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setData(response.data.data);
@@ -83,7 +83,7 @@ const UserManagement = () => {
       cancelText: "Batal",
       onOk: async () => {
         try {
-          await axios.delete(`https://be-sigap.tifpsdku.com/api/users/${item.id_user}`, {
+          await axios.delete(`http://localhost:8000/api/users/${item.id_user}`, {
             headers: { Authorization: `Bearer ${authToken}` },
           });
           getUsers();
@@ -99,12 +99,12 @@ const UserManagement = () => {
   const handleSubmit = async (values) => {
     try {
       if (modalType === "create") {
-        await axios.post("https://be-sigap.tifpsdku.com/api/users", values, {
+        await axios.post("http://localhost:8000/api/users", values, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         notification.success({ message: "Pengguna berhasil ditambahkan!" });
       } else if (modalType === "edit") {
-        await axios.put(`https://be-sigap.tifpsdku.com/api/users/${selectedData.id_user}`, values, {
+        await axios.put(`http://localhost:8000/api/users/${selectedData.id_user}`, values, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         notification.success({ message: "Pengguna berhasil diperbarui!" });

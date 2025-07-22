@@ -44,7 +44,7 @@ const DataNavbar = () => {
 
   const getNavbarItems = async () => {
     try {
-      const response = await axios.get("https://be-sigap.tifpsdku.com/api/superadmin/navbar", {
+      const response = await axios.get("http://localhost:8000/api/superadmin/navbar", {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setData(response.data);
@@ -56,7 +56,7 @@ const DataNavbar = () => {
 
   const fetchParentItems = async () => {
     try {
-      const response = await axios.get("https://be-sigap.tifpsdku.com/api/superadmin/navbar", {
+      const response = await axios.get("http://localhost:8000/api/superadmin/navbar", {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       // Filter hanya item yang bisa menjadi parent (type dropdown atau link)
@@ -98,7 +98,7 @@ const DataNavbar = () => {
   const handleTogglePublish = async (id, currentStatus) => {
     try {
       await axios.put(
-        `https://be-sigap.tifpsdku.com/api/superadmin/navbar/${id}/toggle-publish`,
+        `http://localhost:8000/api/superadmin/navbar/${id}/toggle-publish`,
         {},
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
@@ -121,7 +121,7 @@ const DataNavbar = () => {
       onOk: async () => {
         try {
           await axios.delete(
-            `https://be-sigap.tifpsdku.com/api/superadmin/navbar/${item.id}`,
+            `http://localhost:8000/api/superadmin/navbar/${item.id}`,
             { headers: { Authorization: `Bearer ${authToken}` } }
           );
           getNavbarItems();
@@ -138,14 +138,14 @@ const DataNavbar = () => {
     try {
       if (modalType === "create") {
         await axios.post(
-          "https://be-sigap.tifpsdku.com/api/superadmin/navbar",
+          "http://localhost:8000/api/superadmin/navbar",
           values,
           { headers: { Authorization: `Bearer ${authToken}` } }
         );
         notification.success({ message: "Menu berhasil ditambahkan!" });
       } else if (modalType === "edit") {
         await axios.put(
-          `https://be-sigap.tifpsdku.com/api/superadmin/navbar/${selectedData.id}`,
+          `http://localhost:8000/api/superadmin/navbar/${selectedData.id}`,
           values,
           { headers: { Authorization: `Bearer ${authToken}` } }
         );

@@ -13,7 +13,7 @@ const Hero = () => {
   useEffect(() => {
     const fetchSlides = async () => {
       try {
-        const response = await axios.get("https://be-sigap.tifpsdku.com/api/hero-slides");
+        const response = await axios.get("http://localhost:8000/api/hero-slides");
         setSlides(response.data);
         setLoading(false);
       } catch (error) {
@@ -57,7 +57,7 @@ const Hero = () => {
     <section
       className="hero relative bg-cover bg-center h-screen overflow-hidden"
       style={{
-        backgroundImage: `url(https://be-sigap.tifpsdku.com/storage/${image_path})`,
+        backgroundImage: `url(http://localhost:8000/storage/${image_path})`,
       }}
     >
       {/* Overlay untuk transisi */}

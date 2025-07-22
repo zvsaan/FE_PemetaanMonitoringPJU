@@ -32,7 +32,7 @@ export default class DashboardPageSuperAdmin extends Component {
     const authToken = localStorage.getItem('authToken'); // Pastikan auth token tersedia
     if (authToken) {
       axios
-        .get('https://be-sigap.tifpsdku.com/api/superadmin/dashboard-data', {
+        .get('http://localhost:8000/api/superadmin/dashboard-data', {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },

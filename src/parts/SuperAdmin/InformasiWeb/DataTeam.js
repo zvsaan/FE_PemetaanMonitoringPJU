@@ -26,7 +26,7 @@ const DataTeam = () => {
 
   const getTeam = async () => {
     try {
-      const response = await axios.get("https://be-sigap.tifpsdku.com/api/teams", {
+      const response = await axios.get("http://localhost:8000/api/teams", {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -41,7 +41,7 @@ const DataTeam = () => {
 
   const createTeam = async (formData) => {
     try {
-      await axios.post("https://be-sigap.tifpsdku.com/api/teams", formData, {
+      await axios.post("http://localhost:8000/api/teams", formData, {
         headers: {
           Authorization: `Bearer ${authToken}`,
           "Content-Type": "multipart/form-data",
@@ -56,7 +56,7 @@ const DataTeam = () => {
 
   const updateTeam = async (id, formData) => {
     try {
-      await axios.post(`https://be-sigap.tifpsdku.com/api/teams/${id}`, formData, {
+      await axios.post(`http://localhost:8000/api/teams/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${authToken}`,
           "Content-Type": "multipart/form-data",
@@ -71,7 +71,7 @@ const DataTeam = () => {
 
   const deleteTeam = async (id) => {
     try {
-      await axios.delete(`https://be-sigap.tifpsdku.com/api/teams/${id}`, {
+      await axios.delete(`http://localhost:8000/api/teams/${id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -150,7 +150,7 @@ const DataTeam = () => {
     {
       title: "Foto",
       dataIndex: "photo_url",
-      render: (text) => text && <img src={`https://be-sigap.tifpsdku.com${text}`} alt="Foto" style={{ width: 50, height: 50 }} />,
+      render: (text) => text && <img src={`http://localhost:8000${text}`} alt="Foto" style={{ width: 50, height: 50 }} />,
     },
     {
       title: 'Aksi',

@@ -37,7 +37,7 @@ const DataRiwayatPanel = () => {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `https://be-sigap.tifpsdku.com/api/visitor/riwayat-panel/${panelId}`,
+        `http://localhost:8000/api/visitor/riwayat-panel/${panelId}`,
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }

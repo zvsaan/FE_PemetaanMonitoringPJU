@@ -20,7 +20,7 @@ const Berita = () => {
   const fetchBerita = (page) => {
     setIsLoading(true); // Start loading
     axios
-      .get(`https://be-sigap.tifpsdku.com/api/userberita?page=${page}`)
+      .get(`http://localhost:8000/api/userberita?page=${page}`)
       .then((response) => {
         setBerita(response.data.data);
         setPagination({
@@ -112,7 +112,7 @@ const Berita = () => {
           <div key={item.id_berita} className="flex mb-10">
             <div className="w-1/3 mr-5">
               <img
-                src={`https://be-sigap.tifpsdku.com${item.image_url}`}
+                src={`http://localhost:8000${item.image_url}`}
                 alt={item.title}
                 className="w-full h-auto rounded-lg shadow-lg"
               />

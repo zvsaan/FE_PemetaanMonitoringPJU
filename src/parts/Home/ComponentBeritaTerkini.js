@@ -10,7 +10,7 @@ const ComponentBeritaTerkini = () => {
   useEffect(() => {
     // Fetch the latest 3 news articles when the component mounts
     axios
-      .get('https://be-sigap.tifpsdku.com/api/userberitaterbaru')
+      .get('http://localhost:8000/api/userberitaterbaru')
       .then((response) => {
         setBeritaTerkini(response.data); // Set the fetched berita to the state
         setLoading(false); // Set loading to false setelah data berhasil diambil
@@ -45,7 +45,7 @@ const ComponentBeritaTerkini = () => {
             <Zoom triggerOnce delay={600 + index * 200} key={item.id_berita}>
             <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg relative aspect-[3/2]">
               <img
-                src={`https://be-sigap.tifpsdku.com${item.image_url}`}
+                src={`http://localhost:8000${item.image_url}`}
                 alt={item.title}
                 className="w-full h-full object-cover"
               />

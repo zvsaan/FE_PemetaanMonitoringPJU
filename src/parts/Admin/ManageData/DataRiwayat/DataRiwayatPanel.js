@@ -43,7 +43,7 @@ const DataRiwayatPanel = () => {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `https://be-sigap.tifpsdku.com/api/riwayat-panel/${panelId}`,
+        `http://localhost:8000/api/riwayat-panel/${panelId}`,
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }
@@ -97,7 +97,7 @@ const DataRiwayatPanel = () => {
       onOk: async () => {
         try {
           await axios.delete(
-            `https://be-sigap.tifpsdku.com/api/riwayat-panel/${idRiwayat}`,
+            `http://localhost:8000/api/riwayat-panel/${idRiwayat}`,
             {
               headers: { Authorization: `Bearer ${authToken}` },
             }
@@ -140,7 +140,7 @@ const DataRiwayatPanel = () => {
   const handleExport = async () => {
     setIsExporting(true);
     try {
-        const response = await axios.get(`https://be-sigap.tifpsdku.com/api/export-riwayat-panel/riwayat/${id}`, {
+        const response = await axios.get(`http://localhost:8000/api/export-riwayat-panel/riwayat/${id}`, {
             headers: { Authorization: `Bearer ${authToken}` },
             responseType: 'blob',
         });
@@ -220,13 +220,13 @@ const DataRiwayatPanel = () => {
       };
   
       if (modalType === "create") {
-        await axios.post(`https://be-sigap.tifpsdku.com/api/riwayat-panel`, payload, {
+        await axios.post(`http://localhost:8000/api/riwayat-panel`, payload, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         notification.success({ message: "Riwayat Panel berhasil ditambahkan" });
       } else {
         await axios.put(
-          `https://be-sigap.tifpsdku.com/api/riwayat-panel/${selectedData.id_riwayat_panel}`,
+          `http://localhost:8000/api/riwayat-panel/${selectedData.id_riwayat_panel}`,
           payload,
           { headers: { Authorization: `Bearer ${authToken}` } }
         );

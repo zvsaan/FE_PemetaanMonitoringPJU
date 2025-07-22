@@ -71,7 +71,7 @@ const statusColors = {
         const headers = {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`,
         };
-        const panelResponse = await axios.get('https://be-sigap.tifpsdku.com/api/visitor/panels-with-status', { headers });
+        const panelResponse = await axios.get('http://localhost:8000/api/visitor/panels-with-status', { headers });
         setPanelData(panelResponse.data || []);
       } catch (error) {
         console.error('Error loading data:', error);

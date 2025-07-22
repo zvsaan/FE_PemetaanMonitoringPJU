@@ -29,7 +29,7 @@ const DataKonstruksi = () => {
   const getDataKonstruksi = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get('https://be-sigap.tifpsdku.com/api/visitor/konstruksi', {
+      const response = await axios.get('http://localhost:8000/api/visitor/konstruksi', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setAllData(response.data);
@@ -43,7 +43,7 @@ const DataKonstruksi = () => {
 
   const fetchPjuOptions = async () => {
     try {
-      const response = await axios.get('https://be-sigap.tifpsdku.com/api/visitor/pjus', {
+      const response = await axios.get('http://localhost:8000/api/visitor/pjus', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       const usedPjuIds = allData.map((item) => item.no_tiang_baru);

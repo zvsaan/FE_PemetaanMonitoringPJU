@@ -56,7 +56,7 @@ const DataPengaduan = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.get("https://be-sigap.tifpsdku.com/api/pengaduan", {
+      const response = await axios.get("http://localhost:8000/api/pengaduan", {
         headers: { Authorization: `Bearer ${authToken}` },
         params: {
           year: selectedYear,
@@ -79,7 +79,7 @@ const DataPengaduan = () => {
   useEffect(() => {
     const fetchOptionsPanel = async () => {
       try {
-        const response = await axios.get("https://be-sigap.tifpsdku.com/api/panels", {
+        const response = await axios.get("http://localhost:8000/api/panels", {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         setOptionsPanel(response.data);
@@ -118,7 +118,7 @@ const DataPengaduan = () => {
 
   const handleDownloadTemplate = async () => {
     try {
-      const response = await fetch("https://be-sigap.tifpsdku.com/api/export-template", {
+      const response = await fetch("http://localhost:8000/api/export-template", {
         method: "GET",
         headers: {
           Accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -147,7 +147,7 @@ const DataPengaduan = () => {
     formData.append("file", file);
 
     try {
-      const response = await axios.post("https://be-sigap.tifpsdku.com/api/import-pengaduan", formData, {
+      const response = await axios.post("http://localhost:8000/api/import-pengaduan", formData, {
         headers: {
           Authorization: `Bearer ${authToken}`,
           "Content-Type": "multipart/form-data",
@@ -175,7 +175,7 @@ const DataPengaduan = () => {
 
     try {
       const response = await fetch(
-        `https://be-sigap.tifpsdku.com/api/pengaduan/export_excel?month=${selectedMonth}&year=${selectedYear}`,
+        `http://localhost:8000/api/pengaduan/export_excel?month=${selectedMonth}&year=${selectedYear}`,
         {
           method: "GET",
           headers: {
@@ -212,7 +212,7 @@ const DataPengaduan = () => {
   const handlePanelChange = async (value) => {
     try {
       const response = await axios.get(
-        `https://be-sigap.tifpsdku.com/api/panel/${value}/validate`,
+        `http://localhost:8000/api/panel/${value}/validate`,
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }
@@ -235,7 +235,7 @@ const DataPengaduan = () => {
   useEffect(() => {
     const fetchAllPju = async () => {
       try {
-        const response = await axios.get("https://be-sigap.tifpsdku.com/api/pjus", {
+        const response = await axios.get("http://localhost:8000/api/pjus", {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         setAllPju(response.data);
@@ -252,7 +252,7 @@ const DataPengaduan = () => {
       const fetchLokasi = async () => {
         try {
           const response = await axios.get(
-            `https://be-sigap.tifpsdku.com/api/panel/location/${selectedPanelId}`,
+            `http://localhost:8000/api/panel/location/${selectedPanelId}`,
             {
               headers: { Authorization: `Bearer ${authToken}` },
             }
@@ -389,7 +389,7 @@ const DataPengaduan = () => {
 
       if (isEditMode && selectedPengaduan) {
         await axios.post(
-          `https://be-sigap.tifpsdku.com/api/pengaduan/${selectedPengaduan.id_pengaduan}?_method=PUT`,
+          `http://localhost:8000/api/pengaduan/${selectedPengaduan.id_pengaduan}?_method=PUT`,
           formData,
           {
             headers: {
@@ -400,7 +400,7 @@ const DataPengaduan = () => {
         );
         notification.success({ message: "Data pengaduan berhasil diperbarui" });
       } else {
-        await axios.post("https://be-sigap.tifpsdku.com/api/pengaduan", formData, {
+        await axios.post("http://localhost:8000/api/pengaduan", formData, {
           headers: {
             Authorization: `Bearer ${authToken}`,
             "Content-Type": "multipart/form-data",
@@ -441,7 +441,7 @@ const DataPengaduan = () => {
       onOk: async () => {
         try {
           await axios.delete(
-            `https://be-sigap.tifpsdku.com/api/pengaduan/${record.id_pengaduan}`,
+            `http://localhost:8000/api/pengaduan/${record.id_pengaduan}`,
             {
               headers: { Authorization: `Bearer ${authToken}` },
             }
@@ -471,7 +471,7 @@ const DataPengaduan = () => {
     if (!lokasi && record.panel_id) {
       try {
         const response = await axios.get(
-          `https://be-sigap.tifpsdku.com/api/panel/location/${record.panel_id}`,
+          `http://localhost:8000/api/panel/location/${record.panel_id}`,
           { headers: { Authorization: `Bearer ${authToken}` } }
         );
         const { nama_jalan, desa_kel, kecamatan } = response.data;
@@ -488,7 +488,7 @@ const DataPengaduan = () => {
           uid: '-1',
           name: record.foto_pengaduan,
           status: 'done',
-          url: `https://be-sigap.tifpsdku.com/storage/foto_pengaduan/${record.foto_pengaduan}`,
+          url: `http://localhost:8000/storage/foto_pengaduan/${record.foto_pengaduan}`,
         },
       ];
     }
@@ -553,7 +553,7 @@ const DataPengaduan = () => {
       render: (foto_pengaduan) =>
         foto_pengaduan ? (
           <img
-            src={`https://be-sigap.tifpsdku.com/storage/${foto_pengaduan}`}
+            src={`http://localhost:8000/storage/${foto_pengaduan}`}
             alt="Foto Pengaduan"
             style={{ height: "50px" }}
           />
@@ -570,7 +570,7 @@ const DataPengaduan = () => {
       render: (foto_penanganan) =>
         foto_penanganan ? (
           <img
-            src={`https://be-sigap.tifpsdku.com/storage/${foto_penanganan}`}
+            src={`http://localhost:8000/storage/${foto_penanganan}`}
             alt="Foto Penanganan"
             style={{ height: "50px" }}
           />

@@ -16,7 +16,7 @@ const HeaderVisitor = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post('https://be-sigap.tifpsdku.com/api/logout', {}, {
+      await axios.post('http://localhost:8000/api/logout', {}, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`
         }

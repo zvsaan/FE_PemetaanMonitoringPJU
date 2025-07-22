@@ -28,7 +28,7 @@ const DataPJU = () => {
   const getPjus = async () => {
     setIsLoading(true); // Mulai loading
     try {
-      const response = await axios.get('https://be-sigap.tifpsdku.com/api/visitor/pjus', {
+      const response = await axios.get('http://localhost:8000/api/visitor/pjus', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setAllData(response.data);
@@ -44,7 +44,7 @@ const DataPJU = () => {
   // Fetch daftar kecamatan
   const getKecamatanList = async () => {
     try {
-      const response = await axios.get('https://be-sigap.tifpsdku.com/api/visitor/kecamatan-list', {
+      const response = await axios.get('http://localhost:8000/api/visitor/kecamatan-list', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setKecamatanList(response.data.map(item => ({ value: item.kecamatan, label: item.kecamatan })));

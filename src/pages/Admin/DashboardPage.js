@@ -44,7 +44,7 @@ export default class DashboardPage extends Component {
     const authToken = localStorage.getItem('authToken'); // Pastikan auth token tersedia
     if (authToken) {
       axios
-        .get('https://be-sigap.tifpsdku.com/api/dashboard-data', {
+        .get('http://localhost:8000/api/dashboard-data', {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },

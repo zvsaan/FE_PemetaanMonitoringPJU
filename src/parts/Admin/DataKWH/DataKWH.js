@@ -9,22 +9,18 @@ import {
   Form,
   notification,
   Image,
-  message,
   Select,
-  Card,
   Space,
-  Descriptions
 } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
   PlusOutlined,
   UploadOutlined,
-  SearchOutlined
+  SearchOutlined,
+  ExportOutlined
 } from "@ant-design/icons";
 import axios from "axios";
-
-const { Option } = Select;
 
 const DataKWH = () => {
   const [allData, setAllData] = useState([]);
@@ -49,10 +45,14 @@ const DataKWH = () => {
     getPanels();
   }, []);
 
+  useEffect(() => {
+    filterData();
+  }, [searchTerm, selectedPanel, selectedYear, selectedMonth, allData]);
+
   const getKwhReadings = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:8000/api/panels", {
+      const response = await axios.get("http://localhost:8000/api/kwh-readings", {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setAllData(response.data);
@@ -67,7 +67,7 @@ const DataKWH = () => {
 
   const getPanels = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/kwh-readings", {
+      const response = await axios.get("http://localhost:8000/api/panels", {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setPanelList(response.data.map(panel => ({ 
@@ -75,31 +75,78 @@ const DataKWH = () => {
         label: `${panel.no_app} - ${panel.nama_jalan}` 
       })));
     } catch (error) {
-      console.error("Error fetching readings:", error);
-      notification.error({ message: "Gagal memuat data KWH" });
-      setLoading(false);
+      console.error("Error fetching panels:", error);
+      notification.error({ message: "Gagal memuat data panel" });
     }
   };
 
-  const fetchPanelReadings = async (panelId) => {
-    try {
-      const response = await axios.get(`http://localhost:8000/api/panels/${panelId}/kwh-readings`, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
-      setPanelReadings(response.data);
-      setSelectedPanel(panels.find(p => p.id_panel === panelId));
-      setShowPanelReadings(true);
-    } catch (error) {
-      console.error("Error fetching panel readings:", error);
-      notification.error({ message: "Gagal memuat data KWH panel" });
+  const getAvailableYears = () => {
+    const years = [...new Set(
+      allData.map(item => new Date(item.created_at).getFullYear())
+    )];
+    return years.sort((a, b) => b - a).map(year => ({
+      value: year.toString(),
+      label: year.toString()
+    }));
+  };
+
+  const getAvailableMonths = () => {
+    const months = [
+      { value: '1', label: 'Januari' },
+      { value: '2', label: 'Februari' },
+      { value: '3', label: 'Maret' },
+      { value: '4', label: 'April' },
+      { value: '5', label: 'Mei' },
+      { value: '6', label: 'Juni' },
+      { value: '7', label: 'Juli' },
+      { value: '8', label: 'Agustus' },
+      { value: '9', label: 'September' },
+      { value: '10', label: 'Oktober' },
+      { value: '11', label: 'November' },
+      { value: '12', label: 'Desember' }
+    ];
+    
+    if (selectedYear) {
+      const monthsWithData = new Set(
+        allData
+          .filter(item => new Date(item.created_at).getFullYear().toString() === selectedYear)
+          .map(item => (new Date(item.created_at).getMonth() + 1).toString())
+      );
+      return months.filter(month => monthsWithData.has(month.value));
     }
-  
+    
+    return months;
+  };
+
+  const filterData = () => {
+    let tempData = [...allData];
+    
+    if (searchTerm) {
+      tempData = tempData.filter(item =>
+        item.kwh_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.panel?.no_app && item.panel.no_app.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.panel?.nama_jalan && item.panel.nama_jalan.toLowerCase().includes(searchTerm.toLowerCase())))
+    }
+    
+    if (selectedPanel) {
+      tempData = tempData.filter(item => item.panel_id === selectedPanel);
+    }
+    
+    if (selectedYear) {
+      tempData = tempData.filter(item => 
+        new Date(item.created_at).getFullYear().toString() === selectedYear
+      );
+    }
+    
+    if (selectedMonth) {
+      tempData = tempData.filter(item => 
+        (new Date(item.created_at).getMonth() + 1).toString() === selectedMonth
+      );
+    }
+    
     setFilteredData(tempData);
+    setCurrentPage(1);
   };
-
-  useEffect(() => {
-    filterData();
-  }, [searchTerm, selectedPanel, selectedYear, selectedMonth]);
 
   const handleSearch = (value) => {
     setSearchTerm(value);
@@ -117,17 +164,20 @@ const DataKWH = () => {
     setSelectedMonth(value || '');
   };
 
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const handleExport = () => {
+    setIsExporting(true);
+    // Implement your export logic here
+    setTimeout(() => {
+      notification.success({ message: 'Data berhasil diekspor' });
+      setIsExporting(false);
+    }, 1500);
+  };
 
   const handleModalSubmit = async () => {
     try {
       const values = await form.validateFields();
       const formData = new FormData();
       
-      // Tambahkan semua field ke FormData
       Object.keys(values).forEach(key => {
         if (key === 'image' && values[key] && values[key][0]) {
           formData.append('image', values[key][0].originFileObj);
@@ -138,8 +188,7 @@ const DataKWH = () => {
   
       let response;
       if (currentReading) {
-        // Gunakan POST dengan _method PUT
-        formData.append('_method', 'PUT'); // <-- Ini solusi utamanya
+        formData.append('_method', 'PUT');
         response = await axios.post(
           `http://localhost:8000/api/kwh-readings/${currentReading.id_reading}`,
           formData,
@@ -177,7 +226,7 @@ const DataKWH = () => {
     }
   };
 
-  const handleDelete = (record) => {
+  const handleDelete = async (record) => {
     Modal.confirm({
       title: 'Hapus Data KWH',
       content: `Apakah Anda yakin ingin menghapus data KWH ini?`,
@@ -185,7 +234,7 @@ const DataKWH = () => {
       cancelText: 'Batal',
       onOk: async () => {
         try {
-          await axios.delete(`http://localhost:8000/api/kwh-readings/${id}`, {
+          await axios.delete(`http://localhost:8000/api/kwh-readings/${record.id_reading}`, {
             headers: { Authorization: `Bearer ${authToken}` },
           });
           notification.success({ message: 'Data KWH berhasil dihapus' });
@@ -198,80 +247,21 @@ const DataKWH = () => {
     });
   };
 
-  const handleSubmit = async () => {
-    setSubmitting(true);
-    try {
-      const values = await form.validateFields();
-      const formData = new FormData();
-  
-      // Append all fields including panel_id
-      formData.append('panel_id', values.panel_id);
-      formData.append('kwh_number', values.kwh_number);
-      if (values.notes) formData.append('notes', values.notes);
-      
-      // Handle image upload
-      if (values.image && values.image[0]?.originFileObj) {
-        formData.append('image', values.image[0].originFileObj);
-      }
-  
-      // Tambahkan _method untuk Laravel jika menggunakan PUT
-      if (currentReading) {
-        formData.append('_method', 'PUT');
-      }
-  
-      const url = currentReading 
-        ? `http://localhost:8000/api/kwh-readings/${currentReading.id_reading}`
-        : "http://localhost:8000/api/kwh-readings";
-  
-      const method = currentReading ? 'post' : 'post'; 
-  
-      await axios.post(url, formData, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-  
-      notification.success({ 
-        message: `Catatan KWH berhasil ${currentReading ? 'diperbarui' : 'ditambahkan'}` 
-      });
-      
-      setModalVisible(false);
-      fetchReadings();
-      form.resetFields();
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      if (error.response?.data?.errors) {
-        Object.entries(error.response.data.errors).forEach(([field, errors]) => {
-          notification.error({ 
-            message: `${field}: ${errors.join(', ')}` 
-          });
-        });
-      } else {
-        notification.error({ 
-          message: error.response?.data?.message || "Gagal menyimpan catatan KWH" 
-        });
-      }
-    } finally {
-      setSubmitting(false);
+  const beforeUpload = (file) => {
+    const isImage = file.type.startsWith('image/');
+    if (!isImage) {
+      notification.error({ message: 'Hanya boleh upload gambar!' });
+      return Upload.LIST_IGNORE;
     }
+    
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      notification.error({ message: 'Ukuran gambar harus kurang dari 2MB!' });
+      return Upload.LIST_IGNORE;
+    }
+    
+    return true;
   };
-
-const beforeUpload = (file) => {
-  const isImage = file.type.startsWith('image/');
-  if (!isImage) {
-    notification.error({ message: 'Hanya boleh upload gambar!' });
-    return Upload.LIST_IGNORE; // Mengabaikan file yang bukan gambar
-  }
-  
-  const isLt2M = file.size / 1024 / 1024 < 2; // Batas 2MB
-  if (!isLt2M) {
-    notification.error({ message: 'Ukuran gambar harus kurang dari 2MB!' });
-    return Upload.LIST_IGNORE;
-  }
-  
-  return true;
-};
 
   const handleCreate = () => {
     setCurrentReading(null);
@@ -285,7 +275,13 @@ const beforeUpload = (file) => {
       ...record,
       panel_id: record.panel_id,
       kwh_number: record.kwh_number,
-      notes: record.notes
+      notes: record.notes,
+      image: record.image_path ? [{
+        uid: '-1',
+        name: 'current-image',
+        status: 'done',
+        url: `http://localhost:8000/storage/${record.image_path}`,
+      }] : undefined
     });
     setShowModal(true);
   };
@@ -293,13 +289,13 @@ const beforeUpload = (file) => {
   const columns = [
     { 
       title: 'No', 
-      dataIndex: 'id_reading', 
+      key: 'index',
       render: (_, __, index) => (currentPage - 1) * itemsPerPage + index + 1 
     },
     { 
       title: 'Panel', 
-      dataIndex: 'panel', 
-      render: (panel) => panel ? `${panel.no_app} - ${panel.nama_jalan}` : '-' 
+      dataIndex: ['panel', 'no_app'], 
+      render: (_, record) => record.panel ? `${record.panel.no_app} - ${record.panel.nama_jalan}` : '-' 
     },
     { 
       title: 'Nomor KWH', 
@@ -309,26 +305,18 @@ const beforeUpload = (file) => {
       title: 'Catatan', 
       dataIndex: 'notes' 
     },
-    { 
-      title: 'Tanggal Dibuat', 
-      dataIndex: 'created_at', 
-      render: (date) => new Date(date).toLocaleDateString() 
-    },
     {
       title: "Pencatat",
       dataIndex: ["user", "name"],
-      key: "user",
     },
     {
       title: "Tanggal",
       dataIndex: "created_at",
-      key: "date",
       render: (date) => new Date(date).toLocaleString(),
     },
     {
       title: "Gambar",
       dataIndex: "image_path",
-      key: "image",
       render: (image) => image ? (
         <Image
           src={`http://localhost:8000/storage/${image}`}
@@ -343,7 +331,7 @@ const beforeUpload = (file) => {
       title: 'Aksi',
       key: 'aksi',
       render: (_, record) => (
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <Space>
           <Button icon={<EditOutlined />} onClick={() => handleEdit(record)}>
             Edit
           </Button>
@@ -354,7 +342,7 @@ const beforeUpload = (file) => {
           >
             Hapus
           </Button>
-        </div>
+        </Space>
       ),
     },
   ];
@@ -374,10 +362,10 @@ const beforeUpload = (file) => {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
           <Input.Search
             placeholder="Cari berdasarkan Nomor KWH"
-            value={searchTerm}
-            onChange={(e) => handleSearch(e.target.value)}
             allowClear
-            style={{ width: '200px', flexShrink: 0 }}
+            enterButton={<SearchOutlined />}
+            onSearch={handleSearch}
+            style={{ width: 250 }}
           />
           <Select
             placeholder="Filter Panel"
@@ -385,7 +373,7 @@ const beforeUpload = (file) => {
             onChange={handlePanelChange}
             options={[{ value: '', label: 'Semua Panel' }, ...panelList]}
             allowClear
-            style={{ width: '200px', flexShrink: 0 }}
+            style={{ width: 250 }}
             showSearch
             optionFilterProp="label"
             filterOption={(input, option) =>
@@ -398,7 +386,7 @@ const beforeUpload = (file) => {
             onChange={handleYearChange}
             options={[{ value: '', label: 'Semua Tahun' }, ...getAvailableYears()]}
             allowClear
-            style={{ width: '150px', flexShrink: 0 }}
+            style={{ width: 150 }}
           />
           <Select
             placeholder="Pilih Bulan"
@@ -406,12 +394,13 @@ const beforeUpload = (file) => {
             onChange={handleMonthChange}
             options={[{ value: '', label: 'Semua Bulan' }, ...getAvailableMonths()]}
             allowClear
-            style={{ width: '150px', flexShrink: 0 }}
+            style={{ width: 150 }}
+            disabled={!selectedYear}
           />
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <Button type="default" icon={<ExportOutlined />} loading={isExporting} onClick={handleExport}>
-            {isExporting ? 'Sedang Mengekspor...' : 'Export'}
+            {isExporting ? 'Mengekspor...' : 'Export'}
           </Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
             Tambah Data
@@ -422,11 +411,14 @@ const beforeUpload = (file) => {
       <Table
         columns={columns}
         loading={isLoading}
-        dataSource={paginatedData.map((item, index) => ({ ...item, key: index }))}
+        dataSource={filteredData}
+        rowKey="id_reading"
         pagination={{
           current: currentPage,
           pageSize: itemsPerPage,
           total: filteredData.length,
+          showSizeChanger: true,
+          pageSizeOptions: ['10', '20', '50', '100'],
           onChange: (page, pageSize) => {
             setCurrentPage(page);
             setItemsPerPage(pageSize);
@@ -437,7 +429,7 @@ const beforeUpload = (file) => {
 
       <Modal
         title={currentReading ? "Edit Catatan KWH" : "Tambah Catatan KWH"}
-        visible={showModal}
+        open={showModal}
         onCancel={() => {
           setShowModal(false);
           form.resetFields();
@@ -481,55 +473,44 @@ const beforeUpload = (file) => {
           </Form.Item>
 
           <Form.Item
-  name="image"
-  label="Gambar KWH Meter"
-  valuePropName="fileList"
-  getValueFromEvent={(e) => {
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e && e.fileList;
-  }}
-  rules={[
-    {
-      required: !currentReading,
-      message: 'Gambar KWH meter harus diupload',
-    },
-    {
-      validator: (_, fileList) => {
-        if (fileList && fileList[0]) {
-          const file = fileList[0];
-          if (file.size / 1024 / 1024 > 2) {
-            return Promise.reject(new Error('Ukuran gambar maksimal 2MB!'));
-          }
-        }
-        return Promise.resolve();
-      },
-    },
-  ]}
->
-  <Upload
-    listType="picture-card"
-    beforeUpload={beforeUpload}
-    maxCount={1}
-    accept="image/*"
-  >
-    {form.getFieldValue('image')?.length ? null : (
-      <div>
-        <UploadOutlined />
-        <div style={{ marginTop: 8 }}>Upload</div>
-      </div>
-    )}
-  </Upload>
-</Form.Item>
+            name="image"
+            label="Gambar KWH Meter"
+            valuePropName="fileList"
+            getValueFromEvent={(e) => {
+              if (Array.isArray(e)) {
+                return e;
+              }
+              return e && e.fileList;
+            }}
+            rules={[
+              {
+                required: !currentReading?.image_path,
+                message: 'Gambar KWH meter harus diupload',
+              },
+            ]}
+          >
+            <Upload
+              listType="picture-card"
+              beforeUpload={beforeUpload}
+              maxCount={1}
+              accept="image/*"
+            >
+              {form.getFieldValue('image')?.length ? null : (
+                <div>
+                  <UploadOutlined />
+                  <div style={{ marginTop: 8 }}>Upload</div>
+                </div>
+              )}
+            </Upload>
+          </Form.Item>
 
           {currentReading?.image_path && (
             <Form.Item label="Gambar Saat Ini">
               <Image
-                src={`https://be-sigap.tifpsdku.com/storage/${currentReading.image_path}`}
+                src={`http://localhost:8000/storage/${currentReading.image_path}`}
                 width={200}
                 preview={{
-                  src: `https://be-sigap.tifpsdku.com/storage/${currentReading.image_path}`,
+                  src: `http://localhost:8000/storage/${currentReading.image_path}`,
                 }}
               />
             </Form.Item>

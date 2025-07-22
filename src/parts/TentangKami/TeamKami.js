@@ -12,7 +12,7 @@ const TeamKami = () => {
   // Mengambil data dari API
   useEffect(() => {
     axios
-      .get('https://be-sigap.tifpsdku.com/api/userteams')
+      .get('http://localhost:8000/api/userteams')
       .then((response) => {
         setTeamData(response.data);
         setLoading(false);
@@ -65,7 +65,7 @@ const TeamKami = () => {
             >
               <div className="relative">
                 <img
-                  src={`https://be-sigap.tifpsdku.com${member.photo_url}`}
+                  src={`http://localhost:8000${member.photo_url}`}
                   alt={member.name}
                   className="w-full h-64 object-cover group-hover:opacity-80 transition-opacity duration-300"
                 />
@@ -94,7 +94,7 @@ const TeamKami = () => {
             <div className="flex flex-col lg:flex-row items-center gap-6">
               {/* Gambar di sebelah kiri */}
               <img
-                src={`https://be-sigap.tifpsdku.com${selectedMember.photo_url}`}
+                src={`http://localhost:8000${selectedMember.photo_url}`}
                 alt={selectedMember.name}
                 className="w-full lg:w-1/3 h-64 object-cover rounded-lg"
               />

@@ -44,7 +44,7 @@ const DataBerita = () => {
 
   const getBerita = async () => {
     try {
-      const response = await axios.get("https://be-sigap.tifpsdku.com/api/berita", {
+      const response = await axios.get("http://localhost:8000/api/berita", {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setData(response.data);
@@ -89,7 +89,7 @@ const DataBerita = () => {
     });
   
     // Set preview image dari data yang dipilih
-    setPreviewImage(item.image_url ? `https://be-sigap.tifpsdku.com${item.image_url}` : null);
+    setPreviewImage(item.image_url ? `http://localhost:8000${item.image_url}` : null);
   
     // Tampilkan modal
     setShowModal(true);
@@ -104,7 +104,7 @@ const DataBerita = () => {
       onOk: async () => {
         try {
           await axios.delete(
-            `https://be-sigap.tifpsdku.com/api/berita/${item.id_berita}`,
+            `http://localhost:8000/api/berita/${item.id_berita}`,
             {
               headers: { Authorization: `Bearer ${authToken}` },
             }
@@ -143,7 +143,7 @@ const DataBerita = () => {
     try {
       if (modalType === "create") {
         // Tambah data baru
-        await axios.post("https://be-sigap.tifpsdku.com/api/berita", formData, {
+        await axios.post("http://localhost:8000/api/berita", formData, {
           headers: {
             Authorization: `Bearer ${authToken}`,
             "Content-Type": "multipart/form-data",
@@ -153,7 +153,7 @@ const DataBerita = () => {
       } else if (modalType === "edit") {
         // Edit data yang sudah ada
         await axios.post(
-          `https://be-sigap.tifpsdku.com/api/berita/${selectedData.id_berita}`,
+          `http://localhost:8000/api/berita/${selectedData.id_berita}`,
           formData,
           {
             headers: {
@@ -208,7 +208,7 @@ const DataBerita = () => {
       render: (url) =>
         url ? (
           <img
-            src={`https://be-sigap.tifpsdku.com${url}`}
+            src={`http://localhost:8000${url}`}
             alt="berita"
             style={{ width: 50 }}
           />

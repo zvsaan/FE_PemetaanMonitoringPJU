@@ -19,7 +19,7 @@ const ImportRiwayatPJU = () => {
 
     setIsUploading(true);
     try {
-      const response = await axios.post("https://be-sigap.tifpsdku.com/api/import/riwayat-pju", formData, {
+      const response = await axios.post("http://localhost:8000/api/import/riwayat-pju", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,

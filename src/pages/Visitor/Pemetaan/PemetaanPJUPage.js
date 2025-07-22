@@ -58,7 +58,7 @@ const PemetaanPJUPage = () => {
     };
   
     axios
-      .get('https://be-sigap.tifpsdku.com/api/visitor/kecamatan-list', { headers })
+      .get('http://localhost:8000/api/visitor/kecamatan-list', { headers })
       .then((response) => setKecamatanList(response.data || []))
       .catch((error) => {
         console.error('Error fetching kecamatan list:', error);
@@ -91,7 +91,7 @@ const PemetaanPJUPage = () => {
   
       // Fetch PJU data
       axios
-        .get(`https://be-sigap.tifpsdku.com/api/visitor/pjus-with-status?kecamatan=${selectedKecamatan}`, { headers })
+        .get(`http://localhost:8000/api/visitor/pjus-with-status?kecamatan=${selectedKecamatan}`, { headers })
         .then((response) => {
           const data = response.data.data || [];
           setPjuData(data);

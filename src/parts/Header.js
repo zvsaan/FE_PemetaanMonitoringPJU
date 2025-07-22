@@ -14,7 +14,7 @@ const Header = () => {
   useEffect(() => {
     const fetchNavbarItems = async () => {
       try {
-        const response = await fetch('https://be-sigap.tifpsdku.com/api/navbar');
+        const response = await fetch('http://localhost:8000/api/navbar');
         const data = await response.json();
         setNavbarItems(data);
       } catch (error) {

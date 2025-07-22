@@ -15,7 +15,7 @@ const AdminProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get('https://be-sigap.tifpsdku.com/api/profile', {
+        const response = await axios.get('http://localhost:8000/api/profile', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('authToken')}`,
           },
@@ -53,7 +53,7 @@ const AdminProfile = () => {
     });
 
     try {
-      await axios.put('https://be-sigap.tifpsdku.com/api/profile', formData, {
+      await axios.put('http://localhost:8000/api/profile', formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`,
           'Content-Type': 'multipart/form-data',
@@ -108,7 +108,7 @@ const AdminProfile = () => {
           />
           {foto && typeof foto === 'string' && (
             <img
-              src={`https://be-sigap.tifpsdku.com/storage/fotos/${foto}`}
+              src={`http://localhost:8000/storage/fotos/${foto}`}
               alt="Profile"
               className="mt-2 w-20 h-20 object-cover rounded-full"
             />
